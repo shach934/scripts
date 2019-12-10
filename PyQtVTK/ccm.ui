@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OpenFOAM</class>
+ <widget class="QMainWindow" name="OpenFOAM">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1059</width>
+    <height>731</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>6</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>OpenFOAM</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normalon>:/1/OpenFOAM_icon.gif</normalon>
+   </iconset>
+  </property>
+  <widget class="QWidget" name="Window">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QSplitter" name="leftDomain">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QListWidget" name="pipLine">
+        <item>
+         <property name="text">
+          <string>Geometry</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Physics</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Material</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>fvSchemes</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>fvOption</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Solver</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QTextBrowser" name="propeties"/>
+      </widget>
+      <widget class="QSplitter" name="MainWindow">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="Geometry">
+         <property name="maximumSize">
+          <size>
+           <width>486</width>
+           <height>52</height>
+          </size>
+         </property>
+         <attribute name="title">
+          <string>Geometry</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QFrame" name="geoFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="Monitor">
+         <property name="maximumSize">
+          <size>
+           <width>486</width>
+           <height>52</height>
+          </size>
+         </property>
+         <attribute name="title">
+          <string>Monitor</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QFrame" name="monitorFrame">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QTextBrowser" name="output">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1059</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionWrite"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuGeometry">
+    <property name="title">
+     <string>Geometry</string>
+    </property>
+    <addaction name="actionz"/>
+   </widget>
+   <widget class="QMenu" name="menuSolver">
+    <property name="title">
+     <string>Solver</string>
+    </property>
+    <addaction name="actionfvSchemes"/>
+    <addaction name="actionfvOptions"/>
+    <addaction name="actionControl"/>
+    <addaction name="actionRun"/>
+    <addaction name="actionStop"/>
+    <addaction name="actionPostProcess"/>
+   </widget>
+   <widget class="QMenu" name="menuPhysics">
+    <property name="title">
+     <string>Physics</string>
+    </property>
+    <widget class="QMenu" name="menuHeat_transfer">
+     <property name="title">
+      <string>Heat transfer</string>
+     </property>
+     <addaction name="actionMuti_region"/>
+    </widget>
+    <addaction name="actionTurbulence"/>
+    <addaction name="actionMRF"/>
+    <addaction name="actionDynamic_Mesh"/>
+    <addaction name="actionRadiation"/>
+    <addaction name="actionMultiphase"/>
+    <addaction name="menuHeat_transfer"/>
+   </widget>
+   <widget class="QMenu" name="menuMaterial">
+    <property name="title">
+     <string>Material</string>
+    </property>
+    <addaction name="actionFluid"/>
+    <addaction name="actionSolid"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionNote"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionAlign_X"/>
+    <addaction name="actionAlign_X_2"/>
+    <addaction name="actionAlign_Y"/>
+    <addaction name="actionAligh_Y"/>
+    <addaction name="actionAligh_Z"/>
+    <addaction name="actionAligh_Z_2"/>
+    <addaction name="actionAlign_45"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuGeometry"/>
+   <addaction name="menuView"/>
+   <addaction name="menuPhysics"/>
+   <addaction name="menuMaterial"/>
+   <addaction name="menuSolver"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="separator"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionWrite"/>
+   <addaction name="actionRun"/>
+   <addaction name="actionStop"/>
+   <addaction name="actionQuit"/>
+   <addaction name="actionPostProcess"/>
+  </widget>
+  <widget class="QToolBar" name="rightBar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="separator"/>
+   <addaction name="actionControl"/>
+   <addaction name="actionz"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="baseSize">
+    <size>
+     <width>0</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::PreventContextMenu</enum>
+   </property>
+   <property name="toolTip">
+    <string>To see if it exists</string>
+   </property>
+  </widget>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/open.svg</normaloff>:/1/open.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionWrite">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/save.svg</normaloff>:/1/save.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Write</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/exit.svg</normaloff>:/1/exit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionTurbulence">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/turbulence.png</normaloff>:/1/turbulence.png</iconset>
+   </property>
+   <property name="text">
+    <string>Turbulence</string>
+   </property>
+  </action>
+  <action name="actionMRF">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/MRF.svg</normaloff>:/1/MRF.svg</iconset>
+   </property>
+   <property name="text">
+    <string>MRF</string>
+   </property>
+  </action>
+  <action name="actionDynamic_Mesh">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/dynamicMesh.svg</normaloff>:/1/dynamicMesh.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Dynamic Mesh</string>
+   </property>
+  </action>
+  <action name="actionRadiation">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/radiation.svg</normaloff>:/1/radiation.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Radiation</string>
+   </property>
+  </action>
+  <action name="actionMultiphase">
+   <property name="text">
+    <string>Multiphase</string>
+   </property>
+  </action>
+  <action name="actionfvSchemes">
+   <property name="text">
+    <string>fvSchemes</string>
+   </property>
+  </action>
+  <action name="actionfvOptions">
+   <property name="text">
+    <string>fvOptions</string>
+   </property>
+  </action>
+  <action name="actionControl">
+   <property name="text">
+    <string>Control </string>
+   </property>
+  </action>
+  <action name="actionz">
+   <property name="text">
+    <string>z==</string>
+   </property>
+  </action>
+  <action name="actionSplit_region">
+   <property name="text">
+    <string>Split region</string>
+   </property>
+  </action>
+  <action name="actionMuti_region">
+   <property name="text">
+    <string>Muti region</string>
+   </property>
+  </action>
+  <action name="actionFluid">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/waterDrop.svg</normaloff>:/1/waterDrop.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Fluid</string>
+   </property>
+  </action>
+  <action name="actionSolid">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/solid.svg</normaloff>:/1/solid.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Solid</string>
+   </property>
+  </action>
+  <action name="actionNote">
+   <property name="text">
+    <string>Note</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/start.svg</normaloff>:/1/start.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Run</string>
+   </property>
+  </action>
+  <action name="actionStop">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/stop.svg</normaloff>:/1/stop.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionPostProcess">
+   <property name="icon">
+    <iconset resource="images/icons.qrc">
+     <normaloff>:/1/paraview.png</normaloff>:/1/paraview.png</iconset>
+   </property>
+   <property name="text">
+    <string>PostProcess</string>
+   </property>
+  </action>
+  <action name="actionAlign_X">
+   <property name="text">
+    <string>Align X+</string>
+   </property>
+  </action>
+  <action name="actionAlign_X_2">
+   <property name="text">
+    <string>Align X-</string>
+   </property>
+  </action>
+  <action name="actionAlign_Y">
+   <property name="text">
+    <string>Align Y+</string>
+   </property>
+  </action>
+  <action name="actionAligh_Y">
+   <property name="text">
+    <string>Aligh Y-</string>
+   </property>
+  </action>
+  <action name="actionAligh_Z">
+   <property name="text">
+    <string>Aligh Z+</string>
+   </property>
+  </action>
+  <action name="actionAligh_Z_2">
+   <property name="text">
+    <string>Aligh Z-</string>
+   </property>
+  </action>
+  <action name="actionAlign_45">
+   <property name="text">
+    <string>Align 45°</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="images/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
