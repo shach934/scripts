@@ -1,2 +1,3 @@
-simple gui for OpenFoam. 
-To config, run, monitor the openfoam case start from ANSA mesh and to paraview.
+simple gui for openfoam. 
+import ansa mesh to config boundary condition, rotation, radiation, numerical model... 
+submit to run and monitor the residual
