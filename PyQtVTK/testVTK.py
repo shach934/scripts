@@ -1,123 +1,64 @@
-import vtk
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
-class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
-    def __init__(self, parent=None):
-        self.AddObserver("LeftButtonPressEvent", self.leftButtonPressEvent)
+"""
+ZetCode PyQt5 tutorial
 
-    def leftButtonPressEvent(self, obj, event):
-        self.OnLeftButtonDown()
+In this example, we select a file with a
+QFileDialog and display its contents
+in a QTextEdit.
 
-grid = vtk.vtkUnstructuredGrid()
-points = vtk.vtkPoints()
-points.InsertNextPoint(0, 0, 0)
-points.InsertNextPoint(1, 0, 0)
-points.InsertNextPoint(1, 1, 0)
-points.InsertNextPoint(0, 1, 0)
-points.InsertNextPoint(0, 0, 1)
-points.InsertNextPoint(1, 0, 1)
-points.InsertNextPoint(1, 1, 1)
-points.InsertNextPoint(0, 1, 1)
+Author: Jan Bodnar
+Website: zetcode.com
+Last edited: August 2017
+"""
 
-points.InsertNextPoint(1, 0, 0)
-points.InsertNextPoint(2, 0, 0)
-points.InsertNextPoint(2, 1, 0)
-points.InsertNextPoint(1, 1, 0)
-points.InsertNextPoint(1, 0, 1)
-points.InsertNextPoint(2, 0, 1)
-points.InsertNextPoint(2, 1, 1)
-points.InsertNextPoint(1, 1, 1)
-grid.SetPoints(points)
+from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
+    QAction, QFileDialog, QApplication)
+from PyQt5.QtGui import QIcon
+import sys
 
-cells = vtk.vtkCellArray()
-hexa = vtk.vtkHexahedron()
-hexa.GetPointIds().SetId(0, 0)
-hexa.GetPointIds().SetId(1, 1)
-hexa.GetPointIds().SetId(2, 2)
-hexa.GetPointIds().SetId(3, 3)
-hexa.GetPointIds().SetId(4, 4)
-hexa.GetPointIds().SetId(5, 5)
-hexa.GetPointIds().SetId(6, 6)
-hexa.GetPointIds().SetId(7, 7)
-cells.InsertNextCell(hexa)
+class Example(QMainWindow):
 
-hexa = vtk.vtkHexahedron()
-hexa.GetPointIds().SetId(0, 8)
-hexa.GetPointIds().SetId(1, 9)
-hexa.GetPointIds().SetId(2, 10)
-hexa.GetPointIds().SetId(3, 11)
-hexa.GetPointIds().SetId(4, 12)
-hexa.GetPointIds().SetId(5, 13)
-hexa.GetPointIds().SetId(6, 14)
-hexa.GetPointIds().SetId(7, 15)
-cells.InsertNextCell(hexa)
-grid.SetCells(vtk.VTK_HEXAHEDRON, cells)
+    def __init__(self):
+        super().__init__()
 
-array = vtk.vtkDoubleArray()
-array.SetName("mydata")
-array.SetNumberOfComponents(1)
-array.InsertNextValue(2)
-array.InsertNextValue(1)
-grid.GetCellData().AddArray(array)
+        self.initUI()
 
-array = grid.GetCellData().GetArray("mydata")
-print(array.GetValue(0), array.GetValue(1))
-print(array.GetRange())
 
-# lookup table
-lut = vtk.vtkLookupTable()
-lut.SetHueRange(0.667, 0)
-lut.SetNumberOfColors(2)
-lut.Build()
+    def initUI(self):
 
-# mapper
-mapper = vtk.vtkDataSetMapper()
-mapper.SetInputData(grid)
-mapper.SetScalarModeToUseCellFieldData()
-mapper.SelectColorArray("mydata")
-mapper.SetScalarRange(array.GetRange())
-mapper.SetLookupTable(lut)
+        self.textEdit = QTextEdit()
+        self.setCentralWidget(self.textEdit)
+        self.statusBar()
 
-# actor
-actor = vtk.vtkActor()
-actor.SetMapper(mapper)
+        openFile = QAction(QIcon('open.png'), 'Open', self)
+        openFile.setShortcut('Ctrl+O')
+        openFile.setStatusTip('Open new File')
+        openFile.triggered.connect(self.showDialog)
 
-prop = actor.GetProperty()
-prop.SetAmbient(0.5)
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(openFile)
 
-prop.EdgeVisibilityOn()
-prop.SetEdgeColor(0, 0, 0)
-prop.SetLineWidth(2)
+        self.setGeometry(300, 300, 350, 300)
+        self.setWindowTitle('File dialog')
+        self.show()
 
-prop.VertexVisibilityOn()
-prop.SetVertexColor(0.5, 1, 0.5)
-prop.SetPointSize(5)
 
-prop.SetRepresentationToSurface()
+    def showDialog(self):
 
-# renderer
-ren = vtk.vtkRenderer()
-ren.AddActor(actor)
-ren.GradientBackgroundOn()
-ren.SetBackground(1, 1, 1)
-ren.SetBackground2(0.4, 0.55, .75)
+        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
 
-ren_win = vtk.vtkRenderWindow()
-ren_win.AddRenderer(ren)
-ren_win.SetSize(1000, 600)
+        if fname[0]:
+            f = open(fname[0], 'r')
 
-inter = vtk.vtkRenderWindowInteractor()
-inter.SetRenderWindow(ren_win)
-inter.SetInteractorStyle(MouseInteractorStyle())
+            with f:
+                data = f.read()
+                self.textEdit.setText(data)
 
-# scalar bar
-scalar_bar = vtk.vtkScalarBarActor()
-scalar_bar.SetLookupTable(lut)
+if __name__ == '__main__':
 
-scalar_bar_widget = vtk.vtkScalarBarWidget()
-scalar_bar_widget.SetInteractor(inter)
-scalar_bar_widget.SetScalarBarActor(scalar_bar)
-scalar_bar_widget.On()
-
-ren_win.Render()
-inter.Initialize()
-inter.Start()
+    app = QApplication(sys.argv)
+    ex = Example()
+    sys.exit(app.exec_())

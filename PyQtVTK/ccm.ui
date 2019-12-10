@@ -21,13 +21,13 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normalon>:/1/OpenFOAM_icon.gif</normalon>
+    <normalon>images/OpenFOAM_icon.png</normalon>
    </iconset>
   </property>
-  <widget class="QWidget" name="Window">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+  <widget class="QWidget" name="mainWindow">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QSplitter" name="splitter_2">
+     <widget class="QSplitter" name="topSplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -35,121 +35,594 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QListWidget" name="pipLine">
-        <item>
-         <property name="text">
-          <string>Geometry</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Physics</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Material</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>fvSchemes</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>fvOption</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Solver</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QTextBrowser" name="propeties"/>
-      </widget>
-      <widget class="QSplitter" name="MainWindow">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTreeWidget" name="pipLine">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="currentIndex">
-         <number>1</number>
+        <property name="sizeIncrement">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
         </property>
-        <widget class="QWidget" name="Geometry">
-         <property name="maximumSize">
-          <size>
-           <width>486</width>
-           <height>52</height>
-          </size>
+        <column>
+         <property name="text">
+          <string>Property</string>
          </property>
-         <attribute name="title">
+        </column>
+        <column>
+         <property name="text">
+          <string>ON/OFF</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Value</string>
+         </property>
+        </column>
+        <item>
+         <property name="text">
           <string>Geometry</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QFrame" name="geoFrame">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="Monitor">
-         <property name="maximumSize">
-          <size>
-           <width>486</width>
-           <height>52</height>
-          </size>
          </property>
-         <attribute name="title">
-          <string>Monitor</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Region1</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
           <item>
-           <widget class="QFrame" name="monitorFrame">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+           <property name="text">
+            <string>cellZone1</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <item>
+            <property name="text">
+             <string>Patch1</string>
             </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+            <property name="text">
+             <string/>
             </property>
-           </widget>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Patch2</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
           </item>
-         </layout>
-        </widget>
+          <item>
+           <property name="text">
+            <string>cellZone2</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <item>
+            <property name="text">
+             <string>Patch1</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Patch2</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+          </item>
+         </item>
+         <item>
+          <property name="text">
+           <string>Region2</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <item>
+           <property name="text">
+            <string>cellZone1</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <item>
+            <property name="text">
+             <string>Patch1</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+          </item>
+          <item>
+           <property name="text">
+            <string>cellZone2</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <item>
+            <property name="text">
+             <string>Patch2</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </item>
+          </item>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>Physics</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Turbulence</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MRF</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DynamicMesh</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Multiphase</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Heat</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Radiation</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>Material</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Viscosity</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Heat Conductivity</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Specific Heat</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Density</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>fvSchemes</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>ddt</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>div</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>laplacian</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>fvSolution</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>solver</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>residual</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>relaxation</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>fvOption</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Heat Source</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Temp limit</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
+        <item>
+         <property name="text">
+          <string>Solver</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <item>
+          <property name="text">
+           <string>Application</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>StartFrom</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>TimeStep</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Write Interval</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>End Time</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Change ON-FLY</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>adjust Time step</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>maxCo</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Function</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </item>
+        </item>
        </widget>
-       <widget class="QTextBrowser" name="output">
+       <widget class="QTextBrowser" name="propeties">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="sizeIncrement">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
+      </widget>
+      <widget class="QSplitter" name="rightDomain">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTabWidget" name="mainViewTabs">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="geoTab">
+         <property name="sizeIncrement">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+          </font>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="accessibleName">
+          <string/>
+         </property>
+         <attribute name="title">
+          <string>Geometry</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="monitorTab">
+         <attribute name="title">
+          <string>Monitor</string>
+         </attribute>
+        </widget>
+       </widget>
+       <widget class="QTextBrowser" name="output"/>
       </widget>
      </widget>
     </item>
@@ -177,6 +650,7 @@
      <string>Geometry</string>
     </property>
     <addaction name="actionz"/>
+    <addaction name="actionPatches"/>
    </widget>
    <widget class="QMenu" name="menuSolver">
     <property name="title">
@@ -231,12 +705,19 @@
     <addaction name="actionAligh_Z_2"/>
     <addaction name="actionAlign_45"/>
    </widget>
+   <widget class="QMenu" name="menuSetting">
+    <property name="title">
+     <string>Setting</string>
+    </property>
+    <addaction name="actionTools"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuGeometry"/>
    <addaction name="menuView"/>
    <addaction name="menuPhysics"/>
    <addaction name="menuMaterial"/>
    <addaction name="menuSolver"/>
+   <addaction name="menuSetting"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -254,8 +735,9 @@
    <addaction name="actionWrite"/>
    <addaction name="actionRun"/>
    <addaction name="actionStop"/>
-   <addaction name="actionQuit"/>
+   <addaction name="actionTools"/>
    <addaction name="actionPostProcess"/>
+   <addaction name="actionQuit"/>
   </widget>
   <widget class="QToolBar" name="rightBar">
    <property name="sizePolicy">
@@ -293,8 +775,8 @@
   </widget>
   <action name="actionOpen">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/open.svg</normaloff>:/1/open.svg</iconset>
+    <iconset>
+     <normaloff>images/open.svg</normaloff>images/open.svg</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -302,8 +784,8 @@
   </action>
   <action name="actionWrite">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/save.svg</normaloff>:/1/save.svg</iconset>
+    <iconset>
+     <normaloff>images/save.svg</normaloff>images/save.svg</iconset>
    </property>
    <property name="text">
     <string>Write</string>
@@ -311,8 +793,8 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/exit.svg</normaloff>:/1/exit.svg</iconset>
+    <iconset>
+     <normaloff>images/exit.svg</normaloff>images/exit.svg</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -320,8 +802,8 @@
   </action>
   <action name="actionTurbulence">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/turbulence.png</normaloff>:/1/turbulence.png</iconset>
+    <iconset>
+     <normaloff>images/turbulence.png</normaloff>images/turbulence.png</iconset>
    </property>
    <property name="text">
     <string>Turbulence</string>
@@ -329,8 +811,8 @@
   </action>
   <action name="actionMRF">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/MRF.svg</normaloff>:/1/MRF.svg</iconset>
+    <iconset>
+     <normaloff>images/MRF.svg</normaloff>images/MRF.svg</iconset>
    </property>
    <property name="text">
     <string>MRF</string>
@@ -338,8 +820,8 @@
   </action>
   <action name="actionDynamic_Mesh">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/dynamicMesh.svg</normaloff>:/1/dynamicMesh.svg</iconset>
+    <iconset>
+     <normaloff>images/dynamicMesh.svg</normaloff>images/dynamicMesh.svg</iconset>
    </property>
    <property name="text">
     <string>Dynamic Mesh</string>
@@ -347,8 +829,8 @@
   </action>
   <action name="actionRadiation">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/radiation.svg</normaloff>:/1/radiation.svg</iconset>
+    <iconset>
+     <normaloff>images/radiation.svg</normaloff>images/radiation.svg</iconset>
    </property>
    <property name="text">
     <string>Radiation</string>
@@ -376,7 +858,7 @@
   </action>
   <action name="actionz">
    <property name="text">
-    <string>z==</string>
+    <string>Domain</string>
    </property>
   </action>
   <action name="actionSplit_region">
@@ -391,8 +873,8 @@
   </action>
   <action name="actionFluid">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/waterDrop.svg</normaloff>:/1/waterDrop.svg</iconset>
+    <iconset>
+     <normaloff>images/waterDrop.svg</normaloff>images/waterDrop.svg</iconset>
    </property>
    <property name="text">
     <string>Fluid</string>
@@ -400,8 +882,8 @@
   </action>
   <action name="actionSolid">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/solid.svg</normaloff>:/1/solid.svg</iconset>
+    <iconset>
+     <normaloff>images/solid.svg</normaloff>images/solid.svg</iconset>
    </property>
    <property name="text">
     <string>Solid</string>
@@ -414,8 +896,8 @@
   </action>
   <action name="actionRun">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/start.svg</normaloff>:/1/start.svg</iconset>
+    <iconset>
+     <normaloff>images/start.svg</normaloff>images/start.svg</iconset>
    </property>
    <property name="text">
     <string>Run</string>
@@ -423,8 +905,8 @@
   </action>
   <action name="actionStop">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/stop.svg</normaloff>:/1/stop.svg</iconset>
+    <iconset>
+     <normaloff>images/stop.svg</normaloff>images/stop.svg</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -432,8 +914,8 @@
   </action>
   <action name="actionPostProcess">
    <property name="icon">
-    <iconset resource="images/icons.qrc">
-     <normaloff>:/1/paraview.png</normaloff>:/1/paraview.png</iconset>
+    <iconset>
+     <normaloff>images/paraview.png</normaloff>images/paraview.png</iconset>
    </property>
    <property name="text">
     <string>PostProcess</string>
@@ -474,9 +956,48 @@
     <string>Align 45°</string>
    </property>
   </action>
+  <action name="actionPatches">
+   <property name="text">
+    <string>Patches</string>
+   </property>
+  </action>
+  <action name="actionDefault_Folder">
+   <property name="text">
+    <string>Default Folder</string>
+   </property>
+  </action>
+  <action name="actionParaview_Path">
+   <property name="text">
+    <string>Paraview Path</string>
+   </property>
+  </action>
+  <action name="actionTools">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/setting.svg</normaloff>images/setting.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Tools</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="images/icons.qrc"/>
- </resources>
- <connections/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>OpenFOAM</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>529</x>
+     <y>365</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

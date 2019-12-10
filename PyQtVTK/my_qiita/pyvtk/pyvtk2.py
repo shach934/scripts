@@ -23,7 +23,7 @@ class MainWindow(Qt.QMainWindow):
         self.frame.setLayout(self.vl)
         self.setCentralWidget(self.frame)
 
-        self.rootDir = "pitzDaily"
+        self.rootDir = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
         self.fileName = self.rootDir + "/system/controlDict"
 
         # reader
@@ -35,13 +35,17 @@ class MainWindow(Qt.QMainWindow):
         self.reader.Update()
 
         tArray = vtk_to_numpy(self.reader.GetTimeValues())  # 出力ファイルの時間を格納
-        self.reader.UpdateTimeStep(tArray[-1])  # 最新の時間406を出力設定
+        self.reader.UpdateTimeStep(tArray[1])  # 最新の時間406を出力設定
+        print(tArray)
         self.reader.Update()
 
         self.filter = vtk.vtkGeometryFilter()
         self.filter.SetInputConnection(self.reader.GetOutputPort())  # filterにreaderを設定
 
         # mapper
+
+
+
         self.mapper = vtk.vtkCompositePolyDataMapper2()
         self.mapper.SetInputConnection(self.filter.GetOutputPort())  # mapperにfilterを設定
         # スカラー値の設定
