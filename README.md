@@ -4,4 +4,4 @@ submit to run and monitor the residual
 
 pyqt5 + qt designer used to generate gui. 
 vtk, vtkOpenFoamReader() used to displace the geometry. 
-matplotlib used to monitor residual.
+matplotlib used to plot residual.
