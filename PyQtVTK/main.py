@@ -13,11 +13,11 @@ import sys, os
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, \
     QWidget, QPushButton
+from PyQt5 import QtCore
 from ccm import Ui_OpenFOAM
 from settingBox import Ui_Setting
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
-import numpy as np
 from vtk.util.numpy_support import vtk_to_numpy
 
 
@@ -26,11 +26,13 @@ class SettingDialog(QMainWindow, Ui_Setting):
         QMainWindow.__init__(self)
         Ui_Setting.__init__(self)
         self.setupUi(self)
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
 
 
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
+
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
