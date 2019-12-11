@@ -10,18 +10,23 @@ Last edited: December 2019
 """
 
 import sys, os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, QWidget, QPushButton
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, \
+    QWidget, QPushButton
 from ccm import Ui_OpenFOAM
+from settingBox import Ui_Setting
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
 import numpy as np
 from vtk.util.numpy_support import vtk_to_numpy
 
-class NewDialog(QWidget):
-  def __init__(self, parent):
-    super(NewDialog, self).__init__(parent)
-    self.YesButton = QPushButton()
-    self.YesButton.setObjectName("YesButton")
+
+class SettingDialog(QMainWindow, Ui_Setting):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        Ui_Setting.__init__(self)
+        self.setupUi(self)
+
 
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
@@ -55,7 +60,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.actionTools.triggered.connect(self.setting)
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
-
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
         self.geoTab.setLayout(self.vtkContainBox)
@@ -88,9 +92,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.show()
 
     def setting(self):
-        self.nd = NewDialog(self)
-        self.nd.show()
-
+        self.ui = SettingDialog()
+        self.ui.show()
 
     def AddAxes(self):
         axesActor = vtk.vtkAxesActor()
@@ -98,7 +101,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.axesWidget.SetInteractor(self.vtkWindow)
 
         self.axesWidget.EnabledOn()
-        self.axesWidget.InteractiveOff() # InteractiveOn to enable move the axis
+        self.axesWidget.InteractiveOff()  # InteractiveOn to enable move the axis
         self.axesWidget.Modified()
         self.vtkWindow.Render()
 
@@ -132,7 +135,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def openFile(self):
         # TODO add warning box to save the current config, open a new file will overwrite the current model. just
         #  like ANSA.
-        self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder, "OpenFOAM File (*.foam *.txt)")
+        self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
+                                                      "OpenFOAM File (*.foam *.txt)")
 
         if self.caseFolder[0] != "":
             self.foamReader.SetFileName(str(self.caseFolder[0]))
@@ -150,7 +154,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def shutDownWarning(self):
         buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
-                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
         if buttonReply == QMessageBox.Yes:
             self.close()
         if buttonReply == QMessageBox.No:
