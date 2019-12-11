@@ -33,10 +33,13 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
 
+        self.setupUi(self)
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
-        self.setupUi(self)
+        self.transparency = 0
+
+        self.addMiscell()
 
         self.statusBar.showMessage('Ready')
 
@@ -61,6 +64,18 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.actionOpen.triggered.connect(self.openFile)
         self.actionTools.triggered.connect(self.setting)
         self.actionQuit.triggered.connect(self.shutDownWarning)
+
+    def addMiscell(self):
+        # transparency bar to the tool bar
+        self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.viewBar.addWidget(self.transparencySlider)
+        self.transparencySlider.setFixedWidth(100)
+
+        self.fieldSelectCombo = QtWidgets.QComboBox()
+        self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
+        for item in self.fields:
+            self.fieldSelectCombo.addItem(item)
+        self.receiveBar.addWidget(self.fieldSelectCombo)
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
