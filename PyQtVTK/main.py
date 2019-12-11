@@ -10,12 +10,18 @@ Last edited: December 2019
 """
 
 import sys, os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, QWidget, QPushButton
 from ccm import Ui_OpenFOAM
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
 import numpy as np
 from vtk.util.numpy_support import vtk_to_numpy
+
+class NewDialog(QWidget):
+  def __init__(self, parent):
+    super(NewDialog, self).__init__(parent)
+    self.YesButton = QPushButton()
+    self.YesButton.setObjectName("YesButton")
 
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
@@ -40,19 +46,13 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow = QVTKRenderWindowInteractor(self.geoTab)
 
         self.foamReader = vtk.vtkOpenFOAMReader()
-
         self.filter = vtk.vtkGeometryFilter()
-
         self.mapper = vtk.vtkCompositePolyDataMapper2()
-
         self.actor = vtk.vtkActor()
-
         self.render = vtk.vtkRenderer()
 
         self.actionOpen.triggered.connect(self.openFile)
-
         self.actionTools.triggered.connect(self.setting)
-
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
 
@@ -88,7 +88,9 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.show()
 
     def setting(self):
-        self.Ui_Setting()
+        self.nd = NewDialog(self)
+        self.nd.show()
+
 
     def AddAxes(self):
         axesActor = vtk.vtkAxesActor()

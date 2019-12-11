@@ -55,20 +55,12 @@
         </column>
         <column>
          <property name="text">
-          <string>ON/OFF</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
           <string>Value</string>
          </property>
         </column>
         <item>
          <property name="text">
           <string>Geometry</string>
-         </property>
-         <property name="text">
-          <string/>
          </property>
          <property name="text">
           <string/>
@@ -80,9 +72,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
           <item>
            <property name="text">
             <string>cellZone1</string>
@@ -90,31 +79,6 @@
            <property name="text">
             <string/>
            </property>
-           <property name="text">
-            <string/>
-           </property>
-           <item>
-            <property name="text">
-             <string>Patch1</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Patch2</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
           </item>
           <item>
            <property name="text">
@@ -123,31 +87,14 @@
            <property name="text">
             <string/>
            </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Patch</string>
+           </property>
            <property name="text">
             <string/>
            </property>
-           <item>
-            <property name="text">
-             <string>Patch1</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Patch2</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
           </item>
          </item>
          <item>
@@ -157,9 +104,14 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
+          <item>
+           <property name="text">
+            <string>Patch1</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </item>
           <item>
            <property name="text">
             <string>cellZone1</string>
@@ -167,20 +119,14 @@
            <property name="text">
             <string/>
            </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Patch2</string>
+           </property>
            <property name="text">
             <string/>
            </property>
-           <item>
-            <property name="text">
-             <string>Patch1</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
           </item>
           <item>
            <property name="text">
@@ -189,20 +135,6 @@
            <property name="text">
             <string/>
            </property>
-           <property name="text">
-            <string/>
-           </property>
-           <item>
-            <property name="text">
-             <string>Patch2</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </item>
           </item>
          </item>
         </item>
@@ -213,15 +145,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>Turbulence</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -234,16 +160,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>DynamicMesh</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -256,9 +176,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
@@ -267,16 +184,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>Radiation</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -290,15 +201,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>Viscosity</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -311,9 +216,6 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
@@ -322,16 +224,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>Density</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -345,15 +241,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>ddt</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -366,16 +256,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>laplacian</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -389,15 +273,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>solver</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -410,16 +288,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>relaxation</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -433,15 +305,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>Heat Source</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -450,9 +316,6 @@
          <item>
           <property name="text">
            <string>Temp limit</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -466,15 +329,9 @@
          <property name="text">
           <string/>
          </property>
-         <property name="text">
-          <string/>
-         </property>
          <item>
           <property name="text">
            <string>Application</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -487,16 +344,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>TimeStep</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -509,16 +360,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>End Time</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -531,16 +376,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>adjust Time step</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -553,16 +392,10 @@
           <property name="text">
            <string/>
           </property>
-          <property name="text">
-           <string/>
-          </property>
          </item>
          <item>
           <property name="text">
            <string>Function</string>
-          </property>
-          <property name="text">
-           <string/>
           </property>
           <property name="text">
            <string/>
@@ -592,7 +425,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <widget class="QTabWidget" name="mainViewTabs">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="geoTab">
          <property name="sizeIncrement">

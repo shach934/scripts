@@ -1,64 +1,43 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
-"""
-ZetCode PyQt5 tutorial
-
-In this example, we select a file with a
-QFileDialog and display its contents
-in a QTextEdit.
-
-Author: Jan Bodnar
-Website: zetcode.com
-Last edited: August 2017
-"""
-
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit,
-    QAction, QFileDialog, QApplication)
-from PyQt5.QtGui import QIcon
 import sys
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QPushButton,
+                             QToolTip, QMessageBox, QLabel)
 
-class Example(QMainWindow):
+class Window2(QMainWindow):                           # <===
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Window22222")
 
+class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.initUI()
+        self.title = "First Window"
+        self.top = 100
+        self.left = 100
+        self.width = 680
+        self.height = 500
 
+        self.pushButton = QPushButton("Start", self)
+        self.pushButton.move(275, 200)
+        self.pushButton.setToolTip("<h3>Start the Session</h3>")
 
-    def initUI(self):
+        self.pushButton.clicked.connect(self.window2)              # <===
 
-        self.textEdit = QTextEdit()
-        self.setCentralWidget(self.textEdit)
-        self.statusBar()
+        self.main_window()
 
-        openFile = QAction(QIcon('open.png'), 'Open', self)
-        openFile.setShortcut('Ctrl+O')
-        openFile.setStatusTip('Open new File')
-        openFile.triggered.connect(self.showDialog)
-
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(openFile)
-
-        self.setGeometry(300, 300, 350, 300)
-        self.setWindowTitle('File dialog')
+    def main_window(self):
+        self.label = QLabel("Manager", self)
+        self.label.move(285, 175)
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.top, self.left, self.width, self.height)
         self.show()
 
+    def window2(self):                                             # <===
+        self.w = Window2()
+        self.w.show()
 
-    def showDialog(self):
-
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
-
-        if fname[0]:
-            f = open(fname[0], 'r')
-
-            with f:
-                data = f.read()
-                self.textEdit.setText(data)
-
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())
+    window = Window()
+    sys.exit(app.exec())
