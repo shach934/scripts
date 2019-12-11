@@ -9,6 +9,12 @@ author: Chen Shaohui
 Last edited: December 2019
 """
 
+# TODO: add the expandAll and collapseAll button at the treeView region.
+# TODO: connect the transparency slider to the transparency value
+# TODO: connect the field comboBox to the VTK exists field.
+# TODO: Name of Model dynamic to the real model name.
+# TODO: move the field select comboBox to the right of autoscale and setscale icons.
+
 import sys, os
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, \
@@ -19,6 +25,10 @@ from settingBox import Ui_Setting
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
+
+
+class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
+    pass
 
 
 class SettingDialog(QMainWindow, Ui_Setting):
@@ -32,8 +42,20 @@ class SettingDialog(QMainWindow, Ui_Setting):
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
-
         self.setupUi(self)
+
+        self.topSplitter.setSizes([100, 500])
+        self.leftDomain.setSizes([100, 100])
+        self.rightDomain.setSizes([500, 100])
+
+        # GUI related initialization. some of them from case files.
+        self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
+        self.timeSteps = ["0"]
+        self.fieldSelectCombo = QtWidgets.QComboBox()
+        self.timeSelectCombo = QtWidgets.QComboBox()
+        self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
+        self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
+        self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
@@ -41,41 +63,37 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.addMiscell()
 
-        self.statusBar.showMessage('Ready')
-
-        self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
+        self.setStatusTip("Ready")
 
         # screen = QDesktopWidget().screenGeometry()
         # self.setGeometry(0, 0, screen.width(), screen.height())
         self.showMaximized()
 
-        self.topSplitter.setSizes([100, 500])
-        self.leftDomain.setSizes([100, 100])
-        self.rightDomain.setSizes([500, 100])
-
+        # VTK related initialization.
         self.vtkWindow = QVTKRenderWindowInteractor(self.geoTab)
-
         self.foamReader = vtk.vtkOpenFOAMReader()
         self.filter = vtk.vtkGeometryFilter()
         self.mapper = vtk.vtkCompositePolyDataMapper2()
         self.actor = vtk.vtkActor()
         self.render = vtk.vtkRenderer()
 
+        # actions!!!
         self.actionOpen.triggered.connect(self.openFile)
         self.actionTools.triggered.connect(self.setting)
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
     def addMiscell(self):
         # transparency bar to the tool bar
-        self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.viewBar.addWidget(self.transparencySlider)
         self.transparencySlider.setFixedWidth(100)
 
-        self.fieldSelectCombo = QtWidgets.QComboBox()
-        self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
         for item in self.fields:
             self.fieldSelectCombo.addItem(item)
         self.receiveBar.addWidget(self.fieldSelectCombo)
+
+        for time in self.timeSteps:
+            self.timeSelectCombo.addItem(time)
+        self.receiveBar.addWidget(self.timeSelectCombo)
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
@@ -96,10 +114,17 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.mapper.SetScalarRange(0, 3)
 
         self.actor.SetMapper(self.mapper)
+        # set the presentation style
+        actorProper = self.actor.GetProperty()  # property of the VTK view
+        # show the mesh edge, it is using the surface and integralMesh together
+        actorProper.EdgeVisibilityOn()
+        actorProper.SetEdgeColor(0, 0, 0)
+        actorProper.SetLineWidth(2)
 
         self.render.AddActor(self.actor)
 
         self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
+        self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
         # self.vtkWindow.SetSize(850, 850)
         self.vtkWindow.Initialize()
         self.setupVTKBackGround()
@@ -109,8 +134,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.show()
 
     def setting(self):
-        self.ui = SettingDialog()
-        self.ui.show()
+        self.settingDialog = SettingDialog()
+        self.settingDialog.show()
 
     def AddAxes(self):
         axesActor = vtk.vtkAxesActor()

@@ -470,6 +470,17 @@
     </property>
     <addaction name="actionTools"/>
    </widget>
+   <widget class="QMenu" name="menuPostprocessing">
+    <property name="title">
+     <string>Postprocessing</string>
+    </property>
+    <addaction name="actionWall_Heat_Flux"/>
+    <addaction name="actionTemperature_Probe"/>
+    <addaction name="actionVelocity_Probe"/>
+    <addaction name="actionHeat_Transfer_Coefficent"/>
+    <addaction name="actionVolume"/>
+    <addaction name="actionMass_flow_rate"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuGeometry"/>
@@ -477,6 +488,7 @@
    <addaction name="menuMaterial"/>
    <addaction name="menuSolver"/>
    <addaction name="menuSetting"/>
+   <addaction name="menuPostprocessing"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -518,6 +530,7 @@
    <addaction name="actionAligh_Z"/>
    <addaction name="actionMesh"/>
    <addaction name="actionFrame"/>
+   <addaction name="actionTransperancy"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="baseSize">
@@ -698,7 +711,7 @@
   <action name="actionAlign_X">
    <property name="icon">
     <iconset>
-     <normaloff>images/Xaxis.svg</normaloff>images/Xaxis.svg</iconset>
+     <normaloff>images/Xaxis2.svg</normaloff>images/Xaxis2.svg</iconset>
    </property>
    <property name="text">
     <string>Align X</string>
@@ -707,7 +720,7 @@
   <action name="actionAlign_Y">
    <property name="icon">
     <iconset>
-     <normaloff>images/Yaxis.svg</normaloff>images/Yaxis.svg</iconset>
+     <normaloff>images/Yaxis2.svg</normaloff>images/Yaxis2.svg</iconset>
    </property>
    <property name="text">
     <string>Align Y</string>
@@ -716,7 +729,7 @@
   <action name="actionAligh_Z">
    <property name="icon">
     <iconset>
-     <normaloff>images/Zaxis.svg</normaloff>images/Zaxis.svg</iconset>
+     <normaloff>images/Zaxis2.svg</normaloff>images/Zaxis2.svg</iconset>
    </property>
    <property name="text">
     <string>Aligh Z</string>
@@ -774,6 +787,10 @@
    </property>
   </action>
   <action name="actionTransperancy">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/transparency.svg</normaloff>images/transparency.svg</iconset>
+   </property>
    <property name="text">
     <string>Transperancy</string>
    </property>
@@ -799,6 +816,36 @@
   <action name="actioncellZone">
    <property name="text">
     <string>cellZone</string>
+   </property>
+  </action>
+  <action name="actionWall_Heat_Flux">
+   <property name="text">
+    <string>Wall Heat Flux</string>
+   </property>
+  </action>
+  <action name="actionTemperature_Probe">
+   <property name="text">
+    <string>Temperature Probe</string>
+   </property>
+  </action>
+  <action name="actionVelocity_Probe">
+   <property name="text">
+    <string>Velocity Probe</string>
+   </property>
+  </action>
+  <action name="actionHeat_Transfer_Coefficent">
+   <property name="text">
+    <string>Heat Transfer Coefficent</string>
+   </property>
+  </action>
+  <action name="actionVolume">
+   <property name="text">
+    <string>Volumetric flow rate</string>
+   </property>
+  </action>
+  <action name="actionMass_flow_rate">
+   <property name="text">
+    <string>Mass flow rate</string>
    </property>
   </action>
  </widget>
