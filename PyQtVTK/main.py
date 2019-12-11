@@ -15,10 +15,9 @@ Last edited: December 2019
 # TODO: Name of Model dynamic to the real model name.
 # TODO: move the field select comboBox to the right of autoscale and setscale icons.
 
-import sys, os
+import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, \
-    QWidget, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox
 from PyQt5 import QtCore
 from ccm import Ui_OpenFOAM
 from settingBox import Ui_Setting
@@ -53,14 +52,17 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.timeSteps = ["0"]
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
-        self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
-        self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
         self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
         self.transparency = 0
 
+        self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
+        self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
+        self.caseName = "Model"
+        self.MultiRegion = True
+        self.patches =[]
         self.addMiscell()
 
         self.setStatusTip("Ready")
@@ -167,6 +169,12 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         scalar_bar_widget.SetScalarBarActor(self.scalar_bar)
         scalar_bar_widget.On()
 
+    def updateMapperField(self):
+        mapperField = str(self.fieldSelectCombo.currentText())
+
+    def updateTime(self):
+        timeStep = int(str(self.timeSelectCombo.currentText()))
+
     def resetFile(self):
         self.render = vtk.vtkRenderer()
         self.setupVTKBackGround()
@@ -181,6 +189,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
                                                       "OpenFOAM File (*.foam *.txt)")
 
         if self.caseFolder[0] != "":
+            self.caseName = self.caseFolder[0].split("/")[-2]
             self.foamReader.SetFileName(str(self.caseFolder[0]))
             self.foamReader.CreateCellToPointOn()
             self.foamReader.DecomposePolyhedraOn()
@@ -188,6 +197,15 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
             self.foamReader.Update()
             self.setupVTK()
             self.setWindowTitle(self.caseFolder[0])
+            self.pipLine.topLevelItem(0).setText(0, self.caseName)
+            self.patches = []
+            n = self.foamReader.GetNumberOfPatchArrays()
+            for i in range(n):
+                # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
+                self.patches.append(self.foamReader.GetPatchArrayName(i))
+
+            self.foamReader.DisableAllPatchArrays()
+
 
     def resetFile(self):
         self.render = vtk.vtkRenderer()
