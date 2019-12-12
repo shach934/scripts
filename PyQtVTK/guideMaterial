@@ -1,0 +1,19 @@
+some of the starccm+ solving technic:
+
+ramping up solution accuracy: 
+
+It can be beneficial to start the solution with a first-order numerical scheme.
+As discussed in the section on judging convergence, the dissipative errors resulting from first-order solutions are stabilizing and can enhance convergence. Therefore, it can be beneficial to start the solution with a first-order numerical scheme. For example:
+
+• Models involving convective transport equations have either a Convection property (for segregated
+models), or a Discretization property (for the Coupled Flow model), that can be set to first order. The
+Convection property for segregated models affects only the upwind scheme for convection, leaving the
+diffusion and other gradients still fully second-order. The Discretization property for the Coupled Flow
+model neglects higher-order reconstruction for convection and diffusion.
+
+• Solvers that are related to models that involve convective transport equations have a Reconstruction
+Zeroed expert property. Irrespective of the model type, this property causes reconstruction gradients to be
+neglected, effectively resulting in a first-order scheme.
+
+
+VOF free surface problem is a transient case. 

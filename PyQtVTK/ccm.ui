@@ -390,7 +390,7 @@
      <x>0</x>
      <y>0</y>
      <width>1059</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -557,8 +557,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
-   <addaction name="actionAuto_Scale"/>
-   <addaction name="actionSet_Scale"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -850,22 +848,5 @@
   </action>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>actionQuit</sender>
-   <signal>triggered()</signal>
-   <receiver>OpenFOAM</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>529</x>
-     <y>365</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

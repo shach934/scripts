@@ -14,6 +14,12 @@ Last edited: December 2019
 # TODO: connect the field comboBox to the VTK exists field.
 # TODO: Name of Model dynamic to the real model name.
 # TODO: move the field select comboBox to the right of autoscale and setscale icons.
+# TODO: add the table temperature, rotating speed, velocity... instead of a constant value, ramp up the simulation.
+
+#####################################################################################################
+# TODO 1, do not miss uniform keyword before the number in boundary condition.
+# TODO 2, do not use Wildcard character for boundary definition.
+#####################################################################################################
 
 import sys
 from PyQt5 import QtWidgets
@@ -24,6 +30,7 @@ from settingBox import Ui_Setting
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
+from OpenFOAMCase import *
 
 
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
@@ -41,6 +48,7 @@ class SettingDialog(QMainWindow, Ui_Setting):
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
+
         self.setupUi(self)
 
         self.topSplitter.setSizes([100, 500])
@@ -60,9 +68,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
         self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
-        self.caseName = "Model"
-        self.MultiRegion = True
-        self.patches =[]
+
         self.addMiscell()
 
         self.setStatusTip("Ready")
@@ -97,6 +103,9 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
             self.timeSelectCombo.addItem(time)
         self.receiveBar.addWidget(self.timeSelectCombo)
 
+        self.receiveBar.addAction(self.actionAuto_Scale)
+        self.receiveBar.addAction(self.actionSet_Scale)
+
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
         self.geoTab.setLayout(self.vtkContainBox)
@@ -110,8 +119,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.mapper.SetInputConnection(self.filter.GetOutputPort())
         self.mapper.SetScalarModeToUseCellFieldData()
 
-        # TODO 1, do not miss uniform keyword before the number in boundary condition.
-        # TODO 2, do not use Wildcard character for boundary definition.
         self.mapper.SelectColorArray("U")
         self.mapper.SetScalarRange(0, 3)
 
@@ -185,27 +192,50 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def openFile(self):
         # TODO add warning box to save the current config, open a new file will overwrite the current model. just
         #  like ANSA.
+        buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open new case?",
+                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+        if buttonReply == QMessageBox.Yes:
+            OpenFOAMCase.write()
+        if buttonReply == QMessageBox.No or buttonReply == QMessageBox.Cancel:
+            pass
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
                                                       "OpenFOAM File (*.foam *.txt)")
 
+        print(self.caseFolder)
         if self.caseFolder[0] != "":
-            self.caseName = self.caseFolder[0].split("/")[-2]
-            self.foamReader.SetFileName(str(self.caseFolder[0]))
-            self.foamReader.CreateCellToPointOn()
-            self.foamReader.DecomposePolyhedraOn()
-            self.foamReader.EnableAllCellArrays()
-            self.foamReader.Update()
-            self.setupVTK()
-            self.setWindowTitle(self.caseFolder[0])
-            self.pipLine.topLevelItem(0).setText(0, self.caseName)
-            self.patches = []
-            n = self.foamReader.GetNumberOfPatchArrays()
-            for i in range(n):
-                # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
-                self.patches.append(self.foamReader.GetPatchArrayName(i))
+            self.foamCase = self.loadCase()
 
-            self.foamReader.DisableAllPatchArrays()
+    def loadCase(self):
+        self.caseName = self.caseFolder[0].split("/")[-2]
+        self.foamReader.SetFileName(str(self.caseFolder[0]))
+        self.foamReader.CreateCellToPointOn()
+        self.foamReader.DecomposePolyhedraOn()
+        self.foamReader.EnableAllCellArrays()
+        self.foamReader.Update()
+        self.setupVTK()
+        self.setWindowTitle(self.caseFolder[0])
+        self.pipLine.topLevelItem(0).setText(0, self.caseName)
+        # TODO for now, every time reinitialize the render,
+        #  later should initialize only once and use diableAllPatchArrays method.
+        self.patches = []
+        n = self.foamReader.GetNumberOfPatchArrays()
+        for i in range(n):
+            # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
+            self.patches.append(self.foamReader.GetPatchArrayName(i))
 
+        self.foamReader.DisableAllPatchArrays()
+
+        # TODO count the number of regions/blocks
+        block = self.foamReader.GetOutput()
+        self.numberOfBlocks = 0
+        for i in range(len(self.patches) * 10):
+            if block.GetBlock(i) is not None:
+                self.numberOfBlocks += 1
+        if self.numberOfBlocks == 1:
+            pass
+
+
+        print(block)
 
     def resetFile(self):
         self.render = vtk.vtkRenderer()

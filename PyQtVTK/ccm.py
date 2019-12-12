@@ -135,7 +135,7 @@ class Ui_OpenFOAM(object):
         self.verticalLayout.addWidget(self.topSplitter)
         OpenFOAM.setCentralWidget(self.mainWindow)
         self.menuBar = QtWidgets.QMenuBar(OpenFOAM)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1059, 22))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1059, 21))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -384,12 +384,8 @@ class Ui_OpenFOAM(object):
         self.viewBar.addAction(self.actionFrame)
         self.viewBar.addAction(self.actionTransperancy)
         self.receiveBar.addSeparator()
-        self.receiveBar.addAction(self.actionAuto_Scale)
-        self.receiveBar.addAction(self.actionSet_Scale)
-
         self.retranslateUi(OpenFOAM)
         self.mainViewTabs.setCurrentIndex(0)
-        self.actionQuit.triggered.connect(OpenFOAM.close)
         QtCore.QMetaObject.connectSlotsByName(OpenFOAM)
 
     def retranslateUi(self, OpenFOAM):
@@ -510,6 +506,7 @@ class Ui_OpenFOAM(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     OpenFOAM = QtWidgets.QMainWindow()
     ui = Ui_OpenFOAM()

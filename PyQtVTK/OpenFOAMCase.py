@@ -1,3 +1,6 @@
+import os
+import re
+
 """
 The procedure to generate a chtMultiRegionSimpleFoam case. 
 Main function: 
@@ -15,10 +18,6 @@ rules when mesh the geometry in ANSA
  3, _wall for wall, inlet, outlet
  4, turbulence model 
 """
-
-import numpy as np
-import re
-import os
 
 
 class Patch(object):
@@ -48,7 +47,7 @@ class CyclicAMI(Patch):
         self.transform = transform
 
 
-class rotation(object):
+class rotationProp(object):
     def __init__(self, origin=(0, 0, 0), axis=(0, 0, 1), omega=20):
         self.origin = origin
         self.aixs = axis
@@ -57,17 +56,86 @@ class rotation(object):
 
 class OpenFOAMCase(object):
     def __init__(self):
-        self.numberOfRegions = 1
-        self.regionNames = ["default region"]
+        self.__numberOfRegions = 1
+        self.__regionName = []
+        self.__regionProperty = []
+        self.__caseFolder = ""
+        self.__caseName = ""
+        self.__patches = []
+        self.__boundaries = []
+        self.__message = "Ready! Let's GO!\n\n"
+        self.__solver = {}
+        self.__fvSchemes = {}
+        self.__fvSolution = {}
+        self.__fvOption = {}
+        self.__MRF = {}
+        self.__dynamicMesh = {}
+        self.__radiation = {}
+        self.__initial = {}
+        self.__alpha = {}
 
+    def SetFolderName(self, caseFolder=("", "")):
+        # caseFolder example, from vtkFoamReader:
+        # ('C:/Shaohui/OpenFoam/radiationTest/air99surf/case14.foam', 'OpenFOAM File (*.foam *.txt)')
+        foam_path = caseFolder[0]
+        if len(foam_path):
+            foam_path = foam_path[:foam_path.rfind("/")]
+            self.__caseFolder = foam_path[:foam_path.rfind("/")]
+            self.__caseName = foam_path[foam_path.rfind("/") + 1:]
+        else:
+            self.__message += "\nNo case folder found\n"
 
-foam_path = r"C:/Shaohui/OpenFoam/car_model_Af/car3_test"
+    def GetCasePath(self):
+        return self.__caseFolder
 
-case_name = foam_path.split("/")[-1]
+    def GetCaseName(self):
+        return self.__caseName
 
-initial_folder = foam_path + "/0/"
-constant_folder = foam_path + "/constant/"
-system_folder = foam_path + "/system/"
+    def SetRegionName(self, regionsName=[""]):
+        self.__regionName = regionsName
+
+    def SetRegionProperty(self):
+        if len(self.__regionName) > 1:
+            self.__regionProperty.append("fluid")
+
+        zero_folder = self._caseFolder + "/0/"
+        constant_folder = self._caseFolder + "/constant/"
+        system_folder = self._caseFolder + "/system/"
+
+        if os.path.exists(constant_folder + "regionProperties"):
+            with open(constant_folder + "regionProperties") as fid:
+                text = fid.read()
+
+            fluid_regions = re.findall(r"fluid.*\((.*)?\)", text)[0].split()
+            solid_regions = re.findall(r"solid.*\((.*)?\)", text)[0].split()
+
+            regions = fluid_regions + solid_regions
+            regions = [name for name in regions if len(name)]  # maybe there is no fluid or solid region at all.
+            regions.sort()
+
+            regions2 = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
+            regions2.sort()
+
+            regions3 = [name for name in os.listdir(zero_folder) if os.path.isdir(zero_folder + "/" + name)]
+            regions3.sort()
+
+            regions4 = [name for name in os.listdir(system_folder) if os.path.isdir(system_folder + "/" + name)]
+            regions4.sort()
+
+            if regions != regions2 or regions != regions3 or regions != regions4:
+                self.__message += "\nThe multiRegion folder structure is NOT correct! Check again! \n"
+            else:
+                region_info = {}
+                for reg in solid_regions:
+                    if len(reg):
+                        region_info[reg] = "solid"
+                for reg in fluid_regions:
+                    if len(reg):
+                        region_info[reg] = "fluid"
+
+        else:
+            self.__message += "\nSingle region case, default fluid region exists!\n"
+
 
 with open(foam_path + "/system/controlDict", 'r') as fid:
     text = fid.read()
