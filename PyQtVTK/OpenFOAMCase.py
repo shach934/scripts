@@ -1,5 +1,7 @@
 import os
 import re
+from datetime import datetime
+from math import pi
 
 """
 The procedure to generate a chtMultiRegionSimpleFoam case. 
@@ -29,6 +31,7 @@ class Patch(object):
         self.nFaces = nFaces
 
 
+# TODO: for each patch and turbulence model and boundary, set a write function to enable structured output to file.
 class MappedWall(Patch):
     def __init__(self, name=None, region=None, type="mappedWall", startFace=0, nFaces=0, sampleMode=None,
                  samplePatch=None, sampleRegion=None):
@@ -48,19 +51,66 @@ class CyclicAMI(Patch):
 
 
 class turbulenceModel(object):
-    def __init__(self, simulationType = "RAS", RASModel = "KEpsilon", turbulence = "on", printCoeffs = "on"):
-        self.simulationType = simulationType
-        if self.simulationType == "RAS":
-            self.RASModel = RASModel
-            self.turbulence = turbulence
-            self.printCoeffs = printCoeffs
+    def __init__(self):
+        self.__simulationType = None
+        self.__RASModel = None
+        self.__turbulence = None
+        self.__printCoeffs = None
+
+    def SetTurbulenceModel(self, turbulence):
+        self.__simulationType = turbulence["simulationType"]
+        if self.__simulationType == "RAS":
+            self.__RASModel = turbulence["RASModel"]
+            self.__turbulence = turbulence["turbulence"]
+            self.__printCoeffs = turbulence["printCoeffs"]
 
 
 class rotationProp(object):
     def __init__(self, origin=(0, 0, 0), axis=(0, 0, 1), omega=20):
         self.origin = origin
-        self.aixs = axis
-        self.omega = omega
+        self.axes = axis
+        self.omega = (omega * 2 * pi) / 60  # the unit is rpm.
+
+
+class controlDict(object):
+    def __init__(self, control_dict):
+        self.__application = control_dict["application"]
+        self.__startTime = control_dict["startTime"]
+        self.__endTime = control_dict["endTime"]
+        self.__deltaT = control_dict["deltaT"]
+        self.__writeControl = control_dict["writeControl"]  # timeStep or adjustableRunTime for steady and transient
+        self.__writeInterval = control_dict["writeInterval"]
+        self.__runTimeModifiable = control_dict["runTimeModifiable"]
+        self.__adjustTimeStep = control_dict["adjustTimeStep"]
+        self.__maxCo = control_dict["maxCo"]
+        self.__maxAlphaCo = control_dict["maxAlphaCo"]
+
+
+class MRF(object):
+    def __init__(self):
+        self.name = ""
+        self.cellZone = ""
+        self.rotation = rotationProp()
+
+
+# TODO: add the functions class in OpenFOAM utilities to enable the visualization of postprocess
+class postFunction(object):
+    """  function objects to do postProcessing.
+    ref: https://www.openfoam.com/documentation/guides/latest/doc/guide-function-objects.html
+    functions
+    {
+        <user-defined name>
+        {
+            type        <object type>;
+            libs        (<list of library file names>);
+            ...
+        }
+    }
+    """
+
+    def __init__(self):
+        self.funcName = "probe"
+        self.type = ""
 
 
 class OpenFOAMCase(object):
@@ -72,8 +122,7 @@ class OpenFOAMCase(object):
         self.__caseName = ""
         self.__patches = []
         self.__boundaries = []
-        self.__message = "Ready! Let's GO!\n\n"
-        self.__solver = {}
+        self.__controlDict = {}
         self.__fvSchemes = {}
         self.__fvSolution = {}
         self.__fvOption = {}
@@ -82,6 +131,9 @@ class OpenFOAMCase(object):
         self.__radiation = {}
         self.__initial = {}
         self.__alpha = {}
+        self.__turbulenceModel = {}
+        self.__message = "Ready! Let's GO!\n\n"
+        self.__timeStamp = datetime.now.strftime("%H:%M:%S")
 
     def SetFolderAndName(self, caseFolder=("", "")):
         # caseFolder example, from vtkFoamReader:
@@ -107,9 +159,9 @@ class OpenFOAMCase(object):
 
         if len(regionNameFromVTK) > 1:
 
-            zero_folder = self._caseFolder + "/0/"
-            constant_folder = self._caseFolder + "/constant/"
-            system_folder = self._caseFolder + "/system/"
+            zero_folder = self.__caseFolder + "/0/"
+            constant_folder = self.__caseFolder + "/constant/"
+            system_folder = self.__caseFolder + "/system/"
             self.__regionName = regionNameFromVTK
 
             regions2 = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
@@ -147,67 +199,94 @@ class OpenFOAMCase(object):
             self.__message += "\nSingle region case, default one fluid region!\n"
             self.__regionProperty["default region"] = "fluid"
 
+    def GetRegionProperty(self):
+        return self.__regionProperty
+
+    # TODO: currently only RAS and laminar models are considered, Large Eddy Simulation(LES) & Detached Eddy
+    #  Simulation(DES)
+    def loadTurbulenceModel(self):
+        # read in the turbulence model.
+        for region in self.__regionName:
+            turbulence_model = {}
+            if region == "default region":  # if single region, its name is default region, upon done, exit loop.
+                turbulence_file_path = self.__caseFolder + "/constant/turbulenceProperties"
+            elif self.__regionProperty[region] == "fluid":  # multiregion case, read only fluid region.
+                turbulence_file_path = self.__caseFolder + "/constant/" + region + "/turbulenceProperties"
+
+            if os.path.isfile(turbulence_file_path):
+                with open(turbulence_file_path) as fid:
+                    text = fid.read()
+                simulationType = re.findall(r"simulationType\s* (.*);?", text)[0]
+                turbulence_model[region] = simulationType
+                if simulationType == "RAS":
+                    turbulence_model["RASModel"] = re.findall(r"RASModel (.*);?", text)[0]
+                    turbulence_model["turbulence"] = re.findall(r"turbulence (.*);?", text)[0]
+                    turbulence_model["printCoeffs"] = re.findall(r"printCoeffs (.*);?", text)[0]
+                self.__turbulenceModel[region] = turbulenceModel(turbulence_model)
+            else:
+                self.__message += "\nturbulenceProperties file is missing for region: " + region + ".\n"
+
     def loadSolverInfo(self):
 
-        with open(self.__caseFolder + "/system/controlDict") as fid:
-            solverText = fid.read()
+        if os.path.isfile(self.__caseFolder + "/system/controlDict"):
+            with open(self.__caseFolder + "/system/controlDict") as fid:
+                controlDict_text = fid.read()
+            control_dict = {"application": re.findall(r"application\s+(\S+)?\s*;", controlDict_text)[0],
+                            "startTime": re.findall(r"startTime\s+(\S+)?;", controlDict_text)[0],
+                            "endTime": re.findall(r"endTime\s+(\S+)?\s*;", controlDict_text)[0],
+                            "deltaT": re.findall(r"deltaT\s+(\S+)?\s*;", controlDict_text)[0],
+                            "writeControl": re.findall(r"writeControl\s+(.*)?\s*;", controlDict_text)[0],
+                            "writeInterval": re.findall(r"deltaT\s+(\d*\.?\d*)?\s*;", controlDict_text)[0],
+                            "runTimeModifiable": re.findall(r"deltaT\s+(.*)?\s*;", controlDict_text)[0],
+                            "adjustTimeStep": re.findall(r"deltaT\s+(.*)?\s*;", controlDict_text)[0],
+                            "maxCo": re.findall(r"maxCo\s+(\S+)?\s*;", controlDict_text)[0],
+                            "maxAlphaCo": re.findall(r"maxAlphaCo\s+(\S+)?\s*;", controlDict_text)[0]}
+            self.__controlDict = controlDict(control_dict)
+        else:
+            self.__message += "\nThe controlDict is missing. \n"
 
-        # solver, end time and save interval.
-        application = re.findall(r"application (.*);", solverText)[0]
-        endT = int(re.findall(r"endTime.*?(\d+)\.?;", solverText)[0])
-        write_interval = int(re.findall(r"writeInterval.*?(\d+)\.?;", solverText)[0])
+    def GetControlDict(self):
+        return self.__controlDict
 
     def loadBoundary(self):
+        # TODO: connect the boundary info to the display.
         # read in boundary patches of each region.
-        boundaries = {}
+
         for region in self.__regionName:
+            if self.__regionProperty[region] == "default region":
+                path = self.__caseFolder + "/constant/polyMesh/boundary"
+            else:
+                path = self.__caseFolder + "/constant/" + region + "/polyMesh/boundary"
 
-            # loop over each region
-            path = self.__caseFolder + "/" + region + "/polyMesh/boundary"
-
-            # load the boundary file for this region
-            with open(path) as fid:
-                text = fid.read()
-
-            file_head = re.findall(r"(.*)\d+.*\(.*\)", text)
-
-            text = text.replace("\n", "")
-            text = text.replace("\t", "")
-
-            file_head = re.findall(r"FoamFile.*?\{(.*?)\}", text)
-
-            # here the replace number is hard coded, as the OpenFOAM file head has 5 input in total, if something
-            # wrong, change it here.
-            file_head = file_head[0].replace(";", ";\n\t", 4)
-            file_head = file_head.replace(" ", "\t\t")
-            file_head = "FoamFile\n{\n\t" + file_head + "\n}\n"
-
-            bcs = re.findall(r".*(\d+)\((.*)\)", text)
-            N_bc, bc_text = int(bcs[0][0]), bcs[0][1].split("}")[:-1]
-            # print(bc_text)
-            boundaries[region] = []
+            if os.path.isfile(path):
+                with open(path) as fid:
+                    bc_text = fid.read()
+            else:
+                self.__message += "\nThe boundary file for region:" + " is not exist!\n"
+                return
+            bc_text = re.findall(r"\((.*)\)", bc_text).split("}")[:-1]  # extract only the boundary definition part
+            boundaries = {region: []}
 
             for bc in bc_text:
-                print(bc)
                 bc_name = bc.split("{")[0]
+                patch_type = re.findall(r"type\s+(\S+)\s*;", bc)[0]
+                startFace = re.findall(r"startFace\s+(\d+)\s*;", bc)[0]
+                nFaces = re.findall(r"nFaces\s+(\d+)\s*;", bc)[0]
 
-                patch_type = re.findall(r"type (\S+);", bc)[0]
-                startFace = re.findall(r"startFace (\d+);", bc)[0]
-                nFaces = re.findall(r"nFaces (\d+);", bc)[0]
-                # print(patch_type + startFace + nFaces)
-
+                # TODO: more type of boundary, now limited to patch, wall, mappedWall, cyclicAMI.
+                #  more: symmetry, empty...
                 if patch_type == "mappedWall":
-                    sampleMode = re.findall(r"sampleMode (\S+);", bc)[0]
-                    sampleRegion = re.findall(r"sampleRegion (\S+);", bc)[0]
-                    samplePatch = re.findall(r"samplePatch (\S+);", bc)[0]
+                    sampleMode = re.findall(r"sampleMode\s+(\S+)\s*;", bc)[0]
+                    sampleRegion = re.findall(r"sampleRegion\s+(\S+)\s*;", bc)[0]
+                    samplePatch = re.findall(r"samplePatch\s+(\S+)\s*;", bc)[0]
 
                 elif patch_type == "cyclicAMI":
-                    Tolerance = re.findall(r"Tolerance (\S+);", bc)[0]
-                    neighbourPatch = re.findall(r"neighbourPatch (\S+);", bc)[0]
-                    transform = re.findall(r"transform (\S+);", bc)[0]
+                    Tolerance = re.findall(r"Tolerance\s+(\S+)?\s*;", bc)[0]
+                    neighbourPatch = re.findall(r"neighbourPatch\s+(\S+)\s*;", bc)[0]
+                    transform = re.findall(r"transform\s+(\S+)\s*;", bc)[0]
 
                 elif patch_type != "patch" and patch_type != "wall":
-                    print("I don't know the patch type! \nCheck again!")
+                    self.__message += "\nThe path type is not defined yet! \n"
 
                 if patch_type == "wall" or patch_type == "patch":
                     boundaries[region].append(Patch(bc_name, region, patch_type, startFace, nFaces))
@@ -219,59 +298,34 @@ class OpenFOAMCase(object):
                     boundaries[region].append(
                         CyclicAMI(bc_name, region, patch_type, startFace, nFaces, Tolerance, neighbourPatch, transform))
                 else:
-                    print("No suitable patch class for this boundary! \n")
+                    self.__message += "\nThe path type is not defined yet! \n"
 
-    def pairMultiRegionCaseInterface(self):
+    def differentiateMappedWall(self):
         # now pair the boundaries to make sure the mappedWall and cyclicAMI pair properly.
         # Change the patch name of mappedWall at fluid side to _shadow to avoid confusing.
         # just loop the solid region, slave corresponding fluid's patches.
         for region in self.__regionName:
+            if self.__regionProperty[region] == "fluid":
+                continue
             boundary = self.__boundaries[region]
-            for patch in boundary:
-
-                if patch.type == "mappedWall" and patch.name == patch.samplePatch:
-
-                    patch2change = patch.samplePatch
-                    patch.samplePatch = patch.samplePatch + "_shadow"
-
+            for bc in boundary:
+                if bc.type == "mappedWall" and bc.name == bc.samplePatch:
+                    patch2change = bc.samplePatch
                     candidate_patches = self.__boundaries[patch.sampleRegion]
                     found = False
                     for patch in candidate_patches:
                         # check the corresponding slave patch is mappedWall type
                         if patch.name == patch2change and patch.type != "mappedWall":
-                            print("Check the patch type, it is not a mappedWall!\n")
+                            self.__message += "\n***found patch, but its type is not mappedWall!\n"
                             found = True
                         # check the corresponding slave patch is mapped to the master patch.
                         elif patch.name == patch2change and patch.samplePatch == patch2change:
-                            patch.name = patch.name + "_shadow"
+                            patch.name += "_shadow"
+                            bc.samplePatch += "_shadow"
                             found = True
                     if not found:
-                        print("Didn't found the mappedWall slave in corresspoding region! Check again!\n")
+                        self.__message += "\n***Missing slave for mappedWall " + patch.name + "!\n"
 
                 elif patch.type == "mappedWall" and patch.name != patch.samplePatch:
-                    print("Master and slave mappedWall are differentiated already!\n")
+                    self.__message += "\nMaster and slave mappedWall of " + bc.name + " are differentiated already!\n"
 
-    def loadTurbulanceModel(self):
-        # read in the turbulance model.
-        turbulance_model = {}
-        for region in self.__regionName:
-            turbulance_path = self.__caseFolder + "/" + region + "/turbulenceProperties"
-            if os.path.isfile(turbulance_path):
-                with open(turbulance_path, "r") as fid:
-                    text = fid.read()
-                simulationType = re.findall(r"simulationType (.*);?", text)[0]
-                turbulance_model[region] = simulationType
-
-                if simulationType == "RAS":
-                    RASModel = re.findall(r"RASModel (.*);?", text)[0]
-                    turbulance = re.findall(r"turbulence (.*);?", text)[0]
-                    printCoeffs = re.findall(r"printCoeffs (.*);?", text)[0]
-                    turbulance_model["RASModel"] = RASModel
-                    turbulance_model["turbulence"] = turbulance
-                    turbulance_model["printCoeffs"] = printCoeffs
-
-                elif simulationType == "laminar":
-                    print("Turbulance model of region " + region + " is laminar, check again!\n")
-
-            else:
-                print("The turbulanceProperties doesn't exist for fluid " + region + "!, check again! \n")

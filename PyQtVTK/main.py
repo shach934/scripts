@@ -13,7 +13,7 @@ Last edited: December 2019
 # TODO: connect the transparency slider to the transparency value
 # TODO: connect the field comboBox to the VTK exists field.
 # TODO: Name of Model dynamic to the real model name.
-# TODO: move the field select comboBox to the right of autoscale and setscale icons.
+# TODO: move the field select comboBox to the right of auto-scale and set-scale icons.
 # TODO: add the table temperature, rotating speed, velocity... instead of a constant value, ramp up the simulation.
 
 #####################################################################################################
@@ -22,15 +22,17 @@ Last edited: December 2019
 #####################################################################################################
 
 import sys
+
+import vtk
+from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox
-from PyQt5 import QtCore
+from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vtk.util.numpy_support import vtk_to_numpy
+
+from OpenFOAMCase import *
 from ccm import Ui_OpenFOAM
 from settingBox import Ui_Setting
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-import vtk
-from vtk.util.numpy_support import vtk_to_numpy
-from OpenFOAMCase import *
 
 
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
@@ -216,7 +218,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.setWindowTitle(self.caseFolder[0])
         self.pipLine.topLevelItem(0).setText(0, self.caseName)
         # TODO for now, every time reinitialize the render,
-        #  later should initialize only once and use diableAllPatchArrays method.
+        #  later should initialize only once and use disableAllPatchArrays method.
         self.patches = []
         n = self.foamReader.GetNumberOfPatchArrays()
         for i in range(n):
@@ -233,9 +235,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
                 self.numberOfBlocks += 1
         if self.numberOfBlocks == 1:
             pass
-
-
-        print(block)
 
     def resetFile(self):
         self.render = vtk.vtkRenderer()
