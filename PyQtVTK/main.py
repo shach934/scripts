@@ -21,22 +21,12 @@ Last edited: December 2019
 # TODO 2, do not use Wildcard character for boundary definition.
 #####################################################################################################
 
-<<<<<<< HEAD
 import sys
 
 import vtk
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox
-=======
-import sys, os
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QDesktopWidget, QVBoxLayout, QMessageBox, \
-    QWidget, QPushButton
-from PyQt5 import QtCore
-from ccm import Ui_OpenFOAM
-from settingBox import Ui_Setting
->>>>>>> parent of f7b3fd0... start working on vtk visualization
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import vtk_to_numpy
 
@@ -61,8 +51,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
 
-        self.patches = []
-        self.numberOfBlocks = 0
         self.setupUi(self)
 
         self.topSplitter.setSizes([100, 500])
@@ -74,20 +62,15 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.timeSteps = ["0"]
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
-        self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
-        self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
         self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
         self.transparency = 0
 
-<<<<<<< HEAD
         self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
         self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
 
-=======
->>>>>>> parent of f7b3fd0... start working on vtk visualization
         self.addMiscell()
 
         self.setStatusTip("Ready")
@@ -195,6 +178,12 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         scalar_bar_widget.SetScalarBarActor(self.scalar_bar)
         scalar_bar_widget.On()
 
+    def updateMapperField(self):
+        mapperField = str(self.fieldSelectCombo.currentText())
+
+    def updateTime(self):
+        timeStep = int(str(self.timeSelectCombo.currentText()))
+
     def resetFile(self):
         self.render = vtk.vtkRenderer()
         self.setupVTKBackGround()
@@ -209,15 +198,14 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
         if buttonReply == QMessageBox.Yes:
             OpenFOAMCase.write()
-        if buttonReply == QMessageBox.Cancel:
-            return
-
+        if buttonReply == QMessageBox.No or buttonReply == QMessageBox.Cancel:
+            pass
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
                                                       "OpenFOAM File (*.foam *.txt)")
 
+        print(self.caseFolder)
         if self.caseFolder[0] != "":
-<<<<<<< HEAD
-            self.loadCase()
+            self.foamCase = self.loadCase()
 
     def loadCase(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
@@ -231,6 +219,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.pipLine.topLevelItem(0).setText(0, self.caseName)
         # TODO for now, every time reinitialize the render,
         #  later should initialize only once and use disableAllPatchArrays method.
+        self.patches = []
         n = self.foamReader.GetNumberOfPatchArrays()
         for i in range(n):
             # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
@@ -240,17 +229,12 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         # TODO count the number of regions/blocks
         block = self.foamReader.GetOutput()
-        while block.GetBlock(self.numberOfBlocks) is not None:
-            self.numberOfBlocks += 1
-=======
-            self.foamReader.SetFileName(str(self.caseFolder[0]))
-            self.foamReader.CreateCellToPointOn()
-            self.foamReader.DecomposePolyhedraOn()
-            self.foamReader.EnableAllCellArrays()
-            self.foamReader.Update()
-            self.setupVTK()
-            self.setWindowTitle(self.caseFolder[0])
->>>>>>> parent of f7b3fd0... start working on vtk visualization
+        self.numberOfBlocks = 0
+        for i in range(len(self.patches) * 10):
+            if block.GetBlock(i) is not None:
+                self.numberOfBlocks += 1
+        if self.numberOfBlocks == 1:
+            pass
 
     def resetFile(self):
         self.render = vtk.vtkRenderer()

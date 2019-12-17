@@ -28,11 +28,6 @@
 
 \maketitle
 
-\noindent
-\textit{case directory or case file}
-\begin{verbatim}
-content literaly in the case file. 
-\end{verbatim}
 \section{Numerical}
 OpenFOAM applications are designed for use with unstructured meshes, offering up to second oder accuracy, predominately using collocated variable arrangements. Most focus on the Finite Volume Method, for which the conservative form of the general scalar transport equation for the property $\phi$ takes the form:
 
@@ -136,7 +131,7 @@ The schemes is specified using:
 \begin{verbatim}
 ddtSchemes
 {
-    default         CrankNicolson <coeff>;
+    default         CrankNicolson <coeff>
     ddt(phi)        CrankNicolson <coeff>;
 }
 \end{verbatim}
@@ -214,7 +209,7 @@ x = A^{-1}b
 \end{equation}
 where the inverse of the diagonal matrix is simply:
 \begin{equation}
-A^{-1} = \frac{1}{diag(A)}
+A^{-1} = \frac{1}{dia(A)}
 \end{equation}
 This is available as the diagonalSolver. More tyically the matrix cannot be inverted easily and the system is solved using iterative methods, as discribed in the following sections. 
 
@@ -445,8 +440,8 @@ $^*$: taken from:
 
 
 
-\section{Control}
-The control of OpenFOAM is done by \textit{controlDict} setting. \citep{adams1995hitchhiker}
+\section{Conclusion}
+``I always thought something was fundamentally wrong with the universe'' \citep{adams1995hitchhiker}
  
 \begin{figure}[h!]
 \centering
@@ -456,8 +451,7 @@ The control of OpenFOAM is done by \textit{controlDict} setting. \citep{adams199
 \end{figure}
 
 \appendix
-\section{Appendix}
-Gauss Theorem
+\section{Gauss Theorem}
 \begin{equation}
 \int_V(\nabla \cdot u) dV = 
 \end{equation}
