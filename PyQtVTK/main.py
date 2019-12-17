@@ -51,6 +51,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
 
+        self.numberOfBlocks = 0
         self.setupUi(self)
 
         self.topSplitter.setSizes([100, 500])
@@ -229,12 +230,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         # TODO count the number of regions/blocks
         block = self.foamReader.GetOutput()
-        self.numberOfBlocks = 0
-        for i in range(len(self.patches) * 10):
-            if block.GetBlock(i) is not None:
-                self.numberOfBlocks += 1
-        if self.numberOfBlocks == 1:
-            pass
+        while block.GetBlock(self.numberOfBlocks) is not None:
+            self.numberOfBlocks += 1
 
     def resetFile(self):
         self.render = vtk.vtkRenderer()
