@@ -49,9 +49,23 @@ r"""                   |
 
 split_line = r"// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //"
 
-
 requiredFields = {"laminar": ["p", "U"],
                  "RAS.kEpsilon":["k", "p", "U", "epsilon"]}
 
 wallDist = "method meshWave"
 interpolationSchemes = "default linear"
+
+def determineField(self):
+    # TODO: the needed field is depend on the solver, first go through the application used in the model. then go to
+    #  the optional options like MRF, radiation, dynamicMesh, multiPhase.  don't expect to build the Rome in one day.
+    #  currently just the chtMultiRegionSImpleFoam and interFoam is urgently needed. later update to take care of the
+    #  rest solvers.
+    if len(self.__regionName) == 1:
+        if self.__turbulenceMode.simulationType == "laminar":
+            return ["p", "U"]
+        elif self.__turbulenceMode.simulationType == "RAS":
+            if self.__turbulenceMode.RASModel == "kEpsilon":
+                return ["p", "U", "k", "epsilon", "nut"]
+            elif self.__turbulenceMode.RASModel == "kOmega":
+                return ["p", "U", "k", "omega", "nut"]
+

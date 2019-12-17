@@ -1,7 +1,7 @@
 import os
 import re
-from datetime import datetime
 from math import pi
+from time import localtime, strftime
 
 """
 The procedure to generate a chtMultiRegionSimpleFoam case. 
@@ -66,10 +66,11 @@ class turbulenceModel(object):
 
 
 class rotationProp(object):
-    def __init__(self, origin=(0, 0, 0), axis=(0, 0, 1), omega=20):
+    def __init__(self, origin=(0, 0, 0), axis=(0, 0, 1), omega=["constant", 19.35]):
         self.origin = origin
         self.axes = axis
-        self.omega = (omega * 2 * pi) / 60  # the unit is rpm.
+        self.method = omega[0]
+        self.rad = (float(omega[1]) * 2 * pi) / 60  # the unit is rpm.
 
 
 class controlDict(object):
@@ -87,10 +88,21 @@ class controlDict(object):
 
 
 class MRF(object):
-    def __init__(self):
-        self.name = ""
-        self.cellZone = ""
-        self.rotation = rotationProp()
+    def __init__(self, name, cellZone, active, nonRotatingPatches, rotateProp):
+        self.name = name
+        self.cellZone = cellZone
+        self.active = active
+        self.nonRotatingPatches = nonRotatingPatches
+        self.rotation = rotateProp
+
+
+class decomposePar(object):
+    # available decompose methods, simple, hierarchical, scotch, manual
+    # ref: https://cfd.direct/openfoam/user-guide/v6-running-applications-parallel/
+    def __init__(self, numberOfSubdomains, method, coeffs):
+        self.numberOfSubdomains = numberOfSubdomains
+        self.method = method
+        self.coeffs = coeffs
 
 
 # TODO: add the functions class in OpenFOAM utilities to enable the visualization of postprocess
@@ -113,6 +125,10 @@ class postFunction(object):
         self.type = ""
 
 
+def stripFoamHead(text):
+    return text[text.find("}") + 1:]
+
+
 class OpenFOAMCase(object):
     def __init__(self):
         self.__numberOfRegions = 1
@@ -127,13 +143,14 @@ class OpenFOAMCase(object):
         self.__fvSolution = {}
         self.__fvOption = {}
         self.__MRF = {}
+        self.__decomposeParDict = {}
         self.__dynamicMesh = {}
         self.__radiation = {}
         self.__initial = {}
         self.__alpha = {}
         self.__turbulenceModel = {}
         self.__message = "Ready! Let's GO!\n\n"
-        self.__timeStamp = datetime.now.strftime("%H:%M:%S")
+        self.__log = ""
 
     def SetFolderAndName(self, caseFolder=("", "")):
         # caseFolder example, from vtkFoamReader:
@@ -176,9 +193,9 @@ class OpenFOAMCase(object):
             if regionNameFromVTK != regions2 or regionNameFromVTK != regions3 or regionNameFromVTK != regions4:
                 self.__message += "\nThe multiRegion folder structure is NOT correct! Check again! \n"
 
-            if os.path.exists(constant_folder + "regionProperties"):
+            try:
                 with open(constant_folder + "regionProperties") as fid:
-                    text = fid.read()
+                    text = stripFoamHead(fid.read())
 
                 fluid_regions = re.findall(r"fluid.*\((.*)?\)", text)[0].split()
                 solid_regions = re.findall(r"solid.*\((.*)?\)", text)[0].split()
@@ -193,8 +210,8 @@ class OpenFOAMCase(object):
                 for reg in fluid_regions:
                     if len(reg):
                         self.__regionProperty[reg] = "fluid"
-            else:
-                self.__message += "\nThe regionProperties dict is missing, cannot define solid and fluid region!\n"
+            except IOError as e:
+                self.__message += e
         elif len(regionNameFromVTK) == 1:
             self.__message += "\nSingle region case, default one fluid region!\n"
             self.__regionProperty["default region"] = "fluid"
@@ -210,12 +227,13 @@ class OpenFOAMCase(object):
             turbulence_model = {}
             if region == "default region":  # if single region, its name is default region, upon done, exit loop.
                 turbulence_file_path = self.__caseFolder + "/constant/turbulenceProperties"
-            elif self.__regionProperty[region] == "fluid":  # multiregion case, read only fluid region.
+            elif self.__regionProperty[region] == "fluid":  # multiRegion case, read only fluid region.
                 turbulence_file_path = self.__caseFolder + "/constant/" + region + "/turbulenceProperties"
-
-            if os.path.isfile(turbulence_file_path):
+            else:
+                continue
+            try:
                 with open(turbulence_file_path) as fid:
-                    text = fid.read()
+                    text = stripFoamHead(fid.read())
                 simulationType = re.findall(r"simulationType\s* (.*);?", text)[0]
                 turbulence_model[region] = simulationType
                 if simulationType == "RAS":
@@ -223,14 +241,14 @@ class OpenFOAMCase(object):
                     turbulence_model["turbulence"] = re.findall(r"turbulence (.*);?", text)[0]
                     turbulence_model["printCoeffs"] = re.findall(r"printCoeffs (.*);?", text)[0]
                 self.__turbulenceModel[region] = turbulenceModel(turbulence_model)
-            else:
-                self.__message += "\nturbulenceProperties file is missing for region: " + region + ".\n"
+            except IOError as e:
+                self.__message += e
 
     def loadSolverInfo(self):
-
-        if os.path.isfile(self.__caseFolder + "/system/controlDict"):
+        try:
             with open(self.__caseFolder + "/system/controlDict") as fid:
-                controlDict_text = fid.read()
+                controlDict_text = stripFoamHead(fid.read())
+
             control_dict = {"application": re.findall(r"application\s+(\S+)?\s*;", controlDict_text)[0],
                             "startTime": re.findall(r"startTime\s+(\S+)?;", controlDict_text)[0],
                             "endTime": re.findall(r"endTime\s+(\S+)?\s*;", controlDict_text)[0],
@@ -242,8 +260,8 @@ class OpenFOAMCase(object):
                             "maxCo": re.findall(r"maxCo\s+(\S+)?\s*;", controlDict_text)[0],
                             "maxAlphaCo": re.findall(r"maxAlphaCo\s+(\S+)?\s*;", controlDict_text)[0]}
             self.__controlDict = controlDict(control_dict)
-        else:
-            self.__message += "\nThe controlDict is missing. \n"
+        except IOError as e:
+            self.__message += e
 
     def GetControlDict(self):
         return self.__controlDict
@@ -258,12 +276,13 @@ class OpenFOAMCase(object):
             else:
                 path = self.__caseFolder + "/constant/" + region + "/polyMesh/boundary"
 
-            if os.path.isfile(path):
+            try:
                 with open(path) as fid:
-                    bc_text = fid.read()
-            else:
-                self.__message += "\nThe boundary file for region:" + " is not exist!\n"
+                    bc_text = stripFoamHead(fid.read())
+            except IOError as e:
+                self.__message += e
                 return
+
             bc_text = re.findall(r"\((.*)\)", bc_text).split("}")[:-1]  # extract only the boundary definition part
             boundaries = {region: []}
 
@@ -328,4 +347,119 @@ class OpenFOAMCase(object):
 
                 elif patch.type == "mappedWall" and patch.name != patch.samplePatch:
                     self.__message += "\nMaster and slave mappedWall of " + bc.name + " are differentiated already!\n"
+
+    def loadDecomposePar(self):
+        # TODO: change all the open file block with a try error mode. otherwise the program will exit with error.
+        def parser(path, region_name):
+            try:
+                with open(path) as fid:
+                    text = stripFoamHead(fid.read())
+                    decomposePar({"numberOfSubdomains": re.findall(r"numberOfSubdomains\s+(\d+)\s*;", text),
+                                  "method": re.findall(r"method\s+(\S+)\s*", text),
+                                  "Coeffs": re.findall(r"Coeffs(.*)", text)})
+                self.__decomposeParDict[region_name] = decomposePar
+            except IOError as e:
+                self.__message += e
+
+        path_global = self.__caseFolder + "/system/decomposeParDict"
+        parser(path_global, "global")
+
+        if len(self.__regionName) == 1:
+            return
+        for region in self.__regionName:
+            path = self.__caseFolder + "/system/" + region + "/decomposeParDict"
+            parser(path_global, region)
+
+    def loadMRF(self):
+        def parser(mrf_path):
+            try:
+                with open(mrf_path) as fid:
+                    text = stripFoamHead(fid.read())
+                mrf_list = []
+                MRF_name = re.findall(r"(\S+).?\{", text)
+                MRF_cellZone = re.findall(r"cellZone\s+(\S+)\s*;", text)
+                MRF_active = re.findall(r"active\s+(\S+)\s*;", text)
+                MRF_nonRotatingPatches = re.findall(r"nonRotatingPatches\s+\((.?)\)\s*;", text)
+                MRF_origin = re.findall(r"origin\s+(.*?)\s*;", text)
+                MRF_axis = re.findall(r"axis\s*(.*?)\s*;", text)
+                MRF_omega = re.findall(r"omega\s+(\S+)\s+(.*?)\s*;", text)
+                for i in range(len(MRF_name)):
+                    rotate = rotationProp(MRF_origin[i], MRF_axis[i], MRF_omega[i])
+                    mrf_list.append(MRF_name[i], MRF_cellZone[i], MRF_active[i], MRF_nonRotatingPatches[i], rotate)
+                return mrf_list
+            except IOError as e:
+                self.__message += e
+
+        if len(self.__regionName) == 1:
+            path = self.__caseFolder + "/constant/MRFProperties"
+            self.__MRF["default region"] = parser(path)
+        else:
+            for region in self.__regionName:
+                if self.__regionProperty[region] == "fluid":
+                    path = self.__caseFolder + "/constant/" + region + "/MRFProperties"
+                    self.__MRF[region].append(parser(path))
+
+    def loadRadiation(self):
+        self.__regionName
+
+    def loadFvSchemes(self):
+        self.__regionName
+
+    def loadFvSolution(self):
+        self.__regionName
+
+    def loadInitialCondition(self):
+        self.__regionName
+        self.__turbulenceModel
+        path = self.__caseFolder + "/0/"
+        initial_fields = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
+
+        try:
+            with open(path) as fid:
+                text = stripFoamHead(fid.read)
+            content = re.findall(r"dimensions\s+(.*?);.*internalField\s+(.*?);\s*boundaryField\s*\{(.*)\}", text)
+        except IOError as e:
+            self.__message += e
+
+    def writeLog(self):
+        with open(self.__caseFolder + "/myFoam.log", "a+") as fid:
+            fid.write(self.__log)
+            fid.write(strftime("%Y-%m-%d %H:%M:%S", localtime()))
+
+    def clearLog(self):
+        open(self.__caseFolder + "/myFoam.log", 'w').close()
+
+    def loadDynamicMesh(self):
+        path = self.__caseFolder
+        for region in self.__regionName:
+            if region == "default region":
+                dynamicPath = path + "/constant/dynamicMeshDict"
+                try:
+                    with open(path) as fid:
+                        text = stripFoamHead(fid.read())
+
+                except IOError as e:
+                    self.__message += e
+
+
+"""
+    dynamicFvMesh       solidBodyMotionFvMesh;
+    motionSolverLibs    ("linfvMotionSolver.so")
+
+    solidBodyMotionFvMeshCoeffs
+    {
+        cellZone            rotor;
+        solidBodyMotionFunction     rotatingMotion;
+        rotationMotionCoeffs
+        {
+            origin      (0 0 0);
+            axis        (0 0 1);
+            omega       constant 6.28; #rad/s
+        }
+
+    }
+                except IOError as e:
+                    self.__message += e
+"""
+
 
