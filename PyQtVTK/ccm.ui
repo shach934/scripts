@@ -63,7 +63,7 @@
           </property>
           <item>
            <property name="text">
-            <string>Region1</string>
+            <string>part 1</string>
            </property>
            <item>
             <property name="text">
@@ -83,7 +83,7 @@
           </item>
           <item>
            <property name="text">
-            <string>Region2</string>
+            <string>part2</string>
            </property>
            <item>
             <property name="text">
@@ -148,23 +148,63 @@
           </property>
           <item>
            <property name="text">
-            <string>Viscosity</string>
+            <string>region1</string>
            </property>
+           <item>
+            <property name="text">
+             <string>Viscosity</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Radiation</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Heat Conductivity</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Specific Heat</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Density</string>
+            </property>
+           </item>
           </item>
           <item>
            <property name="text">
-            <string>Heat Conductivity</string>
+            <string>region2</string>
            </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Specific Heat</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Density</string>
-           </property>
+           <item>
+            <property name="text">
+             <string>viscosity</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>radiation</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>heat conductivity</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>spefici heat</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>density</string>
+            </property>
+           </item>
           </item>
          </item>
          <item>
@@ -178,12 +218,22 @@
           </item>
           <item>
            <property name="text">
+            <string>grad</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>div</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>laplacian</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>snag</string>
            </property>
           </item>
          </item>
@@ -195,16 +245,126 @@
            <property name="text">
             <string>solver</string>
            </property>
+           <item>
+            <property name="text">
+             <string>U</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>p</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>h</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>rho</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ii_lambda</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>k</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>epsilon</string>
+            </property>
+           </item>
           </item>
           <item>
            <property name="text">
             <string>residual</string>
            </property>
+           <item>
+            <property name="text">
+             <string>p</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>U</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>epsilon</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>h</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>rho</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ii_lambda</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>k</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>omega</string>
+            </property>
+           </item>
           </item>
           <item>
            <property name="text">
             <string>relaxation</string>
            </property>
+           <item>
+            <property name="text">
+             <string>p</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>U</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>h</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>epsilon</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>rho</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>k</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ii_lambda</string>
+            </property>
+           </item>
           </item>
          </item>
          <item>
@@ -224,21 +384,26 @@
          </item>
          <item>
           <property name="text">
-           <string>Solver</string>
+           <string>Control</string>
           </property>
           <item>
            <property name="text">
-            <string>Application</string>
+            <string>Parallel</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>StartFrom</string>
+            <string>SolverFoam</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>TimeStep</string>
+            <string>Start from</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Time step</string>
            </property>
           </item>
           <item>
@@ -253,12 +418,7 @@
           </item>
           <item>
            <property name="text">
-            <string>Adjust On Fly</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>adjust Time step</string>
+            <string>Adjust On-Fly</string>
            </property>
           </item>
           <item>
@@ -268,12 +428,22 @@
           </item>
           <item>
            <property name="text">
-            <string>decompose</string>
+            <string>adjust Time step</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>Function</string>
+           </property>
+          </item>
+         </item>
+         <item>
+          <property name="text">
+           <string>Postprocessing</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>New Subitem</string>
            </property>
           </item>
          </item>
