@@ -167,6 +167,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def setScaleBar(self):
         # lookup table
         lut = vtk.vtkLookupTable()
+        print(lut)
         lut.SetHueRange(0.667, 0)
         lut.SetNumberOfColors(10)
         lut.Build()
@@ -206,7 +207,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         print(self.caseFolder)
         if self.caseFolder[0] != "":
-            self.foamCase = self.loadCase()
+            self.loadCase()
 
     def loadCase(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
@@ -242,7 +243,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
         if buttonReply == QMessageBox.Yes:
-            self.close()
+            self.close()    # TODO: change the self.close() to self.write() later.
         if buttonReply == QMessageBox.No:
             self.close()
         if buttonReply == QMessageBox.Cancel:

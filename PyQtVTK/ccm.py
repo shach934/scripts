@@ -194,7 +194,7 @@ class Ui_OpenFOAM(object):
         self.actionQuit.setObjectName("actionQuit")
         self.actionTurbulence = QtWidgets.QAction(OpenFOAM)
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("images/turbulence.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap("images/air-flow.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionTurbulence.setIcon(icon4)
         self.actionTurbulence.setObjectName("actionTurbulence")
         self.actionMRF = QtWidgets.QAction(OpenFOAM)
@@ -372,6 +372,7 @@ class Ui_OpenFOAM(object):
         self.menuBar.addAction(self.menuHelp.menuAction())
         self.mainToolBar.addAction(self.actionOpen)
         self.mainToolBar.addAction(self.actionWrite)
+        self.mainToolBar.addAction(self.actionTurbulence)
         self.mainToolBar.addAction(self.actionRun)
         self.mainToolBar.addAction(self.actionStop)
         self.mainToolBar.addAction(self.actionTools)
@@ -384,6 +385,7 @@ class Ui_OpenFOAM(object):
         self.viewBar.addAction(self.actionFrame)
         self.viewBar.addAction(self.actionTransperancy)
         self.receiveBar.addSeparator()
+
         self.retranslateUi(OpenFOAM)
         self.mainViewTabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(OpenFOAM)
@@ -506,7 +508,6 @@ class Ui_OpenFOAM(object):
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     OpenFOAM = QtWidgets.QMainWindow()
     ui = Ui_OpenFOAM()

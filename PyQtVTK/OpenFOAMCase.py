@@ -410,9 +410,7 @@ class OpenFOAMCase(object):
 
     def loadInitialCondition(self):
         self.__regionName
-        self.__turbulenceModel
         path = self.__caseFolder + "/0/"
-        initial_fields = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
 
         try:
             with open(path) as fid:

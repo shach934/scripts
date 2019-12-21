@@ -503,6 +503,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionWrite"/>
+   <addaction name="actionTurbulence"/>
    <addaction name="actionRun"/>
    <addaction name="actionStop"/>
    <addaction name="actionTools"/>
@@ -588,7 +589,7 @@
   <action name="actionTurbulence">
    <property name="icon">
     <iconset>
-     <normaloff>images/turbulence.png</normaloff>images/turbulence.png</iconset>
+     <normaloff>images/air-flow.svg</normaloff>images/air-flow.svg</iconset>
    </property>
    <property name="text">
     <string>Turbulence</string>
