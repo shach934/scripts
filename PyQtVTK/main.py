@@ -205,7 +205,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
                                                       "OpenFOAM File (*.foam *.txt)")
 
-        print(self.caseFolder)
         if self.caseFolder[0] != "":
             self.loadCase()
 
@@ -227,7 +226,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
             # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
             self.patches.append(self.foamReader.GetPatchArrayName(i))
 
-        self.foamReader.DisableAllPatchArrays()
+        # this function will disable all the patches, use this to disable patches not checked
+        # self.foamReader.DisableAllPatchArrays()
 
         # TODO count the number of regions/blocks
         block = self.foamReader.GetOutput()
