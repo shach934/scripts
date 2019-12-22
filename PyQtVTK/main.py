@@ -51,8 +51,11 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
 
+        self.foamConfig = OpenFOAMCase()
         self.numberOfBlocks = 0
         self.setupUi(self)
+
+        self.__message__ = "Ready. Let's FOAM!"
 
         self.topSplitter.setSizes([100, 500])
         self.leftDomain.setSizes([100, 100])
@@ -82,7 +85,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         # VTK related initialization.
         self.vtkWindow = QVTKRenderWindowInteractor(self.geoTab)
-        self.foamReader = vtk.vtkOpenFOAMReader()
+        self.foamVTKGeo = vtk.vtkOpenFOAMReader()
         self.filter = vtk.vtkGeometryFilter()
         self.mapper = vtk.vtkCompositePolyDataMapper2()
         self.actor = vtk.vtkActor()
@@ -113,11 +116,11 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkContainBox.addWidget(self.vtkWindow)
         self.geoTab.setLayout(self.vtkContainBox)
 
-        tArray = vtk_to_numpy(self.foamReader.GetTimeValues())
-        self.foamReader.UpdateTimeStep(tArray[-1])
-        self.foamReader.Update()
+        tArray = vtk_to_numpy(self.foamVTKGeo.GetTimeValues())
+        self.foamVTKGeo.UpdateTimeStep(tArray[-1])
+        self.foamVTKGeo.Update()
 
-        self.filter.SetInputConnection(self.foamReader.GetOutputPort())
+        self.filter.SetInputConnection(self.foamVTKGeo.GetOutputPort())
 
         self.mapper.SetInputConnection(self.filter.GetOutputPort())
         self.mapper.SetScalarModeToUseCellFieldData()
@@ -128,6 +131,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.actor.SetMapper(self.mapper)
         # set the presentation style
         actorProper = self.actor.GetProperty()  # property of the VTK view
+
         # show the mesh edge, it is using the surface and integralMesh together
         actorProper.EdgeVisibilityOn()
         actorProper.SetEdgeColor(0, 0, 0)
@@ -167,7 +171,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def setScaleBar(self):
         # lookup table
         lut = vtk.vtkLookupTable()
-        print(lut)
         lut.SetHueRange(0.667, 0)
         lut.SetNumberOfColors(10)
         lut.Build()
@@ -186,13 +189,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def updateTime(self):
         timeStep = int(str(self.timeSelectCombo.currentText()))
 
-    def resetFile(self):
-        self.render = vtk.vtkRenderer()
-        self.setupVTKBackGround()
-
-        self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
-        self.vtkWindow.Render()
-
     def openFile(self):
         # TODO add warning box to save the current config, open a new file will overwrite the current model. just
         #  like ANSA.
@@ -200,55 +196,75 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
         if buttonReply == QMessageBox.Yes:
             OpenFOAMCase.write()
-        if buttonReply == QMessageBox.No or buttonReply == QMessageBox.Cancel:
-            pass
+            self.resetFile()
+        if buttonReply == QMessageBox.No:
+            self.resetFile()
+        if buttonReply == QMessageBox.Cancel:
+            self.__messaga__ += "No new case opened"
+            return
+
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
                                                       "OpenFOAM File (*.foam *.txt)")
 
         if self.caseFolder[0] != "":
-            self.loadCase()
+            self.loadCaseGeo()
+            self.foamConfig.SetFolderAndName(self.caseFolder)
 
-    def loadCase(self):
+    def loadCaseGeo(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
-        self.foamReader.SetFileName(str(self.caseFolder[0]))
-        self.foamReader.CreateCellToPointOn()
-        self.foamReader.DecomposePolyhedraOn()
-        self.foamReader.EnableAllCellArrays()
-        self.foamReader.Update()
+        self.foamVTKGeo.SetFileName(str(self.caseFolder[0]))
+        self.foamVTKGeo.CreateCellToPointOn()
+        self.foamVTKGeo.DecomposePolyhedraOn()
+        self.foamVTKGeo.EnableAllCellArrays()
+        self.foamVTKGeo.Update()
         self.setupVTK()
         self.setWindowTitle(self.caseFolder[0])
         self.pipLine.topLevelItem(0).setText(0, self.caseName)
         # TODO for now, every time reinitialize the render,
         #  later should initialize only once and use disableAllPatchArrays method.
         self.patches = []
-        n = self.foamReader.GetNumberOfPatchArrays()
+        n = self.foamVTKGeo.GetNumberOfPatchArrays()
         for i in range(n):
             # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
-            self.patches.append(self.foamReader.GetPatchArrayName(i))
-
+            self.patches.append(self.foamVTKGeo.GetPatchArrayName(i))
+        print(self.patches)
         # this function will disable all the patches, use this to disable patches not checked
         # self.foamReader.DisableAllPatchArrays()
 
         # TODO count the number of regions/blocks
-        block = self.foamReader.GetOutput()
+        # TODO clear all the variables when a new case is opened. right now the values are all inherited.
+        block = self.foamVTKGeo.GetOutput()
         while block.GetBlock(self.numberOfBlocks) is not None:
             self.numberOfBlocks += 1
+            print(block.GetBlock(self.numberOfBlocks)["Cell Data"])
+
 
     def resetFile(self):
+        self.__init__()
         self.render = vtk.vtkRenderer()
         self.setupVTKBackGround()
         self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
 
     def shutDownWarning(self):
-        buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
+        closeButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
-        if buttonReply == QMessageBox.Yes:
+        if closeButtonReply == QMessageBox.Yes:
             self.close()    # TODO: change the self.close() to self.write() later.
-        if buttonReply == QMessageBox.No:
+        if closeButtonReply == QMessageBox.No:
             self.close()
-        if buttonReply == QMessageBox.Cancel:
+        if closeButtonReply == QMessageBox.Cancel:
             pass
 
+    def openNewCaseWarning(self):
+        openButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open a new case?",
+                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+
+        if openButtonReply == QMessageBox.Yes:
+            self.close()    # TODO: change the self.close() to self.write() later.
+        if openButtonReply == QMessageBox.No:
+            self.close()
+        if openButtonReply == QMessageBox.Cancel:
+            pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

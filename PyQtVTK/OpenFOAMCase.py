@@ -152,6 +152,21 @@ class OpenFOAMCase(object):
         self.__message = "Ready! Let's GO!\n\n"
         self.__log = ""
 
+    def loadCase(self):
+        self.SetFolderAndName()
+        self.SetRegionProperty()
+        self.loadBoundary()
+        self.loadDecomposePar()
+        self.loadDynamicMesh()
+        self.loadFvSchemes()
+        self.loadFvSolution()
+        self.loadRadiation()
+        self.loadMRF()
+        self.loadSolverInfo()
+        self.loadInitialCondition()
+        self.loadTurbulenceModel()
+        self.loadDecomposePar()
+
     def SetFolderAndName(self, caseFolder=("", "")):
         # caseFolder example, from vtkFoamReader:
         # ('C:/Shaohui/OpenFoam/radiationTest/air99surf/case14.foam', 'OpenFOAM File (*.foam *.txt)')
@@ -219,8 +234,8 @@ class OpenFOAMCase(object):
     def GetRegionProperty(self):
         return self.__regionProperty
 
-    # TODO: currently only RAS and laminar models are considered, Large Eddy Simulation(LES) & Detached Eddy
-    #  Simulation(DES)
+    # TODO: currently only RAS and laminar models are considered,
+    #  Large Eddy Simulation(LES) & Detached Eddy Simulation(DES) added later.
     def loadTurbulenceModel(self):
         # read in the turbulence model.
         for region in self.__regionName:
@@ -318,6 +333,7 @@ class OpenFOAMCase(object):
                         CyclicAMI(bc_name, region, patch_type, startFace, nFaces, Tolerance, neighbourPatch, transform))
                 else:
                     self.__message += "\nThe path type is not defined yet! \n"
+
 
     def differentiateMappedWall(self):
         # now pair the boundaries to make sure the mappedWall and cyclicAMI pair properly.
