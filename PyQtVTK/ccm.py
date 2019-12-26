@@ -323,6 +323,11 @@ class Ui_OpenFOAM(object):
         self.actionVolume.setObjectName("actionVolume")
         self.actionMass_flow_rate = QtWidgets.QAction(OpenFOAM)
         self.actionMass_flow_rate.setObjectName("actionMass_flow_rate")
+        self.actionFit_Window = QtWidgets.QAction(OpenFOAM)
+        icon23 = QtGui.QIcon()
+        icon23.addPixmap(QtGui.QPixmap("images/fit window.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionFit_Window.setIcon(icon23)
+        self.actionFit_Window.setObjectName("actionFit_Window")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionWrite)
         self.menuFile.addAction(self.actionQuit)
@@ -354,6 +359,7 @@ class Ui_OpenFOAM(object):
         self.menuView.addAction(self.actionTransperancy)
         self.menuView.addAction(self.actionAuto_Scale)
         self.menuView.addAction(self.actionSet_Scale)
+        self.menuView.addAction(self.actionFit_Window)
         self.menuSetting.addAction(self.actionTools)
         self.menuPostprocessing.addAction(self.actionWall_Heat_Flux)
         self.menuPostprocessing.addAction(self.actionTemperature_Probe)
@@ -381,6 +387,7 @@ class Ui_OpenFOAM(object):
         self.viewBar.addAction(self.actionAlign_X)
         self.viewBar.addAction(self.actionAlign_Y)
         self.viewBar.addAction(self.actionAligh_Z)
+        self.viewBar.addAction(self.actionFit_Window)
         self.viewBar.addAction(self.actionMesh)
         self.viewBar.addAction(self.actionFrame)
         self.viewBar.addAction(self.actionTransperancy)
@@ -392,7 +399,7 @@ class Ui_OpenFOAM(object):
 
     def retranslateUi(self, OpenFOAM):
         _translate = QtCore.QCoreApplication.translate
-        OpenFOAM.setWindowTitle(_translate("OpenFOAM", "OpenFOAM"))
+        OpenFOAM.setWindowTitle(_translate("OpenFOAM", "XinFOAM"))
         self.pipLine.headerItem().setText(0, _translate("OpenFOAM", "Model"))
         __sortingEnabled = self.pipLine.isSortingEnabled()
         self.pipLine.setSortingEnabled(False)
@@ -504,6 +511,7 @@ class Ui_OpenFOAM(object):
         self.actionHeat_Transfer_Coefficent.setText(_translate("OpenFOAM", "Heat Transfer Coefficent"))
         self.actionVolume.setText(_translate("OpenFOAM", "Volumetric flow rate"))
         self.actionMass_flow_rate.setText(_translate("OpenFOAM", "Mass flow rate"))
+        self.actionFit_Window.setText(_translate("OpenFOAM", "Fit Window"))
 
 
 if __name__ == "__main__":

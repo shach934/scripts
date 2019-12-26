@@ -131,13 +131,10 @@ def stripFoamHead(text):
 
 class OpenFOAMCase(object):
     def __init__(self):
-        self.__numberOfRegions = 1
-        self.__regionName = []
         self.__regionProperty = {}
         self.__caseFolder = ""
         self.__caseName = ""
-        self.__patches = []
-        self.__boundaries = []
+        self.__boundaries = {}
         self.__controlDict = {}
         self.__fvSchemes = {}
         self.__fvSolution = {}
@@ -184,30 +181,26 @@ class OpenFOAMCase(object):
     def GetCaseName(self):
         return self.__caseName
 
-    def SetRegionProperty(self, regionNameFromVTK):
-        # if there is more than 1 region, go to each folder extract the region's name and find the regionProperties file
-        # extract the region's property and using their names to very folders structure.
-        regionNameFromVTK = sorted(regionNameFromVTK)  # to compare with the folder names read from the case path.
+    def SetRegionProperty(self):
+        # check the file structure first, then go to the properties dict.
+        zero_folder = self.__caseFolder + "/0/"
+        constant_folder = self.__caseFolder + "/constant/"
+        system_folder = self.__caseFolder + "/system/"
 
-        if len(regionNameFromVTK) > 1:
+        regions_constant = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
+        regions_constant.sort()
 
-            zero_folder = self.__caseFolder + "/0/"
-            constant_folder = self.__caseFolder + "/constant/"
-            system_folder = self.__caseFolder + "/system/"
-            self.__regionName = regionNameFromVTK
+        regions_zero = [name for name in os.listdir(zero_folder) if os.path.isdir(zero_folder + "/" + name)]
+        regions_zero.sort()
 
-            regions2 = [name for name in os.listdir(constant_folder) if os.path.isdir(constant_folder + "/" + name)]
-            regions2.sort()
+        regions_system = [name for name in os.listdir(system_folder) if os.path.isdir(system_folder + "/" + name)]
+        regions_system.sort()
 
-            regions3 = [name for name in os.listdir(zero_folder) if os.path.isdir(zero_folder + "/" + name)]
-            regions3.sort()
-
-            regions4 = [name for name in os.listdir(system_folder) if os.path.isdir(system_folder + "/" + name)]
-            regions4.sort()
-
-            if regionNameFromVTK != regions2 or regionNameFromVTK != regions3 or regionNameFromVTK != regions4:
-                self.__message += "\nThe multiRegion folder structure is NOT correct! Check again! \n"
-
+        if len(regions_constant) == 0 and len(regions_system) == 0 and len(regions_zero) == 0:
+            self.__message += "\nThere is no sub regions exist! Single region problem. \n"
+            self.__regionProperty["default region"] = "fluid"
+            singleRegion = True
+        else:
             try:
                 with open(constant_folder + "regionProperties") as fid:
                     text = stripFoamHead(fid.read())
@@ -227,9 +220,9 @@ class OpenFOAMCase(object):
                         self.__regionProperty[reg] = "fluid"
             except IOError as e:
                 self.__message += e
-        elif len(regionNameFromVTK) == 1:
-            self.__message += "\nSingle region case, default one fluid region!\n"
-            self.__regionProperty["default region"] = "fluid"
+                self.__message += "\nManually change the regionProperties to define the regions\n"
+            if regions != regions_constant or regions != regions_system or regions != regions_zero:
+                self.__message += "\nThe folder structure doesn't consistent with properties dict!\n"
 
     def GetRegionProperty(self):
         return self.__regionProperty
@@ -285,12 +278,11 @@ class OpenFOAMCase(object):
         # TODO: connect the boundary info to the display.
         # read in boundary patches of each region.
 
-        for region in self.__regionName:
+        for region in list(self.__regionProperty.keys()):
             if self.__regionProperty[region] == "default region":
                 path = self.__caseFolder + "/constant/polyMesh/boundary"
             else:
                 path = self.__caseFolder + "/constant/" + region + "/polyMesh/boundary"
-
             try:
                 with open(path) as fid:
                     bc_text = stripFoamHead(fid.read())
@@ -299,7 +291,7 @@ class OpenFOAMCase(object):
                 return
 
             bc_text = re.findall(r"\((.*)\)", bc_text).split("}")[:-1]  # extract only the boundary definition part
-            boundaries = {region: []}
+            self.__boundaries[region] = []
 
             for bc in bc_text:
                 bc_name = bc.split("{")[0]
@@ -308,7 +300,7 @@ class OpenFOAMCase(object):
                 nFaces = re.findall(r"nFaces\s+(\d+)\s*;", bc)[0]
 
                 # TODO: more type of boundary, now limited to patch, wall, mappedWall, cyclicAMI.
-                #  more: symmetry, empty...
+                #  more boundary type such as: symmetry, empty...
                 if patch_type == "mappedWall":
                     sampleMode = re.findall(r"sampleMode\s+(\S+)\s*;", bc)[0]
                     sampleRegion = re.findall(r"sampleRegion\s+(\S+)\s*;", bc)[0]
@@ -323,23 +315,33 @@ class OpenFOAMCase(object):
                     self.__message += "\nThe path type is not defined yet! \n"
 
                 if patch_type == "wall" or patch_type == "patch":
-                    boundaries[region].append(Patch(bc_name, region, patch_type, startFace, nFaces))
+                    self.__boundaries[region].append(Patch(bc_name, region, patch_type, startFace, nFaces))
                 elif patch_type == "mappedWall":
-                    boundaries[region].append(
+                    self.__boundaries[region].append(
                         MappedWall(bc_name, region, patch_type, startFace, nFaces, sampleMode, samplePatch,
                                    sampleRegion))
                 elif patch_type == "cyclicAMI":
-                    boundaries[region].append(
+                    self.__boundaries[region].append(
                         CyclicAMI(bc_name, region, patch_type, startFace, nFaces, Tolerance, neighbourPatch, transform))
                 else:
                     self.__message += "\nThe path type is not defined yet! \n"
 
+    def checkBoundary(self, regions):
+        if set(self.__boundaries.keys()) != set(regions.keys()):
+            return False
+        for region in self.__boundaries:
+            patch1 = set(self.__boundaries[region])
+            patch1.add("internalMesh")
+            patch2 = set(regions[region])
+            if set(self.__boundaries[region]) != set(regions[region]):
+                return False
+        return True
 
     def differentiateMappedWall(self):
         # now pair the boundaries to make sure the mappedWall and cyclicAMI pair properly.
         # Change the patch name of mappedWall at fluid side to _shadow to avoid confusing.
         # just loop the solid region, slave corresponding fluid's patches.
-        for region in self.__regionName:
+        for region in list(self.__regionProperty.keys()):
             if self.__regionProperty[region] == "fluid":
                 continue
             boundary = self.__boundaries[region]

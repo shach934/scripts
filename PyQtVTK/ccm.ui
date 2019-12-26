@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>OpenFOAM</string>
+   <string>XinFOAM</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -463,6 +463,7 @@
     <addaction name="actionTransperancy"/>
     <addaction name="actionAuto_Scale"/>
     <addaction name="actionSet_Scale"/>
+    <addaction name="actionFit_Window"/>
    </widget>
    <widget class="QMenu" name="menuSetting">
     <property name="title">
@@ -529,6 +530,7 @@
    <addaction name="actionAlign_X"/>
    <addaction name="actionAlign_Y"/>
    <addaction name="actionAligh_Z"/>
+   <addaction name="actionFit_Window"/>
    <addaction name="actionMesh"/>
    <addaction name="actionFrame"/>
    <addaction name="actionTransperancy"/>
@@ -845,6 +847,15 @@
   <action name="actionMass_flow_rate">
    <property name="text">
     <string>Mass flow rate</string>
+   </property>
+  </action>
+  <action name="actionFit_Window">
+   <property name="icon">
+    <iconset>
+     <normaloff>images/fit window.svg</normaloff>images/fit window.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Fit Window</string>
    </property>
   </action>
  </widget>

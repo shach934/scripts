@@ -51,8 +51,12 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
 
+        self.settingDialog = SettingDialog()
         self.foamConfig = OpenFOAMCase()
+        self.caseName = ""
         self.numberOfBlocks = 0
+        self.patches = []
+        self.regions = {}  # the structure of the boundary info is like this self.region["air"] = ["wall", "air1"]
         self.setupUi(self)
 
         self.__message__ = "Ready. Let's FOAM!"
@@ -150,7 +154,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.show()
 
     def setting(self):
-        self.settingDialog = SettingDialog()
         self.settingDialog.show()
 
     def AddAxes(self):
@@ -200,7 +203,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         if buttonReply == QMessageBox.No:
             self.resetFile()
         if buttonReply == QMessageBox.Cancel:
-            self.__messaga__ += "No new case opened"
+            self.__messaga__ += "No new case opened."
             return
 
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
@@ -209,6 +212,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         if self.caseFolder[0] != "":
             self.loadCaseGeo()
             self.foamConfig.SetFolderAndName(self.caseFolder)
+            self.foamConfig.loadCase()
 
     def loadCaseGeo(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
@@ -220,14 +224,15 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.setupVTK()
         self.setWindowTitle(self.caseFolder[0])
         self.pipLine.topLevelItem(0).setText(0, self.caseName)
+
         # TODO for now, every time reinitialize the render,
         #  later should initialize only once and use disableAllPatchArrays method.
-        self.patches = []
+
         n = self.foamVTKGeo.GetNumberOfPatchArrays()
         for i in range(n):
             # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
             self.patches.append(self.foamVTKGeo.GetPatchArrayName(i))
-        print(self.patches)
+
         # this function will disable all the patches, use this to disable patches not checked
         # self.foamReader.DisableAllPatchArrays()
 
@@ -236,8 +241,16 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         block = self.foamVTKGeo.GetOutput()
         while block.GetBlock(self.numberOfBlocks) is not None:
             self.numberOfBlocks += 1
-            print(block.GetBlock(self.numberOfBlocks)["Cell Data"])
-
+        if self.numberOfBlocks > 1:
+            for patch in self.patches:
+                if patch.split("/")[0] in self.regions:
+                    self.regions[patch.split("/")[0]].append(patch.split("/")[1])
+                else:
+                    self.regions[patch.split("/")[0]] = patch.split("/")[1]
+        else:
+            self.regions["default region"] = self.patches
+        if not self.foamConfig.checkBoundary(self.regions):
+            self.__message__ += "´\nThe patches and regions from VTK are not consistent with the file!\n"
 
     def resetFile(self):
         self.__init__()
@@ -247,9 +260,10 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def shutDownWarning(self):
         closeButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
-                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+                                               QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+                                               QMessageBox.Cancel)
         if closeButtonReply == QMessageBox.Yes:
-            self.close()    # TODO: change the self.close() to self.write() later.
+            self.close()  # TODO: change the self.close() to self.write() later.
         if closeButtonReply == QMessageBox.No:
             self.close()
         if closeButtonReply == QMessageBox.Cancel:
@@ -257,14 +271,15 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def openNewCaseWarning(self):
         openButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open a new case?",
-                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+                                              QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
 
         if openButtonReply == QMessageBox.Yes:
-            self.close()    # TODO: change the self.close() to self.write() later.
+            self.close()  # TODO: change the self.close() to self.write() later.
         if openButtonReply == QMessageBox.No:
             self.close()
         if openButtonReply == QMessageBox.Cancel:
             pass
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
