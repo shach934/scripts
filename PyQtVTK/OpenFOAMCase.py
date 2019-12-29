@@ -42,7 +42,7 @@ class MappedWall(Patch):
 
 
 class CyclicAMI(Patch):
-    def __init__(self, name=None, region=None, type="cyclicAMI", startFace=0, nFaces=0, Tolerance=0.0,
+    def __init__(self, name=None, region=None, utype="cyclicAMI", startFace=0, nFaces=0, Tolerance=0.0,
                  neighbourPatch=None, transform=None):
         super(CyclicAMI, self).__init__(name, region, type, startFace, nFaces)
         self.Tolerance = Tolerance
@@ -99,7 +99,7 @@ class MRF(object):
 class decomposePar(object):
     # available decompose methods, simple, hierarchical, scotch, manual
     # ref: https://cfd.direct/openfoam/user-guide/v6-running-applications-parallel/
-    def __init__(self, numberOfSubdomains, method, coeffs):
+    def __init__(self, numberOfSubdomains, method="scotch", coeffs=" "):
         self.numberOfSubdomains = numberOfSubdomains
         self.method = method
         self.coeffs = coeffs
@@ -170,7 +170,7 @@ class OpenFOAMCase(object):
         foam_path = caseFolder[0]
         if len(foam_path):
             foam_path = foam_path[:foam_path.rfind("/")]
-            self.__caseFolder = foam_path[:foam_path.rfind("/")]
+            self.__caseFolder = foam_path
             self.__caseName = foam_path[foam_path.rfind("/") + 1:]
         else:
             self.__message += "\nNo case folder found\n"
@@ -219,7 +219,7 @@ class OpenFOAMCase(object):
                     if len(reg):
                         self.__regionProperty[reg] = "fluid"
             except IOError as e:
-                self.__message += e
+                self.__message += str(e)
                 self.__message += "\nManually change the regionProperties to define the regions\n"
             if regions != regions_constant or regions != regions_system or regions != regions_zero:
                 self.__message += "\nThe folder structure doesn't consistent with properties dict!\n"
@@ -231,7 +231,7 @@ class OpenFOAMCase(object):
     #  Large Eddy Simulation(LES) & Detached Eddy Simulation(DES) added later.
     def loadTurbulenceModel(self):
         # read in the turbulence model.
-        for region in self.__regionName:
+        for region in list(self.__regionProperty.keys()):
             turbulence_model = {}
             if region == "default region":  # if single region, its name is default region, upon done, exit loop.
                 turbulence_file_path = self.__caseFolder + "/constant/turbulenceProperties"
@@ -250,12 +250,13 @@ class OpenFOAMCase(object):
                     turbulence_model["printCoeffs"] = re.findall(r"printCoeffs (.*);?", text)[0]
                 self.__turbulenceModel[region] = turbulenceModel(turbulence_model)
             except IOError as e:
-                self.__message += e
+                self.__message += str(e)
 
     def loadSolverInfo(self):
         try:
             with open(self.__caseFolder + "/system/controlDict") as fid:
                 controlDict_text = stripFoamHead(fid.read())
+            # these items are not necessarily defined in the controlDict file.
 
             control_dict = {"application": re.findall(r"application\s+(\S+)?\s*;", controlDict_text)[0],
                             "startTime": re.findall(r"startTime\s+(\S+)?;", controlDict_text)[0],
@@ -269,7 +270,7 @@ class OpenFOAMCase(object):
                             "maxAlphaCo": re.findall(r"maxAlphaCo\s+(\S+)?\s*;", controlDict_text)[0]}
             self.__controlDict = controlDict(control_dict)
         except IOError as e:
-            self.__message += e
+            self.__message += str(e)
 
     def GetControlDict(self):
         return self.__controlDict
@@ -287,10 +288,11 @@ class OpenFOAMCase(object):
                 with open(path) as fid:
                     bc_text = stripFoamHead(fid.read())
             except IOError as e:
-                self.__message += e
+                self.__message += str(e)
                 return
 
-            bc_text = re.findall(r"\((.*)\)", bc_text).split("}")[:-1]  # extract only the boundary definition part
+            bc_text = re.findall(r"(\d+)\s*\((.*)\)\s+", bc_text, re.DOTALL)[0][1].split("}")[
+                      :-1]  # extract only the boundary definition part
             self.__boundaries[region] = []
 
             for bc in bc_text:
@@ -377,14 +379,14 @@ class OpenFOAMCase(object):
                                   "Coeffs": re.findall(r"Coeffs(.*)", text)})
                 self.__decomposeParDict[region_name] = decomposePar
             except IOError as e:
-                self.__message += e
+                self.__message += str(e)
 
         path_global = self.__caseFolder + "/system/decomposeParDict"
         parser(path_global, "global")
 
-        if len(self.__regionName) == 1:
+        if len(self.__regionProperty.keys()) == 1:
             return
-        for region in self.__regionName:
+        for region in list(self.__regionProperty.keys()):
             path = self.__caseFolder + "/system/" + region + "/decomposeParDict"
             parser(path_global, region)
 
@@ -406,28 +408,28 @@ class OpenFOAMCase(object):
                     mrf_list.append(MRF_name[i], MRF_cellZone[i], MRF_active[i], MRF_nonRotatingPatches[i], rotate)
                 return mrf_list
             except IOError as e:
-                self.__message += e
+                self.__message += str(e)
 
-        if len(self.__regionName) == 1:
+        if len(self.__regionProperty.keys()) == 1:
             path = self.__caseFolder + "/constant/MRFProperties"
             self.__MRF["default region"] = parser(path)
         else:
-            for region in self.__regionName:
+            for region in list(self.__regionProperty.keys()):
                 if self.__regionProperty[region] == "fluid":
                     path = self.__caseFolder + "/constant/" + region + "/MRFProperties"
-                    self.__MRF[region].append(parser(path))
+                    self.__MRF[region] = parser(path)
 
     def loadRadiation(self):
-        self.__regionName
+        self.__regionProperty
 
     def loadFvSchemes(self):
-        self.__regionName
+        self.__regionProperty
 
     def loadFvSolution(self):
-        self.__regionName
+        self.__regionProperty
 
     def loadInitialCondition(self):
-        self.__regionName
+        self.__regionProperty
         path = self.__caseFolder + "/0/"
 
         try:
@@ -435,7 +437,7 @@ class OpenFOAMCase(object):
                 text = stripFoamHead(fid.read)
             content = re.findall(r"dimensions\s+(.*?);.*internalField\s+(.*?);\s*boundaryField\s*\{(.*)\}", text)
         except IOError as e:
-            self.__message += e
+            self.__message += str(e)
 
     def writeLog(self):
         with open(self.__caseFolder + "/myFoam.log", "a+") as fid:
@@ -447,7 +449,7 @@ class OpenFOAMCase(object):
 
     def loadDynamicMesh(self):
         path = self.__caseFolder
-        for region in self.__regionName:
+        for region in list(self.__regionProperty.keys()):
             if region == "default region":
                 dynamicPath = path + "/constant/dynamicMeshDict"
                 try:
@@ -455,7 +457,7 @@ class OpenFOAMCase(object):
                         text = stripFoamHead(fid.read())
 
                 except IOError as e:
-                    self.__message += e
+                    self.__message += str(e)
 
 
 """
@@ -477,5 +479,3 @@ class OpenFOAMCase(object):
                 except IOError as e:
                     self.__message += e
 """
-
-

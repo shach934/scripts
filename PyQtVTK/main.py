@@ -26,6 +26,7 @@ import sys
 import vtk
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
+from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import vtk_to_numpy
@@ -50,21 +51,18 @@ class SettingDialog(QMainWindow, Ui_Setting):
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
-
         self.settingDialog = SettingDialog()
         self.foamConfig = OpenFOAMCase()
-        self.caseName = ""
+        self.caseName = "Model"
         self.numberOfBlocks = 0
         self.patches = []
         self.regions = {}  # the structure of the boundary info is like this self.region["air"] = ["wall", "air1"]
         self.setupUi(self)
-
         self.__message__ = "Ready. Let's FOAM!"
-
         self.topSplitter.setSizes([100, 500])
         self.leftDomain.setSizes([100, 100])
         self.rightDomain.setSizes([500, 100])
-
+        self.addTree()
         # GUI related initialization. some of them from case files.
         self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
         self.timeSteps = ["0"]
@@ -115,6 +113,32 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.receiveBar.addAction(self.actionAuto_Scale)
         self.receiveBar.addAction(self.actionSet_Scale)
+
+    def addTree(self):
+        # self.item_0 is the head item of the tree. it text is the name of the model.
+        regionProperties = self.foamConfig.GetRegionProperty()
+        TreeList = ({
+            'Geometry': (tuple(regionProperties.keys())),
+            'Physics': ('Turbulence', "MRF", "DynamicMesh", "Multiphase", "Heat", "Radiation"),
+            "Material": ("Viscosity", "Heat Conductivity", "Specific Heat", "Density"),
+            "fvSchemes": ("ddt", "div", "laplacian"),
+            "fvSolution": ("solver", "residual", "relaxation"),
+            "fvOption": ("Heat Source", "Temp Limit"),
+            "Solver": (
+                "Application", "StartFrom", "Time Step", "Write Interval", "End Time", "Adjust OnFly", "MaxCo",
+                "Decompose", "Function")
+        })
+        _translate = QtCore.QCoreApplication.translate
+        self.pipLine.topLevelItem(0).setText(0, _translate("OpenFOAM", self.caseName))
+
+        for key, value in TreeList.items():
+            parent = QtWidgets.QTreeWidgetItem(self.pipLine, [key])
+            for val in value:
+                child = QtWidgets.QTreeWidgetItem([val])
+                child.setFlags(child.flags() | Qt.ItemIsUserCheckable)
+                child.setCheckState(0, Qt.Unchecked)
+                parent.addChild(child)
+        self.pipLine.show()
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
@@ -239,6 +263,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         # TODO count the number of regions/blocks
         # TODO clear all the variables when a new case is opened. right now the values are all inherited.
         block = self.foamVTKGeo.GetOutput()
+
         while block.GetBlock(self.numberOfBlocks) is not None:
             self.numberOfBlocks += 1
         if self.numberOfBlocks > 1:
@@ -246,7 +271,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
                 if patch.split("/")[0] in self.regions:
                     self.regions[patch.split("/")[0]].append(patch.split("/")[1])
                 else:
-                    self.regions[patch.split("/")[0]] = patch.split("/")[1]
+                    self.regions[patch.split("/")[0]] = [patch.split("/")[1]]
         else:
             self.regions["default region"] = self.patches
         if not self.foamConfig.checkBoundary(self.regions):
