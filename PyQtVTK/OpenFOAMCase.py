@@ -50,41 +50,12 @@ class CyclicAMI(Patch):
         self.transform = transform
 
 
-class turbulenceModel(object):
-    def __init__(self):
-        self.__simulationType = None
-        self.__RASModel = None
-        self.__turbulence = None
-        self.__printCoeffs = None
-
-    def SetTurbulenceModel(self, turbulence):
-        self.__simulationType = turbulence["simulationType"]
-        if self.__simulationType == "RAS":
-            self.__RASModel = turbulence["RASModel"]
-            self.__turbulence = turbulence["turbulence"]
-            self.__printCoeffs = turbulence["printCoeffs"]
-
-
 class rotationProp(object):
     def __init__(self, origin=(0, 0, 0), axis=(0, 0, 1), omega=["constant", 19.35]):
         self.origin = origin
         self.axes = axis
         self.method = omega[0]
         self.rad = (float(omega[1]) * 2 * pi) / 60  # the unit is rpm.
-
-
-class controlDict(object):
-    def __init__(self, control_dict):
-        self.__application = control_dict["application"]
-        self.__startTime = control_dict["startTime"]
-        self.__endTime = control_dict["endTime"]
-        self.__deltaT = control_dict["deltaT"]
-        self.__writeControl = control_dict["writeControl"]  # timeStep or adjustableRunTime for steady and transient
-        self.__writeInterval = control_dict["writeInterval"]
-        self.__runTimeModifiable = control_dict["runTimeModifiable"]
-        self.__adjustTimeStep = control_dict["adjustTimeStep"]
-        self.__maxCo = control_dict["maxCo"]
-        self.__maxAlphaCo = control_dict["maxAlphaCo"]
 
 
 class MRF(object):
@@ -248,7 +219,7 @@ class OpenFOAMCase(object):
                     turbulence_model["RASModel"] = re.findall(r"RASModel (.*);?", text)[0]
                     turbulence_model["turbulence"] = re.findall(r"turbulence (.*);?", text)[0]
                     turbulence_model["printCoeffs"] = re.findall(r"printCoeffs (.*);?", text)[0]
-                self.__turbulenceModel[region] = turbulenceModel(turbulence_model)
+                self.__turbulenceModel[region] = turbulence_model
             except IOError as e:
                 self.__message += str(e)
 
@@ -256,19 +227,51 @@ class OpenFOAMCase(object):
         try:
             with open(self.__caseFolder + "/system/controlDict") as fid:
                 controlDict_text = stripFoamHead(fid.read())
-            # these items are not necessarily defined in the controlDict file.
+            controlDict_dict = {}
 
-            control_dict = {"application": re.findall(r"application\s+(\S+)?\s*;", controlDict_text)[0],
-                            "startTime": re.findall(r"startTime\s+(\S+)?;", controlDict_text)[0],
-                            "endTime": re.findall(r"endTime\s+(\S+)?\s*;", controlDict_text)[0],
-                            "deltaT": re.findall(r"deltaT\s+(\S+)?\s*;", controlDict_text)[0],
-                            "writeControl": re.findall(r"writeControl\s+(.*)?\s*;", controlDict_text)[0],
-                            "writeInterval": re.findall(r"deltaT\s+(\d*\.?\d*)?\s*;", controlDict_text)[0],
-                            "runTimeModifiable": re.findall(r"deltaT\s+(.*)?\s*;", controlDict_text)[0],
-                            "adjustTimeStep": re.findall(r"deltaT\s+(.*)?\s*;", controlDict_text)[0],
-                            "maxCo": re.findall(r"maxCo\s+(\S+)?\s*;", controlDict_text)[0],
-                            "maxAlphaCo": re.findall(r"maxAlphaCo\s+(\S+)?\s*;", controlDict_text)[0]}
-            self.__controlDict = controlDict(control_dict)
+            # these items are not necessarily defined in the controlDict file.
+            app = re.findall(r"application\s+(\S+)?\s*;", controlDict_text)
+            if len(app):
+                controlDict_dict["application"] = app
+
+            startTime = re.findall(r"startTime\s+(\S+)?;", controlDict_text)
+            if len(startTime):
+                controlDict_dict["startTime"] = startTime
+
+            endTime = re.findall(r"endTime\s+(\S+)?\s*;", controlDict_text)
+            if len(endTime):
+                controlDict_dict["endTime"] = endTime
+
+            deltaT = re.findall(r"deltaT\s+(\S+)?\s*;", controlDict_text)
+            if len(deltaT):
+                controlDict_dict["deltaT"] = deltaT
+
+            writeControl = re.findall(r"writeControl\s+(.*)?\s*;", controlDict_text)
+            if len(writeControl) :
+                controlDict_dict["writeControl"] = writeControl
+
+            writeInterval = re.findall(r"writeInterval\s+(.*)?\s*;", controlDict_text)
+            if len(writeControl) :
+                controlDict_dict["writeInterval"] = writeInterval
+
+            runTimeModifiable = re.findall(r"runTimeModifiable\s+(\d*\.?\d*)?\s*;", controlDict_text)
+            if len(runTimeModifiable):
+                controlDict_dict["runTimeModifiable"] = runTimeModifiable
+
+            adjustTimeStep = re.findall(r"adjustTimeStep\s+(.*)?\s*;", controlDict_text)
+            if len(adjustTimeStep):
+                controlDict_dict["adjustTimeStep"] = adjustTimeStep
+
+            maxCo = re.findall(r"maxCo\s+(\S+)?\s*;", controlDict_text)
+            if len(maxCo):
+                controlDict_dict["maxCo"] = maxCo
+
+            maxAlphaCo = re.findall(r"maxAlphaCo\s+(\S+)?\s*;", controlDict_text)
+            if len(maxAlphaCo):
+                controlDict_dict["maxAlphaCo"] = maxAlphaCo
+
+            self.__controlDict = controlDict_dict
+
         except IOError as e:
             self.__message += str(e)
 

@@ -54,7 +54,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.settingDialog = SettingDialog()
         self.foamConfig = OpenFOAMCase()
         self.caseName = "Model"
-        self.numberOfBlocks = 0
+        self.numberOfRegions = 0
         self.patches = []
         self.regions = {}  # the structure of the boundary info is like this self.region["air"] = ["wall", "air1"]
         self.setupUi(self)
@@ -62,7 +62,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.topSplitter.setSizes([100, 500])
         self.leftDomain.setSizes([100, 100])
         self.rightDomain.setSizes([500, 100])
-        self.addTree()
+        self.initTree()
         # GUI related initialization. some of them from case files.
         self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
         self.timeSteps = ["0"]
@@ -114,30 +114,79 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.receiveBar.addAction(self.actionAuto_Scale)
         self.receiveBar.addAction(self.actionSet_Scale)
 
-    def addTree(self):
+    def initTree(self):
         # self.item_0 is the head item of the tree. it text is the name of the model.
         regionProperties = self.foamConfig.GetRegionProperty()
-        TreeList = ({
-            'Geometry': (tuple(regionProperties.keys())),
-            'Physics': ('Turbulence', "MRF", "DynamicMesh", "Multiphase", "Heat", "Radiation"),
-            "Material": ("Viscosity", "Heat Conductivity", "Specific Heat", "Density"),
-            "fvSchemes": ("ddt", "div", "laplacian"),
-            "fvSolution": ("solver", "residual", "relaxation"),
-            "fvOption": ("Heat Source", "Temp Limit"),
-            "Solver": (
-                "Application", "StartFrom", "Time Step", "Write Interval", "End Time", "Adjust OnFly", "MaxCo",
-                "Decompose", "Function")
-        })
+        TreeList = {"Geometry": ("region1", "region2"),
+                    'Physics': ('Turbulence', "MRF", "DynamicMesh", "Multiphase", "Heat", "Radiation"),
+                    "Material": ("Viscosity", "Heat Conductivity", "Specific Heat", "Density"),
+                    "fvSchemes": ("ddt", "div", "Laplacian"),
+                    "fvSolution": ("solver", "residual", "relaxation"),
+                    "fvOption": ("Heat Source", "Temp Limit"),
+                    "ControlDict": (
+                        "Application", "StartFrom", "Time Step", "Write Interval", "End Time", "Adjust OnFly", "MaxCo",
+                        "Decompose", "Function")
+                    }
         _translate = QtCore.QCoreApplication.translate
+
         self.pipLine.topLevelItem(0).setText(0, _translate("OpenFOAM", self.caseName))
 
-        for key, value in TreeList.items():
-            parent = QtWidgets.QTreeWidgetItem(self.pipLine, [key])
-            for val in value:
-                child = QtWidgets.QTreeWidgetItem([val])
-                child.setFlags(child.flags() | Qt.ItemIsUserCheckable)
-                child.setCheckState(0, Qt.Unchecked)
-                parent.addChild(child)
+        self.geoItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Geometry"])
+
+        self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Physics"])
+        self.phySubItems = []
+        for item in TreeList["Physics"]:
+            phySubItem = QtWidgets.QTreeWidgetItem(self.phyItem, [item])
+            phySubItem.setFlags(phySubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            phySubItem.setCheckState(0, Qt.Unchecked)
+            self.phyItem.addChild(phySubItem)
+            self.phySubItems.append(phySubItem)
+
+        self.matItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
+        self.matSubItems = []
+        for item in TreeList["Material"]:
+            matSubItem = QtWidgets.QTreeWidgetItem(self.matItem, [item])
+            matSubItem.setFlags(matSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            matSubItem.setCheckState(0, Qt.Unchecked)
+            self.matItem.addChild(matSubItem)
+            self.matSubItems.append(matSubItem)
+
+        self.schemeItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSchemes"])
+        self.schemeSubItems = []
+        for item in TreeList["fvSchemes"]:
+            schemeSubItem = QtWidgets.QTreeWidgetItem(self.schemeItem, [item])
+            schemeSubItem.setFlags(schemeSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            schemeSubItem.setCheckState(0, Qt.Unchecked)
+            self.schemeItem.addChild(schemeSubItem)
+            self.schemeSubItems.append(schemeSubItem)
+
+        self.soluItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSolution"])
+        self.soluSubItems = []
+        for item in TreeList["fvSolution"]:
+            soluSubItem = QtWidgets.QTreeWidgetItem(self.soluItem, [item])
+            soluSubItem.setFlags(soluSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            soluSubItem.setCheckState(0, Qt.Unchecked)
+            self.soluItem.addChild(soluSubItem)
+            self.soluSubItems.append(soluSubItem)
+
+        self.optionItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvOption"])
+        self.optionSubItems = []
+        for item in TreeList["fvOption"]:
+            optionSubItem = QtWidgets.QTreeWidgetItem(self.optionItem, [item])
+            optionSubItem.setFlags(optionSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            optionSubItem.setCheckState(0, Qt.Unchecked)
+            self.optionItem.addChild(optionSubItem)
+            self.optionSubItems.append(optionSubItem)
+
+        self.solvItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
+        self.solvSubItems = []
+        for item in TreeList["ControlDict"]:
+            solvSubItem = QtWidgets.QTreeWidgetItem(self.solvItem, [item])
+            solvSubItem.setFlags(solvSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            solvSubItem.setCheckState(0, Qt.Unchecked)
+            self.solvItem.addChild(solvSubItem)
+            self.solvSubItems.append(solvSubItem)
+
         self.pipLine.show()
 
     def setupVTK(self):
@@ -177,6 +226,22 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.Start()
         self.vtkWindow.show()
 
+    def assignGeoTree(self):
+        # itemChanged  itemClicked are 2 signals that indicate item is changed or clicked.
+        self.GeoRegionSubItems, self.GeoPatchSubItems = [], []
+        for region, patches in self.regions.items():
+            GeoRegionItem = QtWidgets.QTreeWidgetItem(self.geoItem, [region])
+            GeoRegionItem.setFlags(GeoRegionItem.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            GeoRegionItem.setCheckState(0, Qt.Checked)
+            for patch in patches:
+                GeoPatchItem = QtWidgets.QTreeWidgetItem(GeoRegionItem, [patch])
+                GeoRegionItem.addChild(GeoPatchItem)
+                GeoPatchItem.setFlags(GeoPatchItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+                GeoPatchItem.setCheckState(0, Qt.Checked)
+                self.GeoPatchSubItems.append(GeoPatchItem)
+            self.GeoRegionSubItems.append(GeoRegionItem)
+        self.pipLine.show()
+
     def setting(self):
         self.settingDialog.show()
 
@@ -184,11 +249,10 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         axesActor = vtk.vtkAxesActor()
         self.axesWidget.SetOrientationMarker(axesActor)
         self.axesWidget.SetInteractor(self.vtkWindow)
-
+        self.axesWidget.SetOutlineColor(1, 1, 1)
         self.axesWidget.EnabledOn()
         self.axesWidget.InteractiveOff()  # InteractiveOn to enable move the axis
-        self.axesWidget.Modified()
-        self.vtkWindow.Render()
+        self.axesWidget.SetViewport(0., 0., 0.4, 0.4)
 
     def setupVTKBackGround(self):
         self.render.GradientBackgroundOn()
@@ -218,7 +282,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def openFile(self):
         # TODO add warning box to save the current config, open a new file will overwrite the current model. just
-        #  like ANSA.
+        #  like ANSA. However, the implimentation below has problem, it always open a new XinFoam instance
+        """
         buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open new case?",
                                           QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
         if buttonReply == QMessageBox.Yes:
@@ -229,7 +294,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         if buttonReply == QMessageBox.Cancel:
             self.__messaga__ += "No new case opened."
             return
-
+        """
         self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
                                                       "OpenFOAM File (*.foam *.txt)")
 
@@ -264,9 +329,9 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         # TODO clear all the variables when a new case is opened. right now the values are all inherited.
         block = self.foamVTKGeo.GetOutput()
 
-        while block.GetBlock(self.numberOfBlocks) is not None:
-            self.numberOfBlocks += 1
-        if self.numberOfBlocks > 1:
+        while block.GetBlock(self.numberOfRegions) is not None:
+            self.numberOfRegions += 1
+        if self.numberOfRegions > 1:
             for patch in self.patches:
                 if patch.split("/")[0] in self.regions:
                     self.regions[patch.split("/")[0]].append(patch.split("/")[1])
@@ -276,6 +341,31 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
             self.regions["default region"] = self.patches
         if not self.foamConfig.checkBoundary(self.regions):
             self.__message__ += "´\nThe patches and regions from VTK are not consistent with the file!\n"
+
+        self.assignGeoTree()
+        self.pipLine.expandAll()
+
+    def adjustTransparent(self):
+        prop = self.actor.GetProperty()
+        prop.SetOpacity(1)
+        self.vtkWindow.Render()
+
+    def wireFrameView(self):
+        prop = self.actor.GetProperty()
+        prop.SetRepresentationToWireframe()
+        self.vtkWindow.Render()
+
+    def surfaceView(self):
+        prop = self.actor.GetProperty()
+        prop.SetRepresentationToSurface()
+        self.vtkWindow.Render()
+
+    def meshOnOff(self):
+        prop = self.actor.GetProperty()
+        prop.EdgeVisibilityOn()
+        prop.SetEdgeColor(0, 0, 0)
+        prop.SetLineWidth(2)
+        self.vtkWindow.Render()
 
     def resetFile(self):
         self.__init__()
