@@ -78,6 +78,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
 
         self.wireFrame = False
+        self.featureEdge = False
         self.actionFrame.triggered.connect(self.featureEdgeView)
         self.setStatusTip("Ready")
 
@@ -125,22 +126,28 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.vtkWindow.Render()
 
     def featureEdgeView(self):
-        feature_edge = vtk.vtkFeatureEdges()
-        feature_edge.SetInputConnection(self.filter.GetOutputPort())
-        self.mapper.SetInputConnection(feature_edge.GetOutputPort())
-
-        prop = self.actor.GetProperty()
-        prop.SetColor(0, 0, 0)
-        prop.SetLineWidth(2)
-        prop.SetRepresentationToSurface()
-        self.vtkWindow.Render()
+        if not self.featureEdge:
+            feature_edge = vtk.vtkFeatureEdges()
+            feature_edge.SetInputConnection(self.filter.GetOutputPort())
+            self.mapper.SetInputConnection(feature_edge.GetOutputPort())
+            self.featureEdge = True
+            prop = self.actor.GetProperty()
+            prop.SetColor(0, 0, 0)
+            prop.SetLineWidth(2)
+            prop.SetRepresentationToSurface()
+            self.vtkWindow.Render()
+        else:
+            self.mapper.SetInputConnection(self.filter.GetOutputPort())
+            self.mapper.SetScalarModeToUseCellFieldData()
+            self.vtkWindow.Render()
+            self.featureEdge = False
 
     def meshOnOff(self):
         prop = self.actor.GetProperty()
         prop.EdgeVisibilityOff()
         prop.EdgeVisibilityOn()
         prop.SetEdgeColor(1, 1, 1)
-        prop.SetLineWidth(2)
+        prop.SetLineWidth(0)
         self.vtkWindow.Render()
 
     def addMiscell(self):
@@ -159,9 +166,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         # self.item_0 is the head item of the tree. it text is the name of the model.
         regionProperties = self.foamConfig.GetRegionProperty()
         TreeList = {"Geometry": ("region1", "region2"),
-                    'Physics': ('Turbulence', "MRF", "DynamicMesh", "Multiphase", "Heat", "Radiation"),
-                    "Material": ("Viscosity", "Heat Conductivity", "Specific Heat", "Density"),
-                    "fvSchemes": ("ddt", "div", "Laplacian"),
                     "fvSolution": ("solver", "residual", "relaxation"),
                     "fvOption": ("Heat Source", "Temp Limit"),
                     "ControlDict": (
@@ -177,56 +181,87 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Physics"])
 
         self.TurbItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Turbulence"])
-        self.TurbItem.setFlags(self.TurbItem.flags() | Qt.ItemIsUserCheckable)
         self.TurbItem.setCheckState(0, Qt.Unchecked)
-        self.phyItem.addChild(self.TurbItem)
 
-        self.matItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
-        self.matSubItems = []
-        for item in TreeList["Material"]:
-            matSubItem = QtWidgets.QTreeWidgetItem(self.matItem, [item])
-            matSubItem.setFlags(matSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            matSubItem.setCheckState(0, Qt.Unchecked)
-            self.matItem.addChild(matSubItem)
-            self.matSubItems.append(matSubItem)
+        self.MRFItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["MRF"])
+        self.MRFItem.setCheckState(0, Qt.Unchecked)
+
+        self.DynaMeshItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Dynamic Mesh"])
+        self.DynaMeshItem.setCheckState(0, Qt.Unchecked)
+
+        self.MultiPhaseItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Multiphase"])
+        self.MultiPhaseItem.setCheckState(0, Qt.Unchecked)
+
+        self.HeatTransItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Heat Transfer"])
+        self.HeatTransItem.setCheckState(0, Qt.Unchecked)
+
+        self.RadiatsItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Radiation"])
+        self.RadiatsItem.setCheckState(0, Qt.Unchecked)
+
+        self.MatItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
+
+        self.viscoItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Viscosity"])
+        self.viscoItem.setCheckState(0, Qt.Unchecked)
+
+        self.DensiItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Density"])
+        self.DensiItem.setCheckState(0, Qt.Unchecked)
+
+        self.HeatConductItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Heat Conductivity"])
+        self.HeatConductItem.setCheckState(0, Qt.Unchecked)
+
+        self.SpeficHeatItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Specific Heat"])
+        self.SpeficHeatItem.setCheckState(0, Qt.Unchecked)
 
         self.schemeItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSchemes"])
-        self.schemeSubItems = []
-        for item in TreeList["fvSchemes"]:
-            schemeSubItem = QtWidgets.QTreeWidgetItem(self.schemeItem, [item])
-            schemeSubItem.setFlags(schemeSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            schemeSubItem.setCheckState(0, Qt.Unchecked)
-            self.schemeItem.addChild(schemeSubItem)
-            self.schemeSubItems.append(schemeSubItem)
+
+        self.ddtItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["ddt"])
+        self.ddtItem.setCheckState(0, Qt.Unchecked)
+
+        self.divItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["div"])
+        self.divItem.setCheckState(0, Qt.Unchecked)
+
+        self.gradItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Grad"])
+        self.gradItem.setCheckState(0, Qt.Unchecked)
+
+        self.lapItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Laplacian"])
+        self.lapItem.setCheckState(0, Qt.Unchecked)
+
+        self.wallDistItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Wall Distance"])
+        self.wallDistItem.setCheckState(0, Qt.Unchecked)
 
         self.soluItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSolution"])
-        self.soluSubItems = []
-        for item in TreeList["fvSolution"]:
-            soluSubItem = QtWidgets.QTreeWidgetItem(self.soluItem, [item])
-            soluSubItem.setFlags(soluSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            soluSubItem.setCheckState(0, Qt.Unchecked)
-            self.soluItem.addChild(soluSubItem)
-            self.soluSubItems.append(soluSubItem)
+
+        self.solverItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["solver"])
+        self.solverItem.setCheckState(0, Qt.Unchecked)
+
+        self.resiItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["residual"])
+        self.resiItem.setCheckState(0, Qt.Unchecked)
+
+        self.relaxItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["Relaxation Factor"])
+        self.relaxItem.setCheckState(0, Qt.Unchecked)
 
         self.optionItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvOption"])
-        self.optionSubItems = []
-        for item in TreeList["fvOption"]:
-            optionSubItem = QtWidgets.QTreeWidgetItem(self.optionItem, [item])
-            optionSubItem.setFlags(optionSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            optionSubItem.setCheckState(0, Qt.Unchecked)
-            self.optionItem.addChild(optionSubItem)
-            self.optionSubItems.append(optionSubItem)
 
-        self.solvItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
-        self.solvSubItems = []
-        for item in TreeList["ControlDict"]:
-            solvSubItem = QtWidgets.QTreeWidgetItem(self.solvItem, [item])
-            solvSubItem.setFlags(solvSubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            solvSubItem.setCheckState(0, Qt.Unchecked)
-            self.solvItem.addChild(solvSubItem)
-            self.solvSubItems.append(solvSubItem)
+        self.HeatSourceItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Heat Source"])
+        self.HeatSourceItem.setCheckState(0, Qt.Unchecked)
 
+        self.TempLimitItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Temperature Limit"])
+        self.TempLimitItem.setCheckState(0, Qt.Unchecked)
+
+
+        self.ControlItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
+
+        self.TimeControlItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Time control"])
+        self.TimeControlItem.setCheckState(0, Qt.Unchecked)
+
+        self.PhyCOntrolItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Physical control"])
+        self.PhyCOntrolItem.setCheckState(0, Qt.Unchecked)
+
+        self.pipLine.currentItemChanged.connect(self.propertyView)
         self.pipLine.show()
+
+    def propertyView(self):
+        pass
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
