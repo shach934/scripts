@@ -68,21 +68,19 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.timeSteps = ["0"]
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
-        self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.addTransparencyBar()
+
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
-        self.transparency = 0
 
         self.defaultFolder = "C:/Shaohui/OpenFoam/radiationTest/air99surf"
         self.paraPath = "C:/Users/CSHAOHUI/Downloads/ParaView-5.6.0-Windows-msvc2015-64bit/bin/paraview.exe"
 
-        self.addMiscell()
-
+        self.wireFrame = False
+        self.actionFrame.triggered.connect(self.featureEdgeView)
         self.setStatusTip("Ready")
 
-        # screen = QDesktopWidget().screenGeometry()
-        # self.setGeometry(0, 0, screen.width(), screen.height())
         self.showMaximized()
 
         # VTK related initialization.
@@ -98,11 +96,54 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.actionTools.triggered.connect(self.setting)
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
-    def addMiscell(self):
-        # transparency bar to the tool bar
+    def addTransparencyBar(self):
+        self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.viewBar.addWidget(self.transparencySlider)
         self.transparencySlider.setFixedWidth(100)
+        self.transparencySlider.setMinimum(0)
+        self.transparencySlider.setMaximum(100)
+        self.transparencySlider.setValue(0)
+        self.transparencySlider.setSingleStep(1)
+        self.transparencySlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.transparencySlider.setTickInterval(20)
+        self.transparencySlider.valueChanged.connect(self.adjustTransparent)
 
+    def adjustTransparent(self):
+        transparencyValue = self.transparencySlider.value()
+        prop = self.actor.GetProperty()
+        prop.SetOpacity(1 - transparencyValue / 100)
+        self.vtkWindow.Render()
+
+    def wireFrameView(self):
+        prop = self.actor.GetProperty()
+        if not self.wireFrame:
+            prop.SetRepresentationToWireframe()
+            self.wireFrame = True
+        else:
+            prop.SetRepresentationToSurface()
+            self.wireFrame = False
+        self.vtkWindow.Render()
+
+    def featureEdgeView(self):
+        feature_edge = vtk.vtkFeatureEdges()
+        feature_edge.SetInputConnection(self.filter.GetOutputPort())
+        self.mapper.SetInputConnection(feature_edge.GetOutputPort())
+
+        prop = self.actor.GetProperty()
+        prop.SetColor(0, 0, 0)
+        prop.SetLineWidth(2)
+        prop.SetRepresentationToSurface()
+        self.vtkWindow.Render()
+
+    def meshOnOff(self):
+        prop = self.actor.GetProperty()
+        prop.EdgeVisibilityOff()
+        prop.EdgeVisibilityOn()
+        prop.SetEdgeColor(1, 1, 1)
+        prop.SetLineWidth(2)
+        self.vtkWindow.Render()
+
+    def addMiscell(self):
         for item in self.fields:
             self.fieldSelectCombo.addItem(item)
         self.receiveBar.addWidget(self.fieldSelectCombo)
@@ -134,13 +175,11 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.geoItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Geometry"])
 
         self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Physics"])
-        self.phySubItems = []
-        for item in TreeList["Physics"]:
-            phySubItem = QtWidgets.QTreeWidgetItem(self.phyItem, [item])
-            phySubItem.setFlags(phySubItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
-            phySubItem.setCheckState(0, Qt.Unchecked)
-            self.phyItem.addChild(phySubItem)
-            self.phySubItems.append(phySubItem)
+
+        self.TurbItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Turbulence"])
+        self.TurbItem.setFlags(self.TurbItem.flags() | Qt.ItemIsUserCheckable)
+        self.TurbItem.setCheckState(0, Qt.Unchecked)
+        self.phyItem.addChild(self.TurbItem)
 
         self.matItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
         self.matSubItems = []
@@ -218,7 +257,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
         self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
-        # self.vtkWindow.SetSize(850, 850)
         self.vtkWindow.Initialize()
         self.setupVTKBackGround()
         self.AddAxes()
@@ -252,7 +290,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.axesWidget.SetOutlineColor(1, 1, 1)
         self.axesWidget.EnabledOn()
         self.axesWidget.InteractiveOff()  # InteractiveOn to enable move the axis
-        self.axesWidget.SetViewport(0., 0., 0.4, 0.4)
+        self.axesWidget.SetViewport(0., 0., 0.2, 0.2)
 
     def setupVTKBackGround(self):
         self.render.GradientBackgroundOn()
@@ -311,6 +349,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.foamVTKGeo.EnableAllCellArrays()
         self.foamVTKGeo.Update()
         self.setupVTK()
+
         self.setWindowTitle(self.caseFolder[0])
         self.pipLine.topLevelItem(0).setText(0, self.caseName)
 
@@ -345,27 +384,55 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.assignGeoTree()
         self.pipLine.expandAll()
 
-    def adjustTransparent(self):
-        prop = self.actor.GetProperty()
-        prop.SetOpacity(1)
-        self.vtkWindow.Render()
+    def setPatchProperties(self):
+        _translate = QtCore.QCoreApplication.translate
 
-    def wireFrameView(self):
-        prop = self.actor.GetProperty()
-        prop.SetRepresentationToWireframe()
-        self.vtkWindow.Render()
+        self.properties.setColumnCount(3)
+        self.properties.setRowCount(8)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(4, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(5, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(6, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setVerticalHeaderItem(7, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setItem(0, 0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setItem(0, 1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.properties.setItem(0, 2, item)
 
-    def surfaceView(self):
-        prop = self.actor.GetProperty()
-        prop.SetRepresentationToSurface()
-        self.vtkWindow.Render()
-
-    def meshOnOff(self):
-        prop = self.actor.GetProperty()
-        prop.EdgeVisibilityOn()
-        prop.SetEdgeColor(0, 0, 0)
-        prop.SetLineWidth(2)
-        self.vtkWindow.Render()
+        item = self.properties.horizontalHeaderItem(0)
+        item.setText(_translate("OpenFOAM", "Property"))
+        item = self.properties.horizontalHeaderItem(1)
+        item.setText(_translate("OpenFOAM", "Value"))
+        item = self.properties.horizontalHeaderItem(2)
+        item.setText(_translate("OpenFOAM", "Switch"))
+        __sortingEnabled = self.properties.isSortingEnabled()
+        self.properties.setSortingEnabled(False)
+        item = self.properties.item(0, 0)
+        item.setText(_translate("OpenFOAM", "row"))
+        item = self.properties.item(0, 1)
+        item.setText(_translate("OpenFOAM", "row1"))
+        item = self.properties.item(0, 2)
+        item.setText(_translate("OpenFOAM", "row2"))
+        self.properties.setSortingEnabled(__sortingEnabled)
 
     def resetFile(self):
         self.__init__()
