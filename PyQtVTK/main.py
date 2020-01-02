@@ -48,6 +48,7 @@ class SettingDialog(QMainWindow, Ui_Setting):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
 
+# noinspection PyAttributeOutsideInit
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
@@ -69,7 +70,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
         self.addTransparencyBar()
-
+        self.addMiscell()
+        
         self.scalar_bar = vtk.vtkScalarBarActor()
         self.axesWidget = vtk.vtkOrientationMarkerWidget()
         self.vtkContainBox = QVBoxLayout()
@@ -195,8 +197,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.HeatTransItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Heat Transfer"])
         self.HeatTransItem.setCheckState(0, Qt.Unchecked)
 
-        self.RadiatsItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Radiation"])
-        self.RadiatsItem.setCheckState(0, Qt.Unchecked)
+        self.RadiatItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Radiation"])
+        self.RadiatItem.setCheckState(0, Qt.Unchecked)
 
         self.MatItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
 
@@ -248,7 +250,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.TempLimitItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Temperature Limit"])
         self.TempLimitItem.setCheckState(0, Qt.Unchecked)
 
-
         self.ControlItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
 
         self.TimeControlItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Time control"])
@@ -260,7 +261,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.pipLine.currentItemChanged.connect(self.propertyView)
         self.pipLine.show()
 
-    def propertyView(self):
+    def propertyView(self, current, old):
         pass
 
     def setupVTK(self):
@@ -414,7 +415,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         else:
             self.regions["default region"] = self.patches
         if not self.foamConfig.checkBoundary(self.regions):
-            self.__message__ += "´\nThe patches and regions from VTK are not consistent with the file!\n"
+            self.__message__ += "\nThe patches and regions from VTK are not consistent with the file!\n"
 
         self.assignGeoTree()
         self.pipLine.expandAll()
