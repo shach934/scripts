@@ -260,9 +260,66 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.pipLine.currentItemChanged.connect(self.propertyView)
         self.pipLine.show()
-
+        self.pipLine.expandAll()
     def propertyView(self, current, old):
-        pass
+        if current.text(0) == "Turbulence":
+            self.TurbProperties()
+        elif current.text(0) == "MRF":
+            self.MRFProperties()
+        elif current.text(0) == "Dynamic Mesh":
+            self.DynaMeshProperties()
+        elif current.text(0) == "Multiphase":
+            self.MultiphaseProperties()
+        elif current.text(0) == "Radiation":
+            self.Radiation()
+
+    def TurbProperties(self):
+        self.properties.setColumnCount(2)
+        self.properties.setRowCount(1)
+        self.properties.show()
+
+        self.properties.horizontalHeader().hide()
+        self.properties.verticalHeader().hide()
+
+        simuTypeLabel = QtWidgets.QLabel("simulationType")        
+        self.properties.setCellWidget(0, 0, simuTypeLabel)
+        simuTypeOp = ["laminar", "RAS", "LES", "DES"]
+        self.simuTypeComboBox = QtWidgets.QComboBox()
+        self.simuTypeComboBox.addItems(simuTypeOp)
+        self.properties.setCellWidget(0, 1, self.simuTypeComboBox)
+        
+        self.simuTypeComboBox.currentIndexChanged.connect(lambda: self.RASproperty(self.simuTypeComboBox.currentText()))
+
+    def RASproperty(self, simuType):
+        if simuType == "RAS":
+            
+            self.properties.setColumnCount(2)
+            self.properties.setRowCount(4)
+
+            RASModelLabel = QtWidgets.QLabel("RASModel")        
+            self.properties.setCellWidget(1, 0, RASModelLabel)
+            simuTypeOp = ["kEpsilon", "realizableKE", "RNGkEpsilon", "kOmemga", "kOmegaSST", "kOmegaSSTLM"]
+            simuTypeComboBox = QtWidgets.QComboBox()
+            simuTypeComboBox.addItems(simuTypeOp)
+            self.properties.setCellWidget(1, 1, simuTypeComboBox)
+
+            TurbSwitchLabel = QtWidgets.QLabel("Turbulence")        
+            self.properties.setCellWidget(2, 0, TurbSwitchLabel)
+            TurbSwitchOp = ["on", "off"]
+            TurbSwitchOpComboBox = QtWidgets.QComboBox()
+            TurbSwitchOpComboBox.addItems(TurbSwitchOp)
+            self.properties.setCellWidget(2, 1, TurbSwitchOpComboBox)
+            
+            TurbCoeffLabel = QtWidgets.QLabel("printCoeffs")        
+            self.properties.setCellWidget(3, 0, TurbCoeffLabel)
+            TurbCoeffOp = ["on", "off"]
+            TurbCoeffComboBox = QtWidgets.QComboBox()
+            TurbCoeffComboBox.addItems(TurbCoeffOp)
+            self.properties.setCellWidget(3, 1, TurbCoeffComboBox)
+
+        elif simuType == "laminar":
+            self.properties.setColumnCount(2)
+            self.properties.setRowCount(1)
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)
@@ -422,7 +479,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def setPatchProperties(self):
         _translate = QtCore.QCoreApplication.translate
-
         self.properties.setColumnCount(3)
         self.properties.setRowCount(8)
         item = QtWidgets.QTableWidgetItem()

@@ -1,40 +1,49 @@
 import sys
-
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QFontComboBox, QLineEdit, QMessageBox, QVBoxLayout
 
 
-class Window(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(Window, self).__init__(parent)
-        self.vlayout = QtWidgets.QVBoxLayout()
+class Demo(QWidget):
+    choice = 'a'
+    choice_list = ['b', 'c', 'd', 'e']
 
-        # tree widget item
-        tree_widget_item = QtWidgets.QTreeWidgetItem(['Item 1'])
-        item1 = QtWidgets.QTreeWidgetItem(tree_widget_item, ["sub Item 1"])
-        item1.setCheckState(0, Qt.Unchecked)
+    def __init__(self):
+        super(Demo, self).__init__()
 
-        item2 = QtWidgets.QTreeWidgetItem(tree_widget_item, ["sub item 2"])
-        item2.setCheckState(0, Qt.Unchecked)
+        self.combobox_1 = QComboBox(self)                   # 1
+        self.combobox_2 = QFontComboBox(self)               # 2
 
-        # tree widget
-        tree_widget = QtWidgets.QTreeWidget(self)
-        tree_widget.addTopLevelItem(tree_widget_item)
-        self.vlayout.addWidget(tree_widget)
+        self.lineedit = QLineEdit(self)                     # 3
 
-        tree_widget.currentItemChanged.connect(self.propertyView)
+        self.v_layout = QVBoxLayout()
 
-    def propertyView(self, current, old):
-        print(current.text(0))
+        self.layout_init()
+        self.combobox_init()
 
-    @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, QtWidgets.QTreeWidgetItem)
-    def current_item_changed(self, current, previous):
-        print('\ncurrent: {}, \nprevious: {}'.format(current, previous))
+    def layout_init(self):
+        self.v_layout.addWidget(self.combobox_1)
+        self.v_layout.addWidget(self.combobox_2)
+        self.v_layout.addWidget(self.lineedit)
+
+        self.setLayout(self.v_layout)
+
+    def combobox_init(self):
+        self.combobox_1.addItem(self.choice)              # 4
+        self.combobox_1.addItems(self.choice_list)        # 5
+        self.combobox_1.currentIndexChanged.connect(lambda: self.on_combobox_func(self.combobox_1))   # 6
+        # self.combobox_1.currentTextChanged.connect(lambda: self.on_combobox_func(self.combobox_1))  # 7
+
+        self.combobox_2.currentFontChanged.connect(lambda: self.on_combobox_func(self.combobox_2))
+        # self.combobox_2.currentFontChanged.connect(lambda: self.on_combobox_func(self.combobox_2))
+
+    def on_combobox_func(self, combobox):                                                             # 8
+        if combobox == self.combobox_1:
+            QMessageBox.information(self, 'ComboBox 1', '{}: {}'.format(combobox.currentIndex(), combobox.currentText()))
+        else:
+            self.lineedit.setFont(combobox.currentFont())
 
 
-application = QtWidgets.QApplication(sys.argv)
-window = Window()
-window.setWindowTitle('Tree widget')
-window.resize(250, 180)
-window.show()
-sys.exit(application.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    demo = Demo()
+    demo.show()
+    sys.exit(app.exec_())
