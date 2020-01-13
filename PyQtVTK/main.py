@@ -32,7 +32,7 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import vtk_to_numpy
 
 from OpenFOAMCase import *
-from ccm import Ui_OpenFOAM
+from mainWindow import Ui_OpenFOAM
 from settingBox import Ui_Setting
 
 
@@ -61,7 +61,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.regions = {}  # the structure of the boundary info is like this self.region["air"] = ["wall", "air1"]
         self.setupUi(self)
         self.__message__ = "Ready. Let's FOAM!"
-        self.topSplitter.setSizes([100, 500])
+        self.leftRightSplitter.setSizes([100, 500])
         self.leftDomain.setSizes([100, 100])
         self.rightDomain.setSizes([500, 100])
         self.initTree()
@@ -168,111 +168,94 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
     def initTree(self):
         # self.item_0 is the head item of the tree. it text is the name of the model.
         regionProperties = self.foamConfig.GetRegionProperty()
-        TreeList = {"Geometry": ("region1", "region2"),
-                    "fvSolution": ("solver", "residual", "relaxation"),
-                    "fvOption": ("Heat Source", "Temp Limit"),
-                    "ControlDict": (
-                        "Application", "StartFrom", "Time Step", "Write Interval", "End Time", "Adjust OnFly", "MaxCo",
-                        "Decompose", "Function")
-                    }
+
         _translate = QtCore.QCoreApplication.translate
 
         self.pipLine.topLevelItem(0).setText(0, _translate("OpenFOAM", self.caseName))
 
         self.geoItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Geometry"])
 
-        self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Physics"])
+        self.createGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Create"])
+        self.createBoxGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Box"])
+        self.createCylGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Cylinder"])
+        self.createSphGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Sphere"])
+        self.createConeGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Cone"])
+
+
+        self.importGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Import"])
+
+
+        self.meshItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Mesh"])
+
+        self.meshGeoItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Geometry"])
+        self.blockMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["BlockMesh"])
+        self.meshPointItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Point"])
+        self.meshMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Mesh"])
+
+
+        self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Setup"])
 
         self.TurbItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Turbulence"])
-        self.TurbItem.setCheckState(0, Qt.Unchecked)
-
         self.MRFItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["MRF"])
-        self.MRFItem.setCheckState(0, Qt.Unchecked)
-
         self.DynaMeshItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Dynamic Mesh"])
-        self.DynaMeshItem.setCheckState(0, Qt.Unchecked)
-
         self.MultiPhaseItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Multiphase"])
-        self.MultiPhaseItem.setCheckState(0, Qt.Unchecked)
-
         self.HeatTransItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Heat Transfer"])
-        self.HeatTransItem.setCheckState(0, Qt.Unchecked)
-
         self.RadiatItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Radiation"])
-        self.RadiatItem.setCheckState(0, Qt.Unchecked)
+
 
         self.MatItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
 
         self.viscoItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Viscosity"])
-        self.viscoItem.setCheckState(0, Qt.Unchecked)
-
         self.DensiItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Density"])
-        self.DensiItem.setCheckState(0, Qt.Unchecked)
-
         self.HeatConductItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Heat Conductivity"])
-        self.HeatConductItem.setCheckState(0, Qt.Unchecked)
-
         self.SpeficHeatItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Specific Heat"])
-        self.SpeficHeatItem.setCheckState(0, Qt.Unchecked)
+
 
         self.schemeItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSchemes"])
 
         self.ddtItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["ddt"])
-        self.ddtItem.setCheckState(0, Qt.Unchecked)
-
+        self.gradItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["grad"])
         self.divItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["div"])
-        self.divItem.setCheckState(0, Qt.Unchecked)
+        self.lapItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["laplacian"])
+        self.interporlItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["interpolation"])
+        self.snGradItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["snGrad"])
 
-        self.gradItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Grad"])
-        self.gradItem.setCheckState(0, Qt.Unchecked)
-
-        self.lapItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Laplacian"])
-        self.lapItem.setCheckState(0, Qt.Unchecked)
-
-        self.wallDistItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["Wall Distance"])
-        self.wallDistItem.setCheckState(0, Qt.Unchecked)
 
         self.soluItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSolution"])
 
         self.solverItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["solver"])
-        self.solverItem.setCheckState(0, Qt.Unchecked)
-
         self.resiItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["residual"])
-        self.resiItem.setCheckState(0, Qt.Unchecked)
-
         self.relaxItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["Relaxation Factor"])
-        self.relaxItem.setCheckState(0, Qt.Unchecked)
+
 
         self.optionItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvOption"])
 
         self.HeatSourceItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Heat Source"])
-        self.HeatSourceItem.setCheckState(0, Qt.Unchecked)
-
         self.TempLimitItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Temperature Limit"])
-        self.TempLimitItem.setCheckState(0, Qt.Unchecked)
+
 
         self.ControlItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
 
         self.TimeControlItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Time control"])
-        self.TimeControlItem.setCheckState(0, Qt.Unchecked)
-
         self.PhyCOntrolItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Physical control"])
-        self.PhyCOntrolItem.setCheckState(0, Qt.Unchecked)
 
         self.pipLine.currentItemChanged.connect(self.propertyView)
         self.pipLine.show()
         self.pipLine.expandAll()
+
     def propertyView(self, current, old):
-        if current.text(0) == "Turbulence":
-            self.TurbProperties()
-        elif current.text(0) == "MRF":
-            self.MRFProperties()
-        elif current.text(0) == "Dynamic Mesh":
-            self.DynaMeshProperties()
-        elif current.text(0) == "Multiphase":
-            self.MultiphaseProperties()
-        elif current.text(0) == "Radiation":
-            self.RadiationProperties()
+        if current.text(0) == "Box":
+            self.createBox()
+        elif current.text(0) == "Sphere":
+            self.createSphere()
+        elif current.text(0) == "Cylinder":
+            self.createCylinder()
+        elif current.text(0) == "Cone":
+            self.createCone()
+
+    def createBox(self):
+        from createBox import Ui_createBox
+        Ui_createBox()
 
     def TurbProperties(self):
         self.properties.setColumnCount(2)
@@ -561,6 +544,95 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.radSootInput = QtWidgets.QComboBox()
         self.radSootInput.addItems(["none"])
         self.properties.setCellWidget(11, 1, self.radSootInput)
+
+    def HeatTransProperties(self):
+        """
+        type            heRhoThermo;
+        mixture         pureMixture;
+        transport       polynomial;
+        thermo          hPolynomial;
+        equationOfState icoPolynomial;
+        specie          specie;
+        energy          sensibleEnthalpy;
+        """
+        self.properties.setRowCount(10)
+        self.properties.setColumnCount(2)
+        self.properties.verticalHeader().hide()
+        self.properties.horizontalHeader().hide()
+
+        regionLabel = QtWidgets.QLabel("Region")
+        self.properties.setCellWidget(0, 0, regionLabel)
+        self.HeatTransRegionInput = QtWidgets.QComboBox()
+        self.HeatTransRegionInput.addItems(list(self.regions.keys()))
+        self.properties.setCellWidget(0, 1, self.HeatTransRegionInput)
+
+        ThermoType = QtWidgets.QLabel("Thermo Type")
+        self.properties.setCellWidget(1, 0, ThermoType)
+        self.ThermoTypeInput = QtWidgets.QComboBox()
+        ThermoTypeOp = ["hePsiThermo", "heRhoThermo", "heheuPsiThermo"]
+        self.ThermoTypeInput.addItems(ThermoTypeOp)
+        self.properties.setCellWidget(1, 1, self.ThermoTypeInput)
+
+        ThermoMixLabel = QtWidgets.QLabel("Mixture")
+        self.properties.setCellWidget(2, 0, ThermoMixLabel)
+        self.ThermoMixInput = QtWidgets.QComboBox()
+        ThermoMixOp = ["pureMixture", "reactingMixture", "homogeneousMixture", "inhomogeneousMixture", "veryInhomogeneousMixture"]
+        self.ThermoMixInput.addItems(ThermoMixOp)
+        self.properties.setCellWidget(2, 1, self.ThermoMixInput)
+        
+        ThermoTransportLabel = QtWidgets.QLabel("transport")
+        self.properties.setCellWidget(3, 0, ThermoTransportLabel)
+        self.ThermoTranspInput = QtWidgets.QComboBox()
+        ThermoTranspOp = ["const", "sutherland", "polynomial", "logPolynomial"]
+        self.ThermoTranspInput.addItems(ThermoTranspOp)
+        self.properties.setCellWidget(3, 1, self.ThermoTranspInput)
+
+        ThermoThermoLabel = QtWidgets.QLabel("thermo")
+        self.properties.setCellWidget(4, 0, ThermoThermoLabel)   
+        self.ThermoThermoInput = QtWidgets.QComboBox()
+        ThermoThermoOp = ["hConst", "eConst", "janaf", "hPolynomial"]
+        self.ThermoThermoInput.addItems(ThermoThermoOp)
+        self.properties.setCellWidget(4, 1, self.ThermoThermoInput)
+
+        ThermoEoSLabel = QtWidgets.QLabel("equationOfState")
+        self.properties.setCellWidget(5, 0, ThermoEoSLabel)
+        self.ThermoEOSInput = QtWidgets.QComboBox()
+        ThermoEOSOp = ["rhoConst", "perfectGas", "incompressiblePerfectGas", "perfectFluid", "linear", "adiabaticPerfectFluid", "Boussinesq","PengRobinsonGas", "icoPolynomial"]
+        self.ThermoEOSInput.addItems(ThermoEOSOp)
+        self.properties.setCellWidget(5, 1, self.ThermoEOSInput)
+
+        ThermoSpecieLabel = QtWidgets.QLabel("specie")
+        self.properties.setCellWidget(6, 0, ThermoSpecieLabel)
+        self.ThermoSpecieInput = QtWidgets.QComboBox()
+        ThermoSpecieOp = ["specie", "thermodynamics", "transport"]
+        self.ThermoSpecieInput.addItems(ThermoSpecieOp)
+        self.properties.setCellWidget(6, 1, self.ThermoSpecieInput)
+
+        ThermoEnergyLabel = QtWidgets.QLabel("energy")
+        self.properties.setCellWidget(7, 0, ThermoEnergyLabel)
+        self.ThermoEnergyInput = QtWidgets.QComboBox()
+        ThermoEnergyOp = ["sensibleEnthalpy", "sensibleInternalEnergy", "absoluteEnthalpy"]
+        self.ThermoEnergyInput.addItems(ThermoEnergyOp)
+        self.properties.setCellWidget(7, 1, self.ThermoEnergyInput)
+
+    def ddtProperties(self):
+        self.properties.setColumnCount(2)
+        self.properties.setRowCount(2)
+        self.properties.verticalHeader().hide()
+        self.properties.horizontalHeader().hide()
+
+        ddtLabel = QtWidgets.QLabel("ddtSchemes")
+        self.properties.setCellWidget(0, 0, ddtLabel)
+        self.ddtInput = QtWidgets.QComboBox()
+        ddtOp = ["steadyState", "Euler", "localEuler", "CrankNicholson \u03C8", "backward"]
+        self.ddtInput.addItems(ddtOp)
+        self.properties.setCellWidget(0, 1, self.ddtInput)
+
+        gradLabel = QtWidgets.QLabel("grad")
+        self.properties.setCellWidget(1, 0, gradLabel)
+        self.gradInput = QtWidgets.QComboBox()
+        gradOp = [""]
+
 
     def setupVTK(self):
         self.vtkContainBox.addWidget(self.vtkWindow)

@@ -293,6 +293,7 @@ The
 \part{OpenFOAM case setup}
 
 \section{Numerical}
+
 OpenFOAM applications are designed for use with unstructured meshes, offering up to second order accuracy, predominately using collocated variable arrangements. Most focus on the Finite Volume Method, for which the conservative form of the general scalar transport equation for the property $\phi$ takes the form:
 
 \begin{equation}
@@ -340,30 +341,50 @@ Finite volume options: Additional run-time selectable physical modelling and gen
 
 \subsection{Schemes}
 
-\subsection{Temporal schemes}
+The fvSchemes dictionary in the system directory sets the numerical schemes for terms, such as derivatives in equations, that appear in applications being run. This section describes how to specify the schemes in the fvSchemes dictionary.
 
-OpenFOAM includes a variety of schemes to integrate fields with respect to:
+The terms that must typically be assigned a numerical scheme in fvSchemes range from derivatives, e.g. gradient $\nabla$, and interpolations of values from one set of points to another. The aim in OpenFOAM is to offer an unrestricted choice to the user. For example, while linear interpolation is effective in many cases, OpenFOAM offers complete freedom to choose from a wide selection of interpolation schemes for all interpolation terms.
 
-Time schemes
+The derivative terms further exemplify this freedom of choice. The user first has a choice of discretisation practice where standard Gaussian finite volume integration is the common choice. Gaussian integration is based on summing values on cell faces, which must be interpolated from cell centres. The user again has a completely free choice of interpolation scheme, with certain schemes being specifically designed for particular derivative terms, especially the convection divergence $\nabla$ terms.
 
+The set of terms, for which numerical schemes must be specified, are subdivided within the fvSchemes dictionary into the categories listed in Table 6.2. Each keyword in Table 6.2 is the name of a sub-dictionary which contains terms of a particular type, e.g.gradSchemes contains all the gradient derivative terms such as grad(p) (which represents $\nabla (p)$ . Further examples can be seen in the extract from an fvSchemes dictionary below:
+
+\begin{tabular}{l | l}
+\hline 
+Keyword & Category of mathematical terms \\
+\hline 
+ddtSchemes  & first and second time derivatives \\
+gradSchemes  & Gradient \\
+divSchemes  & Divergence \\
+laplacianSchemes & lapalcian \\
+interpolationSchemes & point-to-point interpolation of values \\
+snGradSchemes & Component of gradient normal to a cell face \\
+\hline
+\end{tabular}
+
+\subsubsection{ddtSchemes}
+
+OpenFOAM includes a variety of schemes to integrate fields with respect to time.
 Time schemes define how a property is integrated as a function of time, i.e.
 \begin{equation}
 \frac{\partial}{\partial t}(\phi)
 \end{equation}
+Time schemes properties are input in the \textit{fvSchemes} file under the \textit{ddtSchemes} sub-directory using the syntax. The first time derivative  terms are specified in the ddtSchemes sub-dictionary. When specifying a time scheme it must be noted that an application designed for transient problems will not necessarily run as steady-state and visa versa. For example the solution will not converge if steadyState is specified when running icoFoam, the transient, laminar incompressible flow code; rather, simpleFoam should be used for steady-state, incompressible flow. The discrete scheme for each term can be selected from those listed in following table.
+
+\begin{tabular}{l | l}
+\hline
+Schemes & Description\\
+\hline
+steadyState & Do not solve for time derivatives. \\
+Euler & First order, bounded, implicit \\
+localEuler & Local-time step, first order, bounded, implicit \\
+backward & Second order, implicit \\
+CrankNicholson $\psi$ & Second order, bounded, implicit\\
+\hline
+\end{tabular}
+
 Depending on the choice of schemes, field values at previous time steps are required, represented in the following as $\phi^0$ and $\phi^{00}$ for the old and older time levels. 
 
-Usage 
-
-Time schemes properties are input in the \textit{fvSchemes} file under the \textit{ddtSchemes} sub-directory using the syntax:
-
-\begin{verbatim}
-ddtSchemes
-{
-    default         none;
-    ddt(Q)          <time scheme>;
-}
-\end{verbatim}
- 
 Available time schemes include
 \begin{itemize}
 \item Backward time scheme
@@ -372,13 +393,10 @@ Available time schemes include
 \end{equation}
 Using implicit, second order accuracy, transient, boundedness not guaranteed, conditionally stable. 
 
-Usage 
-
 \begin{verbatim}
 ddtSchemes
 {
     default         backward;
-    ddt(phi)        backward;
 }
 \end{verbatim}
 
@@ -388,15 +406,12 @@ Second order, Transient, Bounded, when using uniform time steps the schemes equa
 \frac{\partial}{\partial t} = \frac{\phi - \phi^{00}}{2\Delta t}
 \end{equation}
 
-Usage
-
 The schemes is specified using: 
 
 \begin{verbatim}
 ddtSchemes
 {
     default         CrankNicolson <coeff>;
-    ddt(phi)        CrankNicolson <coeff>;
 }
 \end{verbatim}
 
@@ -413,13 +428,10 @@ Implicit, First order, Transient
 \frac{\partial}{\partial t} = \frac{\phi - \phi^0}{\Delta t}
 \end{equation}
 
-Usage
-
 \begin{verbatim}
 ddtSchemes
 {
     default         Euler;
-    ddt(phi)        Euler;
 }
 \end{verbatim}
 
@@ -429,13 +441,10 @@ First order
 Pseudo transient, designed for steady cases
 Spatially varying, cell-based time scale set by specific Local Time Stepping (LTS) solvers
 
-Usage
-
 \begin{verbatim}
 ddtSchemes
 {
     default         localEuler;
-    ddt(phi)        localEuler;
 }
 \end{verbatim}
 
@@ -446,9 +455,47 @@ Steady state, set temporal derivative contributions to zero,
 \end{equation}
 \end{itemize}
 
-\subsection{Spatial schemes}
+\subsubsection{gradSchemes}
 
-At their core, spatial schemes rely heavily on \textit{interpolation schemes} to transform cell-bases qualities to cell faces, in combination with \textbf{Gauss Theorem} to convert volume integrals to surface integrals.
+At their core, spatial schemes rely heavily on \textit{interpolation schemes} to transform cell-bases qualities to cell faces, in combination with \textbf{Gauss Theorem} to convert volume integrals to surface integrals. The gradSchemes sub-dictionary contains gradient terms. The discretisation scheme for each term can be selected from those listed in Table. 
+
+\begin{tabular}{l | l}
+\hline
+Discretisation scheme	 &  Description \\
+\hline 
+Gauss <interpolationSchemes> & Second order, Gaussian integration \\
+leastSquares   & Second order, least squares \\
+fourth	 & Fourth order, least squares \\
+cellLimited <gradScheme>  & 	Cell limited version of one of the above schemes \\
+faceLimited <gradScheme> &	Face limited version of one of the above schemes \\
+\hline
+\end{tabular}
+
+The Gauss keyword specifies the standard finite volume discretisation of Gaussian integration which requires the interpolation of values from cell centres to face centres. Therefore, the Gauss entry must be followed by the choice of interpolation scheme. It would be extremely unusual to select anything other than general interpolation schemes and in most cases the linear scheme is an effective choice, e.g. 
+
+Gauss linear;  
+
+Limited versions of any of the 3 base gradient schemes — Gauss, leastSquares and fourth — can be selected by preceding the discretisation scheme by cellLimited (or faceLimited), e.g. a cell limited Gauss scheme: 
+
+cellLimited Gauss linear 1;
+
+\subsubsection{divSchemes}
+
+\begin{tabular}{l | l }
+\hline
+Scheme  &	Numerical behaviour \\
+\hline 
+linear	&   Second order, unbounded  \\
+skewLinear	&  	Second order, (more) unbounded, skewness correction   \\
+cubicCorrected		&  Fourth order, unbounded   \\
+upwind		&  First order, bounded   \\
+linearUpwind		&   First/second order, bounded   \\
+QUICK		&  First/second order, bounded   \\
+TVD schemes	&  	First/second order, bounded   \\
+SFCD	&  	Second order, bounded   \\
+NVD schemes	&  	First/second order, bounded   \\
+\hline
+\end{tabular}
 
 \begin{itemize}
 \item Gradient Schemes

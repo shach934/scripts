@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7250 64-bit) (preloaded format=pdflatex 2019.12.16)  21 DEC 2019 01:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7250 64-bit) (preloaded format=pdflatex 2019.12.16)  6 JAN 2020 23:03
 entering extended mode
 **./main.tex
 (main.tex
@@ -559,15 +559,16 @@ File: turbulence models.PNG Graphic file (type png)
 Package pdftex.def Info: turbulence models.PNG  used on input line 242.
 (pdftex.def)             Requested size: 270.44724pt x 307.52315pt.
  [8] [9 <./turbulence models.PNG>] [10] [11]
+[12]
 LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 3
-69.
+90.
 
 ("C:\Users\CSHAOHUI\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\omscmr.fd"
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 369.
- [12] [13] [14] [15] [16] [17
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 390.
+ [13] [14] [15] [16] [17
 
 ] [18
 
@@ -605,7 +606,7 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 
-Overfull \hbox (0.7515pt too wide) in paragraph at lines 615--633
+Overfull \hbox (0.7515pt too wide) in paragraph at lines 646--664
  [][] 
  []
 
@@ -613,12 +614,12 @@ Overfull \hbox (0.7515pt too wide) in paragraph at lines 615--633
 
 
 ]
-Overfull \hbox (67.72017pt too wide) in paragraph at lines 645--697
+Overfull \hbox (67.72017pt too wide) in paragraph at lines 676--728
  [][] 
  []
 
 
-Overfull \hbox (193.58748pt too wide) in paragraph at lines 700--702
+Overfull \hbox (193.58748pt too wide) in paragraph at lines 731--733
 []$[]$\OT1/cmr/m/n/10 : taken from: [][]$\OT1/cmtt/m/n/10 https : / / www . ope
 nfoam . com / documentation / guides / latest / doc / openfoam-[]guide-[]applic
 ations-[]solvers . html # sec-[]applications-[]solvers-[]capability-[]matrix$[]
@@ -633,7 +634,7 @@ ations-[]solvers . html # sec-[]applications-[]solvers-[]capability-[]matrix$[]
 <compressible.png, id=306, 1171.37625pt x 501.875pt>
 File: compressible.png Graphic file (type png)
 <use compressible.png>
-Package pdftex.def Info: compressible.png  used on input line 712.
+Package pdftex.def Info: compressible.png  used on input line 743.
 (pdftex.def)             Requested size: 468.5422pt x 200.74643pt.
  [21
 
@@ -641,28 +642,28 @@ Package pdftex.def Info: compressible.png  used on input line 712.
 <VTK pipe line.PNG, id=332, 463.7325pt x 644.4075pt>
 File: VTK pipe line.PNG Graphic file (type png)
 <use VTK pipe line.PNG>
-Package pdftex.def Info: VTK pipe line.PNG  used on input line 827.
+Package pdftex.def Info: VTK pipe line.PNG  used on input line 858.
 (pdftex.def)             Requested size: 278.24164pt x 386.64748pt.
  [24] [25 <./VTK pipe line.PNG>]
 (main.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 859.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 890.
  [26]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 859.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 890.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 859.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 859.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 890.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 890.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: F64A6D2626952747ECE739AB19C2B141;1805.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 859.
+(rerunfilecheck)             Checksum: 837681A8BFB30A9FF3247C3D3182725C;1815.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 890.
  ) 
 Here is how much of TeX's memory you used:
  8979 strings out of 492483
- 137621 string characters out of 3120229
+ 137641 string characters out of 3120229
  251828 words of memory out of 3000000
  13034 multiletter control sequences out of 15000+200000
  14470 words of font info for 55 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 45i,18n,46p,1060b,448s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 45i,18n,46p,1060b,548s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\CSHAOHUI\AppData\Local\MiKTeX\2.9\fonts/pk/ljfour/public/esint/dpi
 600\esint10.pk><C:/Users/CSHAOHUI/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
 /public/amsfonts/cm/cmbx10.pfb><C:/Users/CSHAOHUI/AppData/Local/Programs/MiKTeX
@@ -684,7 +685,7 @@ rograms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/CSHAOHUI
 /Users/CSHAOHUI/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
 m/cmti10.pfb><C:/Users/CSHAOHUI/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/p
 ublic/amsfonts/cm/cmtt10.pfb>
-Output written on main.pdf (26 pages, 738635 bytes).
+Output written on main.pdf (26 pages, 741859 bytes).
 PDF statistics:
  429 PDF objects out of 1000 (max. 8388607)
  114 named destinations out of 1000 (max. 500000)

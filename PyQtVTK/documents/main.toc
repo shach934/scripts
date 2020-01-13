@@ -9,13 +9,13 @@
 \contentsline {part}{II\hspace {1em}OpenFOAM case setup}{10}{part.2}%
 \contentsline {section}{\numberline {2}Numerical}{11}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Schemes}{12}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Temporal schemes}{12}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Spatial schemes}{14}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Wall distance calculation method}{14}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Solutions}{14}{subsection.2.5}%
-\contentsline {subsection}{\numberline {2.6}Solvers}{14}{subsection.2.6}%
-\contentsline {subsection}{\numberline {2.7}Solver control}{15}{subsection.2.7}%
-\contentsline {section}{\numberline {3}boundary condition}{15}{section.3}%
+\contentsline {subsubsection}{\numberline {2.1.1}ddtSchemes}{12}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}gradSchemes}{14}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Wall distance calculation method}{15}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Solutions}{15}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Solvers}{15}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Solver control}{15}{subsection.2.5}%
+\contentsline {section}{\numberline {3}boundary condition}{16}{section.3}%
 \contentsline {section}{\numberline {4}Conclusion}{21}{section.4}%
 \contentsline {section}{\numberline {A}Appendix}{21}{appendix.A}%
 \contentsline {subsection}{\numberline {A.1}Gradient}{21}{subsection.A.1}%

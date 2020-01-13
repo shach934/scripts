@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>276</width>
+    <height>533</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Convect Variables</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="divhInput"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="divepsilonBtn">
+        <property name="text">
+         <string>epsilon</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="divpBtn">
+        <property name="text">
+         <string>p</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="divUInput"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="divhBtn">
+        <property name="text">
+         <string>h</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="divUBtn">
+        <property name="text">
+         <string>U</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="divp_rghBtn">
+        <property name="text">
+         <string>p_rgh</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="divpInput"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="Inputp_rghInput"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="divepsilonInput"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="divkInput"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QPushButton" name="divkBtn">
+        <property name="text">
+         <string>k</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QPushButton" name="divalphatBtn">
+        <property name="text">
+         <string>alphat</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="divalphatInput"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>div</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QRadioButton" name="divUpwindRadChecBox">
+        <property name="text">
+         <string>Upwind</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divLinerUpwindChecBox">
+        <property name="text">
+         <string>Linear Upwind</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divLinearChecBox">
+        <property name="text">
+         <string>Linear</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="divLimiteLinearRadBtn">
+          <property name="text">
+           <string>Limited Linear</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="divLimitLinearEffiInput">
+          <property name="text">
+           <string>1</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divLUSTChecBox">
+        <property name="text">
+         <string>LUST</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divCubicChecBox">
+        <property name="text">
+         <string>Cubic</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divVanLeerChecBox">
+        <property name="text">
+         <string>van Leer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="divQUICKChecBox">
+        <property name="text">
+         <string>QUICK</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="divBoundedChecBox">
+        <property name="text">
+         <string>Bounded</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="divSkewCorrectChecBox">
+        <property name="text">
+         <string>Skew Corrected</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
