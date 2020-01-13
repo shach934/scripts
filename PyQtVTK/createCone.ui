@@ -242,11 +242,15 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="createConeBtn">
-     <property name="text">
-      <string>Create</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="createConeBtn">
+       <property name="text">
+        <string>Create</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

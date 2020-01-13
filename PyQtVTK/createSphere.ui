@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>237</width>
-    <height>176</height>
+    <width>241</width>
+    <height>187</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
    <item row="0" column="1">
     <widget class="QLineEdit" name="sphereNameInput">
      <property name="text">
-      <string>Cylinder_1</string>
+      <string>Sphere_1</string>
      </property>
     </widget>
    </item>
@@ -210,11 +210,15 @@
     </layout>
    </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QPushButton" name="createSphereBtn">
-     <property name="text">
-      <string>Create</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QPushButton" name="createSphereBtn">
+       <property name="text">
+        <string>Create</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

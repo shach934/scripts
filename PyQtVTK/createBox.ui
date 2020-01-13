@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>214</width>
-    <height>153</height>
+    <height>155</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -187,7 +187,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="boxLengthZInpt">
+          <widget class="QLineEdit" name="boxLengthZInput">
            <property name="text">
             <string>0</string>
            </property>
@@ -200,11 +200,15 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="createBoxBtn">
-     <property name="text">
-      <string>Create</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="createBoxBtn">
+       <property name="text">
+        <string>Create</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

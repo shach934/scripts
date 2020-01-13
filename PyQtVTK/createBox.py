@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_createBox(object):
     def setupUi(self, createBox):
         createBox.setObjectName("createBox")
-        createBox.resize(214, 153)
+        createBox.resize(214, 155)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(createBox)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.gridLayout = QtWidgets.QGridLayout()
@@ -80,15 +80,21 @@ class Ui_createBox(object):
         self.boxLengthYInput = QtWidgets.QLineEdit(createBox)
         self.boxLengthYInput.setObjectName("boxLengthYInput")
         self.horizontalLayout.addWidget(self.boxLengthYInput)
-        self.boxLengthZInpt = QtWidgets.QLineEdit(createBox)
-        self.boxLengthZInpt.setObjectName("boxLengthZInpt")
-        self.horizontalLayout.addWidget(self.boxLengthZInpt)
+        self.boxLengthZInput = QtWidgets.QLineEdit(createBox)
+        self.boxLengthZInput.setObjectName("boxLengthZInput")
+        self.horizontalLayout.addWidget(self.boxLengthZInput)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.previewBoxBtn = QtWidgets.QPushButton(createBox)
+        self.previewBoxBtn.setObjectName("previewBoxBtn")
+        self.horizontalLayout_3.addWidget(self.previewBoxBtn)
         self.createBoxBtn = QtWidgets.QPushButton(createBox)
         self.createBoxBtn.setObjectName("createBoxBtn")
-        self.verticalLayout_3.addWidget(self.createBoxBtn)
+        self.horizontalLayout_3.addWidget(self.createBoxBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
         self.retranslateUi(createBox)
         QtCore.QMetaObject.connectSlotsByName(createBox)
@@ -123,6 +129,7 @@ class Ui_createBox(object):
         self.boxLengthXInput.setText(_translate("createBox", "0"))
         self.boxLengthYInput.setText(_translate("createBox", "0"))
         self.boxLengthZInpt.setText(_translate("createBox", "0"))
+        self.previewBoxBtn.setText(_translate("createBox", "Preview"))
         self.createBoxBtn.setText(_translate("createBox", "Create"))
 
 

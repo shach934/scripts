@@ -89,9 +89,15 @@ class Ui_createSphere(object):
         self.horizontalLayout_3.addWidget(self.sphereResoluAlphaInput)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.gridLayout.addLayout(self.verticalLayout_2, 2, 1, 1, 1)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.previewSphereBtn = QtWidgets.QPushButton(createSphere)
+        self.previewSphereBtn.setObjectName("previewSphereBtn")
+        self.horizontalLayout_4.addWidget(self.previewSphereBtn)
         self.createSphereBtn = QtWidgets.QPushButton(createSphere)
         self.createSphereBtn.setObjectName("createSphereBtn")
-        self.gridLayout.addWidget(self.createSphereBtn, 3, 0, 1, 2)
+        self.horizontalLayout_4.addWidget(self.createSphereBtn)
+        self.gridLayout.addLayout(self.horizontalLayout_4, 3, 0, 1, 2)
 
         self.retranslateUi(createSphere)
         QtCore.QMetaObject.connectSlotsByName(createSphere)
@@ -100,7 +106,7 @@ class Ui_createSphere(object):
         _translate = QtCore.QCoreApplication.translate
         createSphere.setWindowTitle(_translate("createSphere", "Form"))
         self.label_3.setText(_translate("createSphere", "Name"))
-        self.sphereNameInput.setText(_translate("createSphere", "Cylinder_1"))
+        self.sphereNameInput.setText(_translate("createSphere", "Sphere_1"))
         self.label_5.setText(_translate("createSphere", "Color"))
         self.sphereColorComboBox.setItemText(0, _translate("createSphere", "blue"))
         self.sphereColorComboBox.setItemText(1, _translate("createSphere", "darkBlue"))
@@ -128,6 +134,7 @@ class Ui_createSphere(object):
         self.sphereResoluThetaInput.setText(_translate("createSphere", "10"))
         self.sphereResoluDeltaInput.setText(_translate("createSphere", "10"))
         self.sphereResoluAlphaInput.setText(_translate("createSphere", "10"))
+        self.previewSphereBtn.setText(_translate("createSphere", "Preview"))
         self.createSphereBtn.setText(_translate("createSphere", "Create"))
 
 

@@ -92,9 +92,15 @@ class Ui_createCylinder(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.previewCylinderBtn = QtWidgets.QPushButton(createCylinder)
+        self.previewCylinderBtn.setObjectName("previewCylinderBtn")
+        self.horizontalLayout_3.addWidget(self.previewCylinderBtn)
         self.createCylinderBtn = QtWidgets.QPushButton(createCylinder)
         self.createCylinderBtn.setObjectName("createCylinderBtn")
-        self.verticalLayout_3.addWidget(self.createCylinderBtn)
+        self.horizontalLayout_3.addWidget(self.createCylinderBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
         self.retranslateUi(createCylinder)
         QtCore.QMetaObject.connectSlotsByName(createCylinder)
@@ -131,6 +137,7 @@ class Ui_createCylinder(object):
         self.cylinderCenterXInput.setText(_translate("createCylinder", "0"))
         self.cylinderCenterYInput.setText(_translate("createCylinder", "0"))
         self.cylinderCenterZInpt.setText(_translate("createCylinder", "0"))
+        self.previewCylinderBtn.setText(_translate("createCylinder", "preview"))
         self.createCylinderBtn.setText(_translate("createCylinder", "Create"))
 
 

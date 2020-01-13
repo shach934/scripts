@@ -27,7 +27,7 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from vtk.util.numpy_support import vtk_to_numpy
+from vtk import vtkCylinderSource, vtkConeSource, vtkCubeSource, vtkSphereSource
 
 from OpenFOAMCase import *
 from createBox import Ui_createBox
@@ -60,6 +60,10 @@ class createCone(QDialog, Ui_createCone):
     def __init__(self, parent=None):
         super(createCone, self).__init__(parent)
         self.setupUi(self) 
+
+    def drawCone(self):
+        cone = vtkConeSource()
+
 
 class SettingDialog(QMainWindow, Ui_Setting):
     def __init__(self):
@@ -267,7 +271,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.HeatSourceItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Heat Source"])
         self.TempLimitItem = QtWidgets.QTreeWidgetItem(self.optionItem, ["Temperature Limit"])
 
-
         self.ControlItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["ControlDict"])
 
         self.TimeControlItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Time control"])
@@ -277,46 +280,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.pipLine.show()
         self.pipLine.expandAll()
 
-
-    def clearLayout(self, cur_lay):
-        if cur_lay is not None:
-            while cur_lay.count():
-                item = cur_lay.takeAt(0)
-                widget = item.widget()
-                if widget is not None:
-                    widget.deleteLater()
-                else:
-                    self.clearLayout(item.layout())
-            sip.delete(cur_lay)
-
-    def propertyView(self, current, old):
-        if current.text(0) == "Box":
-            self.newBox = createBox()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.newBox)
-            self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-
-        elif current.text(0) == "Sphere":
-            self.newSphere = createSphere()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.newSphere)
-            self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-
-        elif current.text(0) == "Cylinder":
-            self.newCylinder = createCylinder()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.newCylinder)
-            self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-            
-        elif current.text(0) == "Cone":
-            self.newCone = createCone()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.newCone)
-            self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
 
     def TurbProperties(self):
         self.properties.setColumnCount(2)

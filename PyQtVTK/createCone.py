@@ -104,9 +104,15 @@ class Ui_createCone(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.previewConeBtn = QtWidgets.QPushButton(createCone)
+        self.previewConeBtn.setObjectName("previewConeBtn")
+        self.horizontalLayout_3.addWidget(self.previewConeBtn)
         self.createConeBtn = QtWidgets.QPushButton(createCone)
         self.createConeBtn.setObjectName("createConeBtn")
-        self.verticalLayout_3.addWidget(self.createConeBtn)
+        self.horizontalLayout_3.addWidget(self.createConeBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
         self.retranslateUi(createCone)
         QtCore.QMetaObject.connectSlotsByName(createCone)
@@ -147,6 +153,7 @@ class Ui_createCone(object):
         self.coneCenterZInput.setText(_translate("createCone", "0"))
         self.coneCenterXInput.setText(_translate("createCone", "0"))
         self.coneCenterYInput.setText(_translate("createCone", "0"))
+        self.previewConeBtn.setText(_translate("createCone", "Preview"))
         self.createConeBtn.setText(_translate("createCone", "Create"))
 
 
