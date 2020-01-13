@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver          GAMG;
+        tolerance       1e-16;
+        relTol          0.1;
+        smoother        DICGaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        cacheAgglomeration on;
+        agglomerator    faceAreaPair;
+        nCellsInCoarsestLevel 10;
+        mergeLevels     1;
+        minIter         1;
+        maxIter         5;
+    }
+
+    pFinal
+    {
+        $p;
+        //relTol          1e-6;
+        // Time history가 중요한 unsteady 문제에서는 relTol 설정
+    }
+
+    "(U|k|epsilon)"
+    {
+        //solver          PBiCG;
+        //preconditioner  DILU;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-16;
+        relTol          0.1;
+        minIter         1;
+        maxIter         5;
+    }
+
+    "(U|k|epsilon)Final"
+    {
+        $U;
+        //relTol          1e-6;
+        // Time history가 중요한 unsteady 문제에서는 relTol 설정
+    }
+}
+
+PIMPLE
+{
+    pRefPoint   (0.505 0 0);
+    pRefValue   0.0;
+
+    turbOnFinalIterOnly         false;
+
+    nNonOrthogonalCorrectors    0;
+    // laplacian(rAUf,p)에 relaxed scheme을 써야하는 경우 
+    // nNonOrthogonalCorrectors는 반드시 '0'으로 설정해야 함.
+
+    //PISO mode
+    //nCorrectors                 2;  //n = 2
+    //nOuterCorrectors            1;  //n = 1
+
+    //SIMPLE mode
+    //nCorrectors                 1;  //n = 1
+    //nOuterCorrectors            20; //n >> 1
+
+    //PIMPLE mode
+    nCorrectors                 2;  //n >= 2  
+    nOuterCorrectors            20;  //n > 1
+
+    residualControl //valid only in SIMPLE or PIMPLE mode
+    {
+        p
+        {
+            relTol              0.05;
+            tolerance           1e-3;
+        }
+        "(U|k|epsilon)"
+        {
+            relTol              0.05;
+            tolerance           1e-3;
+        }
+    }
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p                       0.3;
+    }
+
+    equations 
+    {
+        U                       0.7;
+        UFinal                  0.7;
+        //UFinal                  1.0;
+
+        // Time history가 중요한 unsteady 문제에서는 Final inner iteration의
+        // under-relaxation factor를 '1'로 설정
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>physicsProperties</class>
+ <widget class="QWidget" name="physicsProperties">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>298</width>
+    <height>464</height>
+   </rect>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="tabletTracking">
+   <bool>false</bool>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::ActionsContextMenu</enum>
+  </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Solver Selection</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="radioButton">
+          <property name="text">
+           <string>Steady State   </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_2">
+          <property name="text">
+           <string>Transient    </string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_2">
+     <property name="tabletTracking">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QRadioButton" name="radioButton_3">
+          <property name="text">
+           <string>Incompressible</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_4">
+          <property name="text">
+           <string>Compresible</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Physics</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="TurbuleChecBox">
+        <property name="text">
+         <string>Turbulence</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="RadiateChecBox">
+        <property name="styleSheet">
+         <string notr="true">QCheckBox.indicator { width: 10px; height: 10px;}</string>
+        </property>
+        <property name="text">
+         <string>Radiation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="MultiphaseChecBox">
+        <property name="text">
+         <string>Multiphase</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="DynaMeshChecBox">
+        <property name="text">
+         <string>Dynamic Mesh</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="MRFChecBox">
+        <property name="text">
+         <string>MRF</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="LagranChecBox">
+        <property name="text">
+         <string>Lagrangian</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="HeatTransferChecBox">
+        <property name="text">
+         <string>Heat Transfer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="BuoyancyChecBox">
+        <property name="text">
+         <string>Buoyancy</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="selectSolverLabel">
+       <property name="text">
+        <string>    Solvers:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="selectedSolver">
+       <property name="text">
+        <string> </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QListWidget" name="listWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>laplacianFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>potentialFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>icoFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>pimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>SRFPimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>pisoFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>simpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>rhoPimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>interFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>multiphaseEulerFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>multiphaseInterFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>buoyantBoussinesqPimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>buoyantBoussinesqSimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>buoyantPimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>buoyantSimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>chtMultiRegionFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>chtMultiRegionSimpleFoam</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>thermoFoam</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Select</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

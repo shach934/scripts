@@ -21,17 +21,19 @@ Last edited: December 2019
 # TODO 2, do not use Wildcard character for boundary definition.
 #####################################################################################################
 
-import sys
-
-import vtk
-from PyQt5 import QtCore
+import sys, vtk
+from PyQt5 import QtCore, QtGui, sip
 from PyQt5 import QtWidgets
 from PyQt5.Qt import Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import vtk_to_numpy
 
 from OpenFOAMCase import *
+from createBox import Ui_createBox
+from createSphere import Ui_createSphere
+from createCylinder import Ui_createCylinder
+from createCone import Ui_createCone
 from mainWindow import Ui_OpenFOAM
 from settingBox import Ui_Setting
 
@@ -39,6 +41,25 @@ from settingBox import Ui_Setting
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
     pass
 
+class createBox(QDialog, Ui_createBox):
+    def __init__(self, parent=None):
+        super(createBox, self).__init__(parent)
+        self.setupUi(self) 
+
+class createCylinder(QDialog, Ui_createCylinder):
+    def __init__(self, parent=None):
+        super(createCylinder, self).__init__(parent)
+        self.setupUi(self) 
+
+class createSphere(QDialog, Ui_createSphere):
+    def __init__(self, parent=None):
+        super(createSphere, self).__init__(parent)
+        self.setupUi(self) 
+
+class createCone(QDialog, Ui_createCone):
+    def __init__(self, parent=None):
+        super(createCone, self).__init__(parent)
+        self.setupUi(self) 
 
 class SettingDialog(QMainWindow, Ui_Setting):
     def __init__(self):
@@ -46,6 +67,7 @@ class SettingDialog(QMainWindow, Ui_Setting):
         Ui_Setting.__init__(self)
         self.setupUi(self)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
+
 
 
 # noinspection PyAttributeOutsideInit
@@ -177,10 +199,21 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
         self.createGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Create"])
         self.createBoxGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Box"])
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/box.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.createBoxGeoItem.setIcon(0, icon)
         self.createCylGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Cylinder"])
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/cylinder.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.createCylGeoItem.setIcon(0, icon)
         self.createSphGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Sphere"])
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/sphere.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.createSphGeoItem.setIcon(0, icon)
         self.createConeGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Cone"])
-
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/cone.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.createConeGeoItem.setIcon(0, icon)
 
         self.importGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Import"])
 
@@ -194,6 +227,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
 
         self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Setup"])
+
 
         self.TurbItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Turbulence"])
         self.MRFItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["MRF"])
@@ -243,19 +277,46 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.pipLine.show()
         self.pipLine.expandAll()
 
+
+    def clearLayout(self, cur_lay):
+        if cur_lay is not None:
+            while cur_lay.count():
+                item = cur_lay.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clearLayout(item.layout())
+            sip.delete(cur_lay)
+
     def propertyView(self, current, old):
         if current.text(0) == "Box":
-            self.createBox()
-        elif current.text(0) == "Sphere":
-            self.createSphere()
-        elif current.text(0) == "Cylinder":
-            self.createCylinder()
-        elif current.text(0) == "Cone":
-            self.createCone()
+            self.newBox = createBox()
+            h_la = QtWidgets.QHBoxLayout()
+            h_la.addWidget(self.newBox)
+            self.clearLayout(self.propertyBox.layout())
+            self.propertyBox.setLayout(h_la)
 
-    def createBox(self):
-        from createBox import Ui_createBox
-        Ui_createBox()
+        elif current.text(0) == "Sphere":
+            self.newSphere = createSphere()
+            h_la = QtWidgets.QHBoxLayout()
+            h_la.addWidget(self.newSphere)
+            self.clearLayout(self.propertyBox.layout())
+            self.propertyBox.setLayout(h_la)
+
+        elif current.text(0) == "Cylinder":
+            self.newCylinder = createCylinder()
+            h_la = QtWidgets.QHBoxLayout()
+            h_la.addWidget(self.newCylinder)
+            self.clearLayout(self.propertyBox.layout())
+            self.propertyBox.setLayout(h_la)
+            
+        elif current.text(0) == "Cone":
+            self.newCone = createCone()
+            h_la = QtWidgets.QHBoxLayout()
+            h_la.addWidget(self.newCone)
+            self.clearLayout(self.propertyBox.layout())
+            self.propertyBox.setLayout(h_la)
 
     def TurbProperties(self):
         self.properties.setColumnCount(2)

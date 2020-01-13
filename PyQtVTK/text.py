@@ -2,21 +2,25 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog, QGroupBox, QTabWidget
 from PyQt5.uic import loadUi, loadUiType
+from mainWindow import Ui_OpenFOAM
+from physicsProperty import Ui_physicsProperties
+from createBox import Ui_createBox
 
-
-Form, Base = loadUiType('physicsProperty.ui') # this path should be a relative path. For testing you can use absolute path.
-class CustomWidget(Form, Base):
+class physicsProperty(QDialog, Ui_physicsProperties):
     def __init__(self, parent=None):
-        super(CustomWidget, self).__init__(parent)
+        super(physicsProperty, self).__init__(parent)
         self.setupUi(self)
-        
 
-Form2, Base2 = loadUiType('mainWindow.ui') # this path should be a relative path. For testing you can use absolute path.
-class Window(Form2, Base2):
+class createBox(QDialog, Ui_createBox):
+    def __init__(self, parent=None):
+        super(createBox, self).__init__(parent)
+        self.setupUi(self) 
+
+class Window(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setupUi(self)
-        self.cWidget = CustomWidget(self)
+        self.cWidget = createBox(self)
         h_la = QtWidgets.QHBoxLayout()
         h_la.addWidget(self.cWidget)
         self.propertyBox.setLayout(h_la)

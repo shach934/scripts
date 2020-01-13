@@ -1,0 +1,63 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         NEXT::Euler;
+}
+
+gradSchemes
+{
+    default             Gauss linear;
+
+    //reconGrad         NEXT::VKLimited Gauss linear 0.4;
+}
+
+divSchemes
+{   
+    default             Gauss linear;
+
+    div(phi,U)          Gauss linearUpwind reconGrad;
+    div(phi,k)          Gauss linearUpwind reconGrad;
+    div(phi,epsilon)    Gauss linearUpwind reconGrad;
+    div(phi,omega)      Gauss linearUpwind reconGrad;
+    div(phi,K)          Gauss linearUpwind reconGrad;
+    div(phi,h)          Gauss linearUpwind reconGrad;
+}
+
+laplacianSchemes
+{   
+    default             Gauss linear NEXT::corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+
+    interpolate(p_rgh)  NEXT::momentumWeighted;
+}
+
+snGradSchemes
+{   
+    default   NEXT::corrected;
+}
+
+wallDist
+{
+    method meshWave;
+}
+
+// ************************************************************************* //

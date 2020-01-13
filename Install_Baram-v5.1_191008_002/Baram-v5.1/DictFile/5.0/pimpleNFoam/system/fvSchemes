@@ -1,0 +1,60 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         NEXT::Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+
+    //reconstructionGrad  VKLimited Gauss linear 0.4;
+    reconstructionGrad  cellLimited Gauss linear 0.9;
+    // 수렴성 문제시 VKLimited 또는 cellLimited 사용
+}
+
+divSchemes
+{
+    default         Gauss linear;
+    div(phi,U)      Gauss linearUpwind reconstructionGrad;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear NEXT::corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+
+    interpolate(p)  NEXT::momentumWeighted;
+}
+
+snGradSchemes
+{
+    default         NEXT::corrected;
+}
+
+wallDist
+{
+    method meshWave;
+}
+
+
+// ************************************************************************* //

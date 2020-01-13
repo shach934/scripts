@@ -1,0 +1,37 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       dictionary;
+    location    "system";
+    object      boundaryConditions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+region0
+{
+    inner-wall
+    {
+        type            isoThermalWall;
+        T               uniform 373;
+    }
+    frontAndBackPlanes
+    {
+        type            empty;
+    }
+    outer-wall
+    {
+        type            isoThermalWall;
+        T               uniform 350;
+    }
+}
+
+
+// ************************************************************************* //

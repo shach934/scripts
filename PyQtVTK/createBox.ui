@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
-    <height>129</height>
+    <width>214</width>
+    <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,16 +15,118 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Color</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="BoxName">
+       <property name="text">
+        <string>Box_1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="BoxColorComboBox">
+       <item>
+        <property name="text">
+         <string>blue</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkBlue</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>gray</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkGray</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>lightGray</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>green</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkGreen</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>cyan</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkCyan</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>red</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkRed</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>magenta</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>darkMagenta</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>white</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>black</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>PICK</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Center</string>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
@@ -33,9 +135,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Color</string>
+          <string>Center</string>
          </property>
         </widget>
        </item>
@@ -48,21 +150,21 @@
          <item>
           <widget class="QLineEdit" name="boxCenterXInput">
            <property name="text">
-            <string>0</string>
+            <string>1</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="boxCenterYInput">
            <property name="text">
-            <string>0</string>
+            <string>1</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="boxCenterZInput">
            <property name="text">
-            <string>0</string>
+            <string>1</string>
            </property>
           </widget>
          </item>
@@ -73,46 +175,21 @@
          <item>
           <widget class="QLineEdit" name="boxLengthXInput">
            <property name="text">
-            <string>10</string>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="boxLengthYInput">
            <property name="text">
-            <string>10</string>
+            <string>0</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLineEdit" name="boxLengthZInpt">
            <property name="text">
-            <string>10</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLineEdit" name="boxColorRInput">
-           <property name="text">
             <string>0</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="boxColorGInput">
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="boxColorBInput">
-           <property name="text">
-            <string>1</string>
            </property>
           </widget>
          </item>
@@ -123,7 +200,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="createBoxBtn">
      <property name="text">
       <string>Create</string>
      </property>

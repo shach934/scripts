@@ -1,0 +1,91 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "(p|p_rgh)"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            smoother        DIC;
+            tolerance       1e-05;
+            relTol          0.1;
+        }
+        tolerance       1e-16;
+        relTol          0.01;
+        minIter         1;
+        maxIter         5;
+    }
+    "(U|k|omega|epsilon|R).*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-16;
+        relTol          0.1;
+        minIter         1;
+        maxIter         10;
+    }
+    "(h|e)"
+    {
+        solver          GAMG;
+        smoother        DILUGaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     1;
+        cacheAgglomeration on;
+        agglomerator    faceAreaPair;
+        nCellsInCoarsestLevel 10;
+        mergeLevels     1;
+        tolerance       1e-16;
+        relTol          0.1;
+        minIter         1;
+        maxIter         10;
+    }
+}
+
+SIMPLE
+{
+    consistent      yes;
+    nNonOrthogonalCorrectors 0;
+    pRefPoint       ( 0 0 0 );
+    pRefValue       0;
+    residualControl
+    {
+        "(p|p_rgh)"     0.0001;
+        U               0.001;
+        "(k|epsilon|omega|R)" 0.001;
+        "(h|e)"         1e-05;
+    }
+}
+
+relaxationFactors
+{
+    fields
+    {
+        "(p|p_rgh)"     0.9;
+    }
+    equations
+    {
+        U               0.8;
+        "(k|epsilon|omega|R)" 0.8;
+        "(h|e)"         1;
+    }
+}
+
+
+// ************************************************************************* //

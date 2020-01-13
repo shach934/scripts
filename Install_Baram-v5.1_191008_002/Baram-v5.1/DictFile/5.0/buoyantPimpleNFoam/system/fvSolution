@@ -1,0 +1,152 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    rho
+    {
+        solver                  PCG;
+        preconditioner          DIC;
+        tolerance               1e-16;
+        relTol                  0.1;
+        minIter                 1;
+        maxIter                 5;
+    }
+    rhoFinal
+    {
+        $rho                    ;
+        //relTol                  1e-6;
+        // Time history가 중요한 unsteady 문제에서는 relTol 설정
+    }
+
+    "(p|p_rgh)"
+    {
+        solver                  PCG;
+        preconditioner
+        {
+            preconditioner      GAMG;
+            tolerance           1e-5;
+            relTol              0.1;
+            smoother            DIC;
+        }
+
+        tolerance               1e-16;
+        relTol                  0.01;
+        minIter                 1;
+        maxIter                 5;
+    }
+    "(p|p_rgh)Final"
+    {
+        $p_rgh                  ;
+        //relTol                  1e-6;
+        // Time history가 중요한 unsteady 문제에서는 relTol 설정
+    }
+
+    "(U|k|epsilon|omega|nuTilda|R|h|e)"
+    {
+        solver                  PBiCGStab;
+        preconditioner
+        {
+            preconditioner      GAMG;
+            tolerance           1e-5;
+            relTol              0.1;
+            smoother            DILU;
+        }
+        tolerance               1e-16;
+        relTol                  0.1;
+        minIter                 1;
+        maxIter                 5;
+    }
+
+    "(U|k|epsilon|omega|nuTilda|R|h|e)Final"
+    {
+        $U                  ;
+        //relTol                  1e-6;
+        // Time history가 중요한 unsteady 문제에서는 relTol 설정
+    }
+}
+
+PIMPLE
+{
+    consistent      no;
+
+    turbOnFinalIterOnly         false;
+
+    nNonOrthogonalCorrectors    0;
+    // laplacian(rAUf,p)에 relaxed scheme을 써야하는 경우 
+    // nNonOrthogonalCorrectors는 반드시 '0'으로 설정해야 함.
+
+    //PISO mode
+    //nCorrectors                 2;  //n = 2
+    //nOuterCorrectors            1;  //n = 1
+
+    //SIMPLE mode
+    //nCorrectors                 1;  //n = 1
+    //nOuterCorrectors            20; //n >> 1
+
+    //PIMPLE mode
+    nCorrectors                 4;  //n >= 2  
+    nOuterCorrectors            20;  //n > 1
+
+    pRefPoint                   (0 0.02 0);
+    pRefValue                   0.0;
+
+    residualControl
+    {
+        "(p|p_rgh)"
+        {
+            relTol          0.05;
+            tolerance       1e-4;
+        }
+        "(U|k|epsilon|omega|nuTilda|R)"
+        {
+            relTol          0.05;
+            tolerance       0.001;
+        }
+        "(rho|h|e)"
+        {
+            relTol          0.05;
+            tolerance       1e-6;
+        }
+    }
+}
+
+relaxationFactors
+{
+    fields
+    {
+        rho                 1.0;
+        "p_rgh.*"           0.3;
+    }
+    equations
+    {
+        U                   0.7;
+        UFinal              0.7;
+        //UFinal              1.0;
+
+        "(h|e)"             1.0;
+        "(h|e)Final"        1.0;
+
+        "(k|epsilon|omega|nuTilda|R)"       0.8;
+        "(k|epsilon|omega|nuTilda|R)Final"  0.8;
+        //"(k|epsilon|omega|nuTilda|R)Final"  1.0;
+
+        // Time history가 중요한 unsteady 문제에서는 Final inner iteration의
+        // under-relaxation factor를 '1'로 설정
+    }
+}
+
+// ************************************************************************* //

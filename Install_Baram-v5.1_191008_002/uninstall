@@ -1,0 +1,243 @@
+#!/bin/bash
+cd ${0%/*} || exit 1
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Information (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Uninstallation Script (Ubuntu and CentOS)
+# Made by NEXTfoam
+# Created   : 2019.03.01 (017)
+# Updated	: 2019.06.13 (001)
+# Modified  : 2019.08.05 (001)
+# Notice    : none
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Define (v1.2)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common
+OPENFOAM_VERSION="5"                            # OpenFOAM version
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Name
+NAME_FOLDER="Baram-v5.1"                     	# Install folder name
+
+# Program1 (Solver)
+NAME_PROGRAM="Baram"                            # Program name
+NAME_EXEC="Baram"                               # Python file name to execute
+
+FILE_EXEC="${NAME_EXEC}.py"
+FILE_ICON="${NAME_EXEC}.png"
+FILE_SHORTCUT="${NAME_PROGRAM}.desktop"
+
+# Program2 (Snappy)
+NAME_PROGRAM_SNPY="Baram-snappy"                # Program name
+NAME_EXEC_SNPY="Baram-snappy"                   # Python file name to execute
+
+FILE_EXEC_SNPY="${NAME_EXEC_SNPY}.py"
+FILE_ICON_SNPY="${NAME_EXEC_SNPY}.png"
+FILE_SHORTCUT_SNPY="${NAME_PROGRAM_SNPY}.desktop"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common Functions
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Get OS Type (v1.5)
+TYPE_OS="False"
+TYPE_VER="False"
+TYPE_OSVER="False"
+Get_OS_Infor()
+{	
+	GET_OS="False"
+	GET_VER="False"
+    SYSTEM_INFOR=$(grep . /etc/*-release)
+
+    if [[ "${SYSTEM_INFOR}" == *"Ubuntu"* ]]; then
+        GET_OS="UB"
+        if [[ "${SYSTEM_INFOR}" == *"Ubuntu 14."* ]]; then
+         	GET_VER="14"
+        elif [[ "${SYSTEM_INFOR}" == *"Ubuntu 16."* ]]; then
+         	GET_VER="16"
+        elif [[ "${SYSTEM_INFOR}" == *"Ubuntu 18."* ]]; then
+	        GET_VER="18"
+        fi
+
+    elif [[ "${SYSTEM_INFOR}" == *"CentOS"* ]]; then
+        GET_OS="CO"
+        if [[ "${SYSTEM_INFOR}" == *"release 6."* ]]; then
+			GET_VER="6"
+		elif [[ "${SYSTEM_INFOR}" == *"release 7."* ]]; then
+			GET_VER="7"
+		fi
+
+	elif [[ "${SYSTEM_INFOR}" == *"Red Hat Enterprise"* ]]; then
+	    GET_OS="RH"         # same with CentOS
+        GET_VER="7"
+    fi
+    
+    # Check
+	if [[ "${GET_OS}" == "False" ]] || [[ "${GET_VER}" == "False" ]];then
+		echo -e "Cannot support this linux system"
+		exit 1
+	fi
+
+	# return
+	TYPE_OS=${GET_OS}
+	TYPE_VER=${GET_VER}
+	TYPE_OSVER=${TYPE_OS}${TYPE_VER}
+}
+
+# Check OpenFOAM version (v1.1)
+CUR_FOAMVER=${OPENFOAM_VERSION}
+Check_System_Environment()
+{
+    if [[ -z "${WM_PROJECT_VERSION}" ]] || [[ "${WM_PROJECT_VERSION}" != *"${CUR_FOAMVER}."* ]];then
+        echo -e "\033[1;31m""\n***!! Error !!***""\033[0m"
+        echo -e "This terminal is not 'OpenFOAM-v${CUR_FOAMVER}x' environment."
+        echo -e "Please, set it to 'OpenFOAM-v${CUR_FOAMVER}x' environment."
+        exit 1
+    fi
+}
+
+# Check a state of command (v1.0)
+Check_Command()
+{
+    if [[ $? -ne 0 ]];then
+        echo "$1 Failed."
+        exit 1
+    fi
+}
+
+# Get User (v1.0)
+CUR_USER=""
+Get_CurrentUser()
+{	
+	CUR_USER=`id -un`
+}
+
+# Message (v1.1)
+Msg()
+{
+    echo -e "$1"
+}
+Msg2()
+{
+    echo -e -n "$1"
+}
+MsgNotice()
+{
+    echo -e "\033[1;36m"$1"\033[0m"
+}
+MsgOK()
+{
+    echo -e "\033[1;32m"$1"\033[0m"
+}
+MsgErr()
+{
+    echo -e "\033[1;31m"$1"\033[0m"
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Init (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MsgNotice "\n>>> Start ${NAME_FOLDER} Uninstallation >>>"
+
+# Check OpenFOAM environment
+Check_System_Environment
+
+# Check OS type
+Get_OS_Infor
+
+# Check current user
+Get_CurrentUser
+
+# Install Path
+PATH_INST=""
+if [[ ${CUR_USER} == "root" ]];then					# root
+	PATH_INST="${FOAM_APPBIN}/${NAME_FOLDER}"
+else	
+	PATH_INST="${FOAM_USER_APPBIN}/${NAME_FOLDER}"	# local
+
+	PATH_DESKTOP_STR=$(grep "XDG_DESKTOP_DIR=" ~/.config/user-dirs.dirs | awk -F \" '{print $2}')
+	PATH_DESKTOP="${PATH_DESKTOP_STR//'$HOME'/$HOME}"
+	PATH_SHORTCUT="${PATH_DESKTOP}"
+	
+	PATH_ICON="$HOME/.local/share"
+	PATH_LAUNCHER="$HOME/.local/share/applications"
+	PATH_TRASH="$HOME/.local/share/Trash/files"		# not used
+fi
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Uninstallation (Step-1) (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Msg2 "[1/2] Checking path..."
+
+# Check Path
+if [[ ${PATH_INST} == "" ]]; then
+    MsgErr "Caution!!! Check the installation path.\n"
+    exit 1    
+fi
+
+# End
+MsgOK "Done"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Uninstallation (Step-2) (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Msg2 "[2/2] Removing folder and files..."
+
+# Delete program files
+if [[ "${PATH_INST}" == "/" ]];then
+	MsgErr "Warning!!! Cannot delete system path >> '${PATH_INST}'\n"
+	exit 1
+else			
+    rm -rf "${PATH_INST}"
+fi  
+
+# Delete setting files  
+if [[ ${CUR_USER} != "root" ]];then
+    # Delete alias in .bashrc
+    #sed -i "/alias ${NAME_PROGRAM}/d" $HOME/.bashrc
+    #sed -i "/alias ${NAME_PROGRAM_SNPY}/d" $HOME/.bashrc
+
+    # Delete icon files
+    find "${PATH_ICON}" -name "${FILE_ICON}" -delete
+    find "${PATH_ICON}" -name "${FILE_ICON_SNPY}" -delete
+    
+    # Delete Shortcut/launcher files
+    DEL_FILES=("${PATH_SHORTCUT}/${FILE_SHORTCUT}")
+    DEL_FILES+=("${PATH_LAUNCHER}/${FILE_SHORTCUT}")
+    DEL_FILES+=("${FOAM_USER_APPBIN}/${NAME_EXEC}")
+
+    DEL_FILES+=("${PATH_SHORTCUT}/${FILE_SHORTCUT_SNPY}")
+    DEL_FILES+=("${PATH_LAUNCHER}/${FILE_SHORTCUT_SNPY}")        
+	DEL_FILES+=("${FOAM_USER_APPBIN}/${NAME_EXEC_SNPY}")
+
+    for (( i=0;i<${#DEL_FILES[@]};i++ ))
+    do
+        if [[ -f ${DEL_FILES[i]} ]];then
+            rm "${DEL_FILES[i]}"
+        	#mv -f "${DEL_FILES[i]}" ${PATH_TRASH}
+    	fi
+    done
+        
+	# Unregister a shortcut icon
+	# for Ubuntu
+	if [[ ${TYPE_OS} == *"UB"* ]];then
+		gtk-update-icon-cache -t --force "$HOME/.local/share/icons/hicolor"
+	# for CentOS
+	elif [[ ${TYPE_OS} == *"CO"* ]];then
+		echo ""
+	fi
+else
+	rm -rf "${FOAM_APPBIN}/${NAME_EXEC}"
+	rm -rf "${FOAM_APPBIN}/${NAME_EXEC_SNPY}"
+fi
+
+# source (not used)
+#source ~/.bashrc
+
+# End
+MsgOK "Done"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# End of Code
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

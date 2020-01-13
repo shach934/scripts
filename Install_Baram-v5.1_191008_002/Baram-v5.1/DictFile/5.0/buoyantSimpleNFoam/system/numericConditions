@@ -1,0 +1,42 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  5.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       dictionary;
+    location    "system/settings";
+    object      numericConditions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+discretization
+{
+    momentum        secondOrder;
+    turbulence      firstOrder;
+    energy          secondOrder;
+}
+
+relaxationFactors
+{
+    pressure        0.3;
+    momentum        0.7;
+    turbulence      0.7;
+    energy          0.9;    
+}
+
+convergenceCriteria
+{
+    pressure        0.001;
+    momentum        0.001;
+    turbulence      0.001;
+    energy          0.001;    
+}
+
+
+// ************************************************************************* //

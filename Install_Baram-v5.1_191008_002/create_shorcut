@@ -1,0 +1,266 @@
+#!/bin/bash
+cd ${0%/*} || exit 1
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Information (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Create a shortcut (Ubuntu and CentOS)
+# Made by NEXTfoam
+# Created   : 2019.07.29 (001)
+# Updated	: 2019.07.29 (001)
+# Modified  : 2019.08.05 (001)
+# Notice    : none
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Define (v1.2)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common
+OPENFOAM_VERSION="5"                            # OpenFOAM version
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Name
+NAME_FOLDER="Baram-v5.1"                     	# Install folder name
+
+# Program1 (Solver)
+NAME_PROGRAM="Baram"                            # Program name
+NAME_EXEC="Baram"                               # Python file name to execute
+
+FILE_EXEC="${NAME_EXEC}.py"
+FILE_ICON="${NAME_EXEC}.png"
+FILE_SHORTCUT="${NAME_PROGRAM}.desktop"
+
+# Program2 (Snappy)
+NAME_PROGRAM_SNPY="Baram-snappy"                # Program name
+NAME_EXEC_SNPY="Baram-snappy"                   # Python file name to execute
+
+FILE_EXEC_SNPY="${NAME_EXEC_SNPY}.py"
+FILE_ICON_SNPY="${NAME_EXEC_SNPY}.png"
+FILE_SHORTCUT_SNPY="${NAME_PROGRAM_SNPY}.desktop"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Common Functions
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Get OS Type (v1.5)
+TYPE_OS="False"
+TYPE_VER="False"
+TYPE_OSVER="False"
+Get_OS_Infor()
+{	
+	GET_OS="False"
+	GET_VER="False"
+    SYSTEM_INFOR=$(grep . /etc/*-release)
+
+    if [[ "${SYSTEM_INFOR}" == *"Ubuntu"* ]]; then
+        GET_OS="UB"
+        if [[ "${SYSTEM_INFOR}" == *"Ubuntu 14."* ]]; then
+         	GET_VER="14"
+        elif [[ "${SYSTEM_INFOR}" == *"Ubuntu 16."* ]]; then
+         	GET_VER="16"
+        elif [[ "${SYSTEM_INFOR}" == *"Ubuntu 18."* ]]; then
+	        GET_VER="18"
+        fi
+
+    elif [[ "${SYSTEM_INFOR}" == *"CentOS"* ]]; then
+        GET_OS="CO"
+        if [[ "${SYSTEM_INFOR}" == *"release 6."* ]]; then
+			GET_VER="6"
+		elif [[ "${SYSTEM_INFOR}" == *"release 7."* ]]; then
+			GET_VER="7"
+		fi
+
+	elif [[ "${SYSTEM_INFOR}" == *"Red Hat Enterprise"* ]]; then
+	    GET_OS="RH"         # same with CentOS
+        GET_VER="7"
+    fi
+    
+    # Check
+	if [[ "${GET_OS}" == "False" ]] || [[ "${GET_VER}" == "False" ]];then
+		echo -e "Cannot support this linux system"
+		exit 1
+	fi
+
+	# return
+	TYPE_OS=${GET_OS}
+	TYPE_VER=${GET_VER}
+	TYPE_OSVER=${TYPE_OS}${TYPE_VER}
+}
+
+# Check OpenFOAM version (v1.1)
+CUR_FOAMVER=${OPENFOAM_VERSION}
+Check_System_Environment()
+{
+    if [[ -z "${WM_PROJECT_VERSION}" ]] || [[ "${WM_PROJECT_VERSION}" != *"${CUR_FOAMVER}."* ]];then
+        echo -e "\033[1;31m""\n***!! Error !!***""\033[0m"
+        echo -e "This terminal is not 'OpenFOAM-v${CUR_FOAMVER}x' environment."
+        echo -e "Please, set it to 'OpenFOAM-v${CUR_FOAMVER}x' environment."
+        exit 1
+    fi
+}
+
+# Check a state of command (v1.0)
+Check_Command()
+{
+    if [[ ${?} -ne 0 ]];then
+        echo "${1} failed."
+        exit 1
+    fi
+}
+
+# Get User (v1.0)
+CUR_USER=""
+Get_CurrentUser()
+{	
+	CUR_USER=`id -un`
+}
+
+# Message (v1.1)
+Msg()
+{
+    echo -e "${1}"
+}
+Msg2()
+{
+    echo -e -n "${1}"
+}
+MsgNotice()
+{
+    echo -e "\033[1;36m"${1}"\033[0m"
+}
+MsgOK()
+{
+    echo -e "\033[1;32m"${1}"\033[0m"
+}
+MsgErr()
+{
+    echo -e "\033[1;31m"${1}"\033[0m"
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Init (v1.1)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MsgNotice "\n>>> Start ${NAME_FOLDER} Installation - shortcut only >>>"
+
+# Check current user
+Get_CurrentUser
+
+# Install Path
+PATH_INST="${FOAM_APPBIN}/${NAME_FOLDER}"
+	
+PATH_DESKTOP_STR=$(grep "XDG_DESKTOP_DIR=" ~/.config/user-dirs.dirs | awk -F \" '{print $2}')
+PATH_DESKTOP="${PATH_DESKTOP_STR//'$HOME'/$HOME}"
+PATH_SHORTCUT="${PATH_DESKTOP}"
+
+PATH_ICON="$HOME/.local/share"
+PATH_LAUNCHER="$HOME/.local/share/applications"
+#PATH_TRASH="$HOME/.local/share/Trash/files"	# not used
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Finding (Step-1) (v1.0)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Msg2 "[1/2] Finding Installation folder..."
+
+# Check Path
+if [[ -d "${PATH_INST}" ]];then
+	# Check OS type
+	Get_OS_Infor
+
+	# Check OpenFOAM environment
+	Check_System_Environment
+
+else
+	MsgErr "Cannot find installation folder!"
+	exit 1
+fi
+
+# End
+MsgOK "Ok"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Creating (Step-2) (v1.1)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Msg2 "[2/2] Creating shortcut..."
+
+# Make Desktop Folder
+mkdir -p ${PATH_SHORTCUT}
+
+# Copy icon files
+cp -rf ./icons ${PATH_ICON}
+Check_Command "Icon file copy"
+
+# Get a 'Start' file
+FILE_START="${PATH_INST}/../${NAME_EXEC}"
+FILE_START_SNPY="${PATH_INST}/../${NAME_EXEC_SNPY}"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Program-Solver
+SHORTCUTFILE="${PATH_SHORTCUT}/${FILE_SHORTCUT}"
+
+# Delete data in file
+cat /dev/null > "${SHORTCUTFILE}"                   
+
+echo "[Desktop Entry]"                              >> ${SHORTCUTFILE}
+echo "Encoding=UTF-8"                               >> ${SHORTCUTFILE}
+echo "Name=${NAME_PROGRAM}"                         >> ${SHORTCUTFILE}
+echo "Version=1.0"                                  >> ${SHORTCUTFILE}
+echo "Comment=${NAME_PROGRAM}"                      >> ${SHORTCUTFILE}
+echo "GenericName=${NAME_PROGRAM}"                  >> ${SHORTCUTFILE}
+echo "Icon=${FILE_ICON}"                            >> ${SHORTCUTFILE}
+echo "Exec='${FILE_START}'"               			>> ${SHORTCUTFILE}
+echo "Terminal=false"                               >> ${SHORTCUTFILE}
+echo "Type=Application"                             >> ${SHORTCUTFILE}
+echo "Categories=CFD"                               >> ${SHORTCUTFILE}
+echo "NoDisplay=false"                              >> ${SHORTCUTFILE}
+
+chmod +x ${SHORTCUTFILE}
+
+# Append to .bashrc
+#sed -i "/alias ${NAME_EXEC}/d" $HOME/.bashrc        # Duplicate inspection
+#echo "alias ${NAME_EXEC}='${FILE_START}'"   		>> $HOME/.bashrc
+
+# Add to launcher
+cp -f "${SHORTCUTFILE}" "${PATH_LAUNCHER}/${FILE_SHORTCUT}"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Program-snappy
+SHORTCUTFILE_SNPY="${PATH_SHORTCUT}/${FILE_SHORTCUT_SNPY}"
+
+cat /dev/null > "${SHORTCUTFILE_SNPY}"              # Delete data in file
+
+echo "[Desktop Entry]"                              >> "${SHORTCUTFILE_SNPY}"
+echo "Encoding=UTF-8"                       	    >> "${SHORTCUTFILE_SNPY}"
+echo "Name=${NAME_PROGRAM_SNPY}"              	    >> "${SHORTCUTFILE_SNPY}"
+echo "Version=1.0"                          	    >> "${SHORTCUTFILE_SNPY}"
+echo "Comment=${NAME_PROGRAM_SNPY}"    			    >> "${SHORTCUTFILE_SNPY}"
+echo "GenericName=${NAME_PROGRAM_SNPY}"       	    >> "${SHORTCUTFILE_SNPY}"
+echo "Icon=${FILE_ICON_SNPY}"              		    >> "${SHORTCUTFILE_SNPY}"
+echo "Exec='${FILE_START_SNPY}'"	        		>> "${SHORTCUTFILE_SNPY}"
+echo "Terminal=false"                       	    >> "${SHORTCUTFILE_SNPY}"
+echo "Type=Application"                     	    >> "${SHORTCUTFILE_SNPY}"
+echo "Categories=CFD"                       	    >> "${SHORTCUTFILE_SNPY}"
+echo "NoDisplay=false"                      	    >> "${SHORTCUTFILE_SNPY}"
+
+chmod +x "${SHORTCUTFILE_SNPY}"
+
+# Append to .bashrc
+#sed -i "/alias ${NAME_EXEC_SNPY}/d" $HOME/.bashrc   # Duplicate inspection
+#echo "alias ${NAME_EXEC_SNPY}='${FILE_START_SNPY}'" >> "$HOME/.bashrc"
+
+# Add to launcher
+cp -f "${SHORTCUTFILE_SNPY}" "${PATH_LAUNCHER}/${FILE_SHORTCUT_SNPY}"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Register a shortcut icon
+# for Ubuntu
+if [[ ${TYPE_OS} == *"UB"* ]];then
+	gtk-update-icon-cache -t --force $HOME/.local/share/icons/hicolor
+# for CentOS
+elif [[ ${TYPE_OS} == *"CO"* ]];then
+    echo ""
+fi
+
+# End
+MsgOK "Done"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# End of Code
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
