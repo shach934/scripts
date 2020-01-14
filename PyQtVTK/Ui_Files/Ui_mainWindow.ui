@@ -38,6 +38,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionWrite"/>
     <addaction name="actionQuit"/>
@@ -143,14 +144,15 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionWrite"/>
    <addaction name="actionTurbulence"/>
    <addaction name="actionRun"/>
    <addaction name="actionStop"/>
    <addaction name="actionTools"/>
-   <addaction name="actionPostProcess"/>
    <addaction name="actionQuit"/>
+   <addaction name="actionPostProcess"/>
   </widget>
   <widget class="QToolBar" name="viewBar">
    <property name="sizePolicy">
@@ -205,7 +207,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>../images/open.svg</normaloff>images/open.svg</iconset>
+     <normaloff>../images/open.svg</normaloff>../images/open.svg</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -497,6 +499,15 @@
    </property>
    <property name="text">
     <string>Fit Window</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset>
+     <normaloff>../images/New.svg</normaloff>../images/New.svg</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>

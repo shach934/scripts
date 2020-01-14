@@ -1,4 +1,9 @@
 from PyQt5 import QtCore, QtWidgets
+from Panel_Tree import ModelTree
+from createBox import *
+from createCone import *
+from createCylinder import *
+from createSphere import *
 
 class Property(object):
 	
@@ -9,9 +14,14 @@ class Property(object):
 		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 		self.propertyBox.setSizePolicy(sizePolicy)
 
+		self.propertyBox.show()
+
 	def setViewItem(self, clickedItem):
-		self.currentItem = clickedItem.text(0)
-		self.__propertyView(self.currentItem)
+		self.currentItem = clickedItem
+		self.__propertyView()
+
+	def relateTo(self, ModelTree):
+		self.ModelTree = ModelTree
 
 	def clearLayout(self, cur_lay):
 		if cur_lay is not None:

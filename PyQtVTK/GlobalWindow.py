@@ -15,6 +15,9 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         super(GlobalWindow, self).__init__(parent)
         self.setupUi(self)
 
+        self.scalar_bar = vtk.vtkScalarBarActor()
+        self.axesWidget = vtk.vtkOrientationMarkerWidget()
+
         self.verticalLayout = QtWidgets.QVBoxLayout(self.mainWindow)
 
         self.leftRightSplitter = QtWidgets.QSplitter(self.mainWindow)
@@ -32,9 +35,12 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.infoMonitor = Info(self.rightDomain)
 
         self.verticalLayout.addWidget(self.leftRightSplitter)
-
         self.setCentralWidget(self.mainWindow)
-        self.__message__ = "Ready. Let's FOAM!"
+
+        self.modelTree.relateTo(self.property)
+        self.property.relateTo(self.modelTree)
+
+        self.setStatusTip("Ready")
         self.leftRightSplitter.setSizes([100, 500])
         self.leftDomain.setSizes([100, 100])
         self.rightDomain.setSizes([500, 100])
@@ -69,6 +75,49 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
             self.loadCaseGeo()
             self.foamConfig.SetFolderAndName(self.caseFolder)
             self.foamConfig.loadCase()
+
+    def loadCaseGeo(self):
+        self.caseName = self.caseFolder[0].split("/")[-2]
+        self.foamVTKGeo.SetFileName(str(self.caseFolder[0]))
+        self.foamVTKGeo.CreateCellToPointOn()
+        self.foamVTKGeo.DecomposePolyhedraOn()
+        self.foamVTKGeo.EnableAllCellArrays()
+        self.foamVTKGeo.Update()
+        self.setupVTK()
+
+        self.setWindowTitle(self.caseFolder[0])
+        self.pipLine.topLevelItem(0).setText(0, self.caseName)
+
+        # TODO for now, every time reinitialize the render,
+        #  later should initialize only once and use disableAllPatchArrays method.
+
+        n = self.foamVTKGeo.GetNumberOfPatchArrays()
+        for i in range(n):
+            # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
+            self.patches.append(self.foamVTKGeo.GetPatchArrayName(i))
+
+        # this function will disable all the patches, use this to disable patches not checked
+        # self.foamReader.DisableAllPatchArrays()
+
+        # TODO count the number of regions/blocks
+        # TODO clear all the variables when a new case is opened. right now the values are all inherited.
+        block = self.foamVTKGeo.GetOutput()
+
+        while block.GetBlock(self.numberOfRegions) is not None:
+            self.numberOfRegions += 1
+        if self.numberOfRegions > 1:
+            for patch in self.patches:
+                if patch.split("/")[0] in self.regions:
+                    self.regions[patch.split("/")[0]].append(patch.split("/")[1])
+                else:
+                    self.regions[patch.split("/")[0]] = [patch.split("/")[1]]
+        else:
+            self.regions["default region"] = self.patches
+        if not self.foamConfig.checkBoundary(self.regions):
+            self.__message__ += "\nThe patches and regions from VTK are not consistent with the file!\n"
+
+        self.assignGeoTree()
+        self.pipLine.expandAll()
 
     def  setting(self):
         self.Ui_settingDialog.show()

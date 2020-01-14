@@ -1,5 +1,6 @@
 from PyQt5 import QtGui
 from Ui_createBox import Ui_createBox
+from PyQt5.QtWidgets import QDialog
 
 doubleValidator = QtGui.QDoubleValidator()
 

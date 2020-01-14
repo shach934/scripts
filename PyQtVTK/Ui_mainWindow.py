@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:/Shaohui/OpenFoam/scripts/PyQtVTK/Ui_Files/Ui_mainWindow.ui'
+# Form implementation generated from reading ui file 'Ui_Files/Ui_mainWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -219,6 +219,12 @@ class Ui_OpenFOAM(object):
         icon23.addPixmap(QtGui.QPixmap("images/fit window.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionFit_Window.setIcon(icon23)
         self.actionFit_Window.setObjectName("actionFit_Window")
+        self.actionNew = QtWidgets.QAction(OpenFOAM)
+        icon24 = QtGui.QIcon()
+        icon24.addPixmap(QtGui.QPixmap("images/New.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionNew.setIcon(icon24)
+        self.actionNew.setObjectName("actionNew")
+        self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionWrite)
         self.menuFile.addAction(self.actionQuit)
@@ -267,14 +273,15 @@ class Ui_OpenFOAM(object):
         self.menuBar.addAction(self.menuSetting.menuAction())
         self.menuBar.addAction(self.menuPostprocessing.menuAction())
         self.menuBar.addAction(self.menuHelp.menuAction())
+        self.mainToolBar.addAction(self.actionNew)
         self.mainToolBar.addAction(self.actionOpen)
         self.mainToolBar.addAction(self.actionWrite)
         self.mainToolBar.addAction(self.actionTurbulence)
         self.mainToolBar.addAction(self.actionRun)
         self.mainToolBar.addAction(self.actionStop)
         self.mainToolBar.addAction(self.actionTools)
-        self.mainToolBar.addAction(self.actionPostProcess)
         self.mainToolBar.addAction(self.actionQuit)
+        self.mainToolBar.addAction(self.actionPostProcess)
         self.viewBar.addAction(self.actionAlign_X)
         self.viewBar.addAction(self.actionAlign_Y)
         self.viewBar.addAction(self.actionAligh_Z)
@@ -345,6 +352,7 @@ class Ui_OpenFOAM(object):
         self.actionVolume.setText(_translate("OpenFOAM", "Volumetric flow rate"))
         self.actionMass_flow_rate.setText(_translate("OpenFOAM", "Mass flow rate"))
         self.actionFit_Window.setText(_translate("OpenFOAM", "Fit Window"))
+        self.actionNew.setText(_translate("OpenFOAM", "New"))
 
 
 if __name__ == "__main__":

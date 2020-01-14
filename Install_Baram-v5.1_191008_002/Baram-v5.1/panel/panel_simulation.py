@@ -358,8 +358,3 @@ class freepanelSimulationClass:
             if self.GEN.isNumber(self.simDict['wallEmissivity'][self.wallList[i]]) == False:
                 self.GEN.makeDialog('Error!!! wall emissivity of ' + self.wallList[i] + ' is not number')
         
-        
-        
-
-
-

@@ -1,4 +1,5 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
+from Panel_Property import *
 
 class ModelTree(object):
     def __init__(self, domain):
@@ -16,19 +17,12 @@ class ModelTree(object):
         self.pipLine.setDragEnabled(False)
 
         self.pipLine.headerItem().setText(0, "Model")
-        item_0 = QtWidgets.QTreeWidgetItem(self.pipLine)
-        self.pipLine.topLevelItem(0).setText(0, "Model Name")
-        item_0.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsEnabled|QtCore.Qt.ItemIsTristate)
-
-    def initTree(self):
-        # self.item_0 is the head item of the tree. it text is the name of the model.
-        regionProperties = self.foamConfig.GetRegionProperty()
-
-        _translate = QtCore.QCoreApplication.translate
-
-        self.pipLine.topLevelItem(0).setText(0, _translate("OpenFOAM", self.caseName))
-
+        
+        self.TopItem = QtWidgets.QTreeWidgetItem(self.pipLine)
+        self.TopItem.setText(0, "Model Name")
+        self.TopItem.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsEnabled|QtCore.Qt.ItemIsTristate)
         self.geoItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Geometry"])
+        self.geoItem.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsEnabled|QtCore.Qt.ItemIsTristate)
 
         self.createGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Create"])
         self.createBoxGeoItem = QtWidgets.QTreeWidgetItem(self.createGeoItem, ["Box"])
@@ -50,17 +44,36 @@ class ModelTree(object):
 
         self.importGeoItem = QtWidgets.QTreeWidgetItem(self.geoItem, ["Import"])
 
-
         self.meshItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Mesh"])
 
-        self.meshGeoItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Geometry"])
+        self.meshGeoItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Parts"])
         self.blockMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["BlockMesh"])
         self.meshPointItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Point"])
         self.meshMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Mesh"])
 
-
         self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Setup"])
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/setup.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.phyItem.setIcon(0, icon)
 
+        self.pipLine.currentItemChanged.connect(self.propertyView)
+
+        self.pipLine.show()
+        self.pipLine.expandAll()  
+
+    def relateTo(self, Panel_Property):
+        self.propertyView = Panel_Property
+
+    def propertyView(self, currentItem, oldItem):
+        self.activeItem = currentItem.text(0)
+        self.propertyView.setViewItem(self.activeItem)     
+
+    def initTree(self):
+        # self.item_0 is the head item of the tree. it text is the name of the model.
+        regionProperties = self.foamConfig.GetRegionProperty()
+
+        _translate = QtCore.QCoreApplication.translate
+        self.pipLine.topLevelItem(0).setText(0, _translate("OpenFOAM", self.caseName))
 
         self.TurbItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Turbulence"])
         self.MRFItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["MRF"])
@@ -69,14 +82,12 @@ class ModelTree(object):
         self.HeatTransItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Heat Transfer"])
         self.RadiatItem = QtWidgets.QTreeWidgetItem(self.phyItem, ["Radiation"])
 
-
         self.MatItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Material"])
 
         self.viscoItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Viscosity"])
         self.DensiItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Density"])
         self.HeatConductItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Heat Conductivity"])
         self.SpeficHeatItem = QtWidgets.QTreeWidgetItem(self.MatItem, ["Specific Heat"])
-
 
         self.schemeItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSchemes"])
 
@@ -87,13 +98,11 @@ class ModelTree(object):
         self.interporlItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["interpolation"])
         self.snGradItem = QtWidgets.QTreeWidgetItem(self.schemeItem, ["snGrad"])
 
-
         self.soluItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvSolution"])
 
         self.solverItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["solver"])
         self.resiItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["residual"])
         self.relaxItem = QtWidgets.QTreeWidgetItem(self.soluItem, ["Relaxation Factor"])
-
 
         self.optionItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["fvOption"])
 
@@ -105,6 +114,18 @@ class ModelTree(object):
         self.TimeControlItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Time control"])
         self.PhyCOntrolItem = QtWidgets.QTreeWidgetItem(self.ControlItem, ["Physical control"])
 
-        self.pipLine.currentItemChanged.connect(self.propertyView)
+    def assignGeoTree(self):
+        # itemChanged  itemClicked are 2 signals that indicate item is changed or clicked.
+        self.GeoRegionSubItems, self.GeoPatchSubItems = [], []
+        for region, patches in self.regions.items():
+            GeoRegionItem = QtWidgets.QTreeWidgetItem(self.geoItem, [region])
+            GeoRegionItem.setFlags(GeoRegionItem.flags() | Qt.ItemIsTristate | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+            GeoRegionItem.setCheckState(0, Qt.Checked)
+            for patch in patches:
+                GeoPatchItem = QtWidgets.QTreeWidgetItem(GeoRegionItem, [patch])
+                GeoRegionItem.addChild(GeoPatchItem)
+                GeoPatchItem.setFlags(GeoPatchItem.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable)
+                GeoPatchItem.setCheckState(0, Qt.Checked)
+                self.GeoPatchSubItems.append(GeoPatchItem)
+            self.GeoRegionSubItems.append(GeoRegionItem)
         self.pipLine.show()
-        self.pipLine.expandAll()        
