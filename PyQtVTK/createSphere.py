@@ -10,12 +10,12 @@ class createSphere(QDialog, Ui_createSphere):
         super(createSphere, self).__init__(parent)
         self.setupUi(self) 
 		
+        self.sphereCenterXInput.setValidator(doubleValidator)
+        self.sphereCenterYInput.setValidator(doubleValidator)
+        self.sphereCenterZInput.setValidator(doubleValidator)
+
         self.sphereRadiusInput.setValidator(doubleValidator)
 		
         self.sphereResoluThetaInput.setValidator(integelValidator)
         self.sphereResoluAlphaInput.setValidator(integelValidator)
 		self.sphereResoluDeltaInput.setValidator(integelValidator)
-		
-        self.sphereCenterXInput.setValidator(doubleValidator)
-        self.sphereCenterYInput.setValidator(doubleValidator)
-        self.sphereCenterZInput.setValidator(doubleValidator)

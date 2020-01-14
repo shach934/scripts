@@ -4,9 +4,10 @@
 create a simple interface for OpenFOAM using PyQt5 and VTK. Help to setup the OpenFOAM case and visualization.
 PyQt5 is used to generate the GUI
 VTK   is used to visualize the OpenFOAM mesh
-
+XinFoam 
+v0.1_preAlpha
 author: Chen Shaohui
-Last edited: December 2019
+Last updated: Ongoing.
 """
 
 # TODO: add the expandAll and collapseAll button at the treeView region.
@@ -29,64 +30,21 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk import vtkCylinderSource, vtkConeSource, vtkCubeSource, vtkSphereSource
 
 from OpenFOAMCase import *
+from GlobalWindow import *
 
-from createSphere import Ui_createSphere
-from createCylinder import Ui_createCylinder
-from createCone import Ui_createCone
-from mainWindow import Ui_OpenFOAM
-from settingBox import Ui_Setting
-import properties
+import MouseInteractorStyle
 
-import Lib
-import properties
-
-class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
-    pass
-
-class createCylinder(QDialog, Ui_createCylinder):
+class main(GlobalWindow):
     def __init__(self, parent=None):
-        super(createCylinder, self).__init__(parent)
-        self.setupUi(self) 
+        super(main, self).__init__(parent)
 
-class createSphere(QDialog, Ui_createSphere):
-    def __init__(self, parent=None):
-        super(createSphere, self).__init__(parent)
-        self.setupUi(self) 
-
-class createCone(QDialog, Ui_createCone):
-    def __init__(self, parent=None):
-        super(createCone, self).__init__(parent)
-        self.setupUi(self) 
-
-    def drawCone(self):
-        cone = vtkConeSource()
-
-
-class SettingDialog(QMainWindow, Ui_Setting):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        Ui_Setting.__init__(self)
-        self.setupUi(self)
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
-
-
-@Lib.add_methods_from(properties)
-class MyWindow(QMainWindow, Ui_OpenFOAM):
-    def __init__(self, parent=None):
-        super(MyWindow, self).__init__(parent)
-        self.settingDialog = SettingDialog()
         self.foamConfig = OpenFOAMCase()
         self.caseName = "Model"
         self.numberOfRegions = 0
         self.MRFCount = 0
         self.patches = []
         self.regions = {}  # the structure of the boundary info is like this self.region["air"] = ["wall", "air1"]
-        self.setupUi(self)
-        self.__message__ = "Ready. Let's FOAM!"
-        self.leftRightSplitter.setSizes([100, 500])
-        self.leftDomain.setSizes([100, 100])
-        self.rightDomain.setSizes([500, 100])
-        self.initTree()
+
         # GUI related initialization. some of them from case files.
         self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
         self.timeSteps = ["0"]
@@ -108,21 +66,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.setStatusTip("Ready")
 
         self.showMaximized()
-
-        # VTK related initialization.
-        self.vtkWindow = QVTKRenderWindowInteractor(self.geoTab)
-        self.foamVTKGeo = vtk.vtkOpenFOAMReader()
-        self.filter = vtk.vtkGeometryFilter()
-        self.mapper = vtk.vtkCompositePolyDataMapper2()
-        self.actor = vtk.vtkActor()
-        self.render = vtk.vtkRenderer()
-
-        # actions!!!
-        self.actionOpen.triggered.connect(self.openFile)
-        self.actionTools.triggered.connect(self.setting)
-        self.actionQuit.triggered.connect(self.shutDownWarning)
-
-    from createGeo import drawBox
 
     def addTransparencyBar(self):
         self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
@@ -207,9 +150,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
             self.GeoRegionSubItems.append(GeoRegionItem)
         self.pipLine.show()
 
-    def setting(self):
-        self.settingDialog.show()
-
     def AddAxes(self):
         axesActor = vtk.vtkAxesActor()
         self.axesWidget.SetOrientationMarker(axesActor)
@@ -244,29 +184,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
     def updateTime(self):
         timeStep = int(str(self.timeSelectCombo.currentText()))
-
-    def openFile(self):
-        # TODO add warning box to save the current config, open a new file will overwrite the current model. just
-        #  like ANSA. However, the implimentation below has problem, it always open a new XinFoam instance
-        """
-        buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open new case?",
-                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
-        if buttonReply == QMessageBox.Yes:
-            OpenFOAMCase.write()
-            self.resetFile()
-        if buttonReply == QMessageBox.No:
-            self.resetFile()
-        if buttonReply == QMessageBox.Cancel:
-            self.__messaga__ += "No new case opened."
-            return
-        """
-        self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
-                                                      "OpenFOAM File (*.foam *.txt)")
-
-        if self.caseFolder[0] != "":
-            self.loadCaseGeo()
-            self.foamConfig.SetFolderAndName(self.caseFolder)
-            self.foamConfig.loadCase()
 
     def loadCaseGeo(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
@@ -317,16 +234,7 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.setupVTKBackGround()
         self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
 
-    def shutDownWarning(self):
-        closeButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
-                                               QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
-                                               QMessageBox.Cancel)
-        if closeButtonReply == QMessageBox.Yes:
-            self.close()  # TODO: change the self.close() to self.write() later.
-        if closeButtonReply == QMessageBox.No:
-            self.close()
-        if closeButtonReply == QMessageBox.Cancel:
-            pass
+
 
     def openNewCaseWarning(self):
         openButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open a new case?",
@@ -342,6 +250,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    myWin = MyWindow()
+    myWin = main()
     myWin.show()
     sys.exit(app.exec_())

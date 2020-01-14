@@ -149,7 +149,8 @@ class ui2py(QtWidgets.QMainWindow, Ui_ui2py):
                 pyname = file.name
                 pyname = pyname[:len(pyname)-2] + pyname[len(pyname):]
                 pyname = pyname + "py"
-                os.system("pyuic5 -x "+file.name+" -o "+pyname)
+                pyname = "/".join(pyname.split("/")[:-2]) + "/" + pyname.split("/")[-1]
+                os.system("pyuic5 -x "+file.name+" -o " + pyname)
                 self.PathLabel.setText("Done!")
 
     def Clear(self):

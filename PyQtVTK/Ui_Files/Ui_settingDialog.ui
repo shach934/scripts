@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Setting</class>
- <widget class="QWidget" name="Setting">
+ <class>settingDialog</class>
+ <widget class="QWidget" name="settingDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -110,7 +110,7 @@
   <connection>
    <sender>YesButton</sender>
    <signal>clicked()</signal>
-   <receiver>Setting</receiver>
+   <receiver>settingDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -126,7 +126,7 @@
   <connection>
    <sender>CancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>Setting</receiver>
+   <receiver>settingDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

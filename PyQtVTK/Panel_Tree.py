@@ -1,8 +1,25 @@
+from PyQt5 import QtCore, QtWidgets
 
-class Model_Tree(object):
-    def __init__(self):
+class ModelTree(object):
+    def __init__(self, domain):
         super().__init__()
         
+        self.pipLine = QtWidgets.QTreeWidget(domain)
+        self.pipLine.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pipLine.sizePolicy().hasHeightForWidth())
+        self.pipLine.setSizePolicy(sizePolicy)
+        self.pipLine.setSizeIncrement(QtCore.QSize(300, 0))
+        self.pipLine.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
+        self.pipLine.setDragEnabled(False)
+
+        self.pipLine.headerItem().setText(0, "Model")
+        item_0 = QtWidgets.QTreeWidgetItem(self.pipLine)
+        self.pipLine.topLevelItem(0).setText(0, "Model Name")
+        item_0.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsEnabled|QtCore.Qt.ItemIsTristate)
+
     def initTree(self):
         # self.item_0 is the head item of the tree. it text is the name of the model.
         regionProperties = self.foamConfig.GetRegionProperty()

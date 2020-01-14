@@ -1,8 +1,18 @@
+from PyQt5 import QtCore, QtWidgets
+
 class Property(object):
 	
-	def __init__(self):
+	def __init__(self, domain):
 		super().__init__()
 	
+		self.propertyBox = QtWidgets.QFrame(domain)
+		sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+		self.propertyBox.setSizePolicy(sizePolicy)
+
+	def setViewItem(self, clickedItem):
+		self.currentItem = clickedItem.text(0)
+		self.__propertyView(self.currentItem)
+
 	def clearLayout(self, cur_lay):
 		if cur_lay is not None:
 			while cur_lay.count():
@@ -14,22 +24,25 @@ class Property(object):
 					self.clearLayout(item.layout())
 			sip.delete(cur_lay)
 
-	def propertyView(self, current, old):
+	def __propertyView(self):
 			
-		if current.text(0) == "Box":
+		if self.currentItem == "Box":
 			self.newBoxPanel = createBox()
 			h_la = QtWidgets.QHBoxLayout()
 			h_la.addWidget(self.newBoxPanel)
 			self.clearLayout(self.propertyBox.layout())
 			self.propertyBox.setLayout(h_la)
 			self.drawBox()
-			for inputLine in (self.boxLengthXInput, self.boxLengthYInput, self.boxLengthZInput, self.boxCenterXInput, self.boxCenterYInput, self.boxCenterZInput):
+
+			for inputLine in (self.boxLengthXInput, self.boxLengthYInput, self.boxLengthZInput, \
+							 self.boxCenterXInput, self.boxCenterYInput, self.boxCenterZInput):
 				inputLine.textChanged['QString'].connect(self.drawBox)
+
 			self.BoxColorComboBox.currentTextChanged.connect(self.drawBox)
 
 			self.createBoxBtn.clicked.connect(self.addBox)
 
-		elif current.text(0) == "Sphere":
+		elif self.currentItem == "Sphere":
 			self.newSphere = createSphere()
 			h_la = QtWidgets.QHBoxLayout()
 			h_la.addWidget(self.newSphere)
@@ -40,7 +53,7 @@ class Property(object):
 				
 			self.createSphereBtn.clicked.connect(self.addSphere)
 
-		elif current.text(0) == "Cylinder":
+		elif self.currentItem == "Cylinder":
 			self.newCylinder = createCylinder()
 			h_la = QtWidgets.QHBoxLayout()
 			h_la.addWidget(self.newCylinder)
@@ -49,7 +62,7 @@ class Property(object):
 			self.previewCylinderBtn.clicked.connect(self.drawCylinder)
 			self.createCylinderBtn.clicked.connect(self.addCylinder)
 			
-		elif current.text(0) == "Cone":
+		elif self.currentItem == "Cone":
 			self.newCone = createCone()
 			h_la = QtWidgets.QHBoxLayout()
 			h_la.addWidget(self.newCone)
@@ -57,8 +70,6 @@ class Property(object):
 			self.propertyBox.setLayout(h_la)
 			self.previewConeBtn.clicked.connect(self.drawCone)
 			self.createConeBtn.clicked.connect(self.addCone)
-
-
 
 		def TurbProperties(self):
 			self.properties.setColumnCount(2)
@@ -84,354 +95,354 @@ class Property(object):
 			
 			self.simuTypeComboBox.currentIndexChanged.connect(lambda: self.RASproperty(self.simuTypeComboBox.currentText()))
 
-		def RASproperty(self, simuType):
-			if simuType == "RAS":
-				self.properties.setColumnCount(2)
-				self.properties.setRowCount(5)
-
-				RASModelLabel = QtWidgets.QLabel("RASModel")        
-				self.properties.setCellWidget(2, 0, RASModelLabel)
-				simuTypeOp = ["kEpsilon", "realizableKE", "RNGkEpsilon", "kOmemga", "kOmegaSST", "kOmegaSSTLM"]
-				simuTypeComboBox = QtWidgets.QComboBox()
-				simuTypeComboBox.addItems(simuTypeOp)
-				self.properties.setCellWidget(2, 1, simuTypeComboBox)
-
-				TurbSwitchLabel = QtWidgets.QLabel("Turbulence")        
-				self.properties.setCellWidget(3, 0, TurbSwitchLabel)
-				TurbSwitchOp = ["on", "off"]
-				TurbSwitchOpComboBox = QtWidgets.QComboBox()
-				TurbSwitchOpComboBox.addItems(TurbSwitchOp)
-				self.properties.setCellWidget(3, 1, TurbSwitchOpComboBox)
-				
-				TurbCoeffLabel = QtWidgets.QLabel("printCoeffs")        
-				self.properties.setCellWidget(4, 0, TurbCoeffLabel)
-				TurbCoeffOp = ["on", "off"]
-				TurbCoeffComboBox = QtWidgets.QComboBox()
-				TurbCoeffComboBox.addItems(TurbCoeffOp)
-				self.properties.setCellWidget(4, 1, TurbCoeffComboBox)
-
-			elif simuType == "laminar":
-				self.properties.setColumnCount(2)
-				self.properties.setRowCount(1)  
-
-		def MRFProperties(self):
-			row, col = 8, 2
-			#TODO MRF also need a region input indicate which region the cellZone belongs to. Also, configed MRF need to appare in the tree. 
-			self.properties.setColumnCount(col)
-			self.properties.setRowCount(row)
-			self.properties.show()
-
-			self.properties.horizontalHeader().hide()
-			self.properties.verticalHeader().hide()
-
-			MRFNameLabel = QtWidgets.QLabel("MRF Name")        
-			self.properties.setCellWidget(0, 0, MRFNameLabel)
-			MRFNameInput = QtWidgets.QLineEdit()
-			MRFNameInput.setText("MRF_" + str(self.MRFCount)) 
-			self.MRFCount += 1
-			self.properties.setCellWidget(0, 1, MRFNameInput)
-
-			MRFCellZone = QtWidgets.QLabel("cellZone")        
-			self.properties.setCellWidget(1, 0, MRFCellZone)
-			cellZoneOp = ["cellZone1", "cellZone2"]
-			cellZoneOpComboBox = QtWidgets.QComboBox()
-			cellZoneOpComboBox.addItems(cellZoneOp)
-			self.properties.setCellWidget(1, 1, cellZoneOpComboBox)
-			
-			MRFactiveLabel = QtWidgets.QLabel("MRF")        
-			self.properties.setCellWidget(2, 0, MRFactiveLabel)
-			MRFactiveOp = ["on", "off"]
-			MRFactiveComboBox = QtWidgets.QComboBox()
-			MRFactiveComboBox.addItems(MRFactiveOp)
-			self.properties.setCellWidget(2, 1, MRFactiveComboBox)
-
-			MRFnonRotatLabel = QtWidgets.QLabel("nonRotatingPatches")
-			self.properties.setCellWidget(3, 0, MRFnonRotatLabel)
-			MRFnonRotatPatchOp = self.patches
-			MRFnonRotatPatchCombox = QtWidgets.QComboBox()
-			MRFnonRotatPatchCombox.addItems(MRFnonRotatPatchOp)
-			self.properties.setCellWidget(3, 1, MRFnonRotatPatchCombox)
-
-			MRForiginLabel = QtWidgets.QLabel("origin")
-			self.properties.setCellWidget(4, 0, MRForiginLabel)
-			MRForiginInput = QtWidgets.QLineEdit("0, 0, 0")
-			self.properties.setCellWidget(4, 1, MRForiginInput)
-
-			MRFaxisLabel = QtWidgets.QLabel("axis")
-			self.properties.setCellWidget(5, 0, MRFaxisLabel)
-			axisOp = ["x", "y", "z"]
-			MRFaxisCombobox = QtWidgets.QComboBox()
-			MRFaxisCombobox.addItems(axisOp)
-			self.properties.setCellWidget(5, 1, MRFaxisCombobox)
-
-			MRFomegaLabel = QtWidgets.QLabel("omega")
-			self.properties.setCellWidget(6, 0, MRFomegaLabel)
-			MRFomegaInput = QtWidgets.QLineEdit()
-			MRFomegaInput.setPlaceholderText("rpm")
-			self.properties.setCellWidget(6, 1, MRFomegaInput)
-
-			addMRFButt = QtWidgets.QPushButton('Add/Update')
-			self.properties.setCellWidget(7, 0, addMRFButt)
-			DeleMRFButt = QtWidgets.QPushButton("Delete")
-			self.properties.setCellWidget(7, 1, DeleMRFButt)
-
-		def DynaMeshProperties(self):        
-			self.properties.setRowCount(8)
+	def RASproperty(self, simuType):
+		if simuType == "RAS":
 			self.properties.setColumnCount(2)
-			self.properties.horizontalHeader().hide()
-			self.properties.verticalHeader().hide()
+			self.properties.setRowCount(5)
 
-			DynaMeshFvLabel = QtWidgets.QLabel("dynamicFvMesh")
-			self.properties.setCellWidget(0, 0, DynaMeshFvLabel)
-			DynaMeshFvCombox = QtWidgets.QComboBox()
-			DynaMeshFvOp = ["solidBodyMotionFvMesh", "dynamicMotionSolverFvMesh", "dynamicRefineFvMesh", "staticFvMesh"]
-			DynaMeshFvCombox.addItems(DynaMeshFvOp)
-			self.properties.setCellWidget(0, 1, DynaMeshFvCombox)
+			RASModelLabel = QtWidgets.QLabel("RASModel")        
+			self.properties.setCellWidget(2, 0, RASModelLabel)
+			simuTypeOp = ["kEpsilon", "realizableKE", "RNGkEpsilon", "kOmemga", "kOmegaSST", "kOmegaSSTLM"]
+			simuTypeComboBox = QtWidgets.QComboBox()
+			simuTypeComboBox.addItems(simuTypeOp)
+			self.properties.setCellWidget(2, 1, simuTypeComboBox)
 
-			DynaMeshSolver = QtWidgets.QLabel("Motion Solver")
-			self.properties.setCellWidget(1, 0, DynaMeshSolver)
-			DynaMeshSolverCombox = QtWidgets.QComboBox()
-			DynaMeshSolverOp = ["solidBody", "sixDoFRigidBodyMotion", ]
-			DynaMeshSolverCombox.addItems(DynaMeshSolverOp)
-			self.properties.setCellWidget(1, 1, DynaMeshSolverCombox)
-
-			DynaMeshFuncLabel = QtWidgets.QLabel("Motion function")
-			self.properties.setCellWidget(2, 0, DynaMeshFuncLabel)
-			motionFuncOp = ["rotatingMotion"]
-			motionFuncCombox = QtWidgets.QComboBox()
-			motionFuncCombox.addItems(motionFuncOp)
-			self.properties.setCellWidget(2, 1, motionFuncCombox)
-
-			DynaMeshCellZone = QtWidgets.QLabel("cellZone")        
-			self.properties.setCellWidget(3, 0, DynaMeshCellZone)
-			cellZoneOp = ["cellZone1", "cellZone2"]
-			cellZoneOpComboBox = QtWidgets.QComboBox()
-			cellZoneOpComboBox.addItems(cellZoneOp)
-			self.properties.setCellWidget(3, 1, cellZoneOpComboBox)
-
-			DynaMeshoriginLabel = QtWidgets.QLabel("origin")
-			self.properties.setCellWidget(4, 0, DynaMeshoriginLabel)
-			DynaMeshoriginInput = QtWidgets.QLineEdit("0, 0, 0")
-			self.properties.setCellWidget(4, 1, DynaMeshoriginInput)
-
-			DynaMeshaxisLabel = QtWidgets.QLabel("axis")
-			self.properties.setCellWidget(5, 0, DynaMeshaxisLabel)
-			axisOp = ["x", "y", "z"]
-			DynaMeshaxisCombobox = QtWidgets.QComboBox()
-			DynaMeshaxisCombobox.addItems(axisOp)
-			self.properties.setCellWidget(5, 1, DynaMeshaxisCombobox)
-
-			DynaMeshomegaLabel = QtWidgets.QLabel("omega")
-			self.properties.setCellWidget(6, 0, DynaMeshomegaLabel)
-			DynaMeshomegaInput = QtWidgets.QLineEdit()
-			DynaMeshomegaInput.setPlaceholderText("rpm")
-			self.properties.setCellWidget(6, 1, DynaMeshomegaInput)
-
-			addDynaMeshButt = QtWidgets.QPushButton('Add/Update')
-			self.properties.setCellWidget(7, 0, addDynaMeshButt)
-			DeleDynaMeshButt = QtWidgets.QPushButton("Delete")
-			self.properties.setCellWidget(7, 1, DeleDynaMeshButt)
-
-		def MultiphaseProperties(self):
-			self.properties.setRowCount(6)
-			self.properties.setColumnCount(2)
-			self.properties.show()
+			TurbSwitchLabel = QtWidgets.QLabel("Turbulence")        
+			self.properties.setCellWidget(3, 0, TurbSwitchLabel)
+			TurbSwitchOp = ["on", "off"]
+			TurbSwitchOpComboBox = QtWidgets.QComboBox()
+			TurbSwitchOpComboBox.addItems(TurbSwitchOp)
+			self.properties.setCellWidget(3, 1, TurbSwitchOpComboBox)
 			
-			self.properties.horizontalHeader().hide()
-			self.properties.verticalHeader().hide()
+			TurbCoeffLabel = QtWidgets.QLabel("printCoeffs")        
+			self.properties.setCellWidget(4, 0, TurbCoeffLabel)
+			TurbCoeffOp = ["on", "off"]
+			TurbCoeffComboBox = QtWidgets.QComboBox()
+			TurbCoeffComboBox.addItems(TurbCoeffOp)
+			self.properties.setCellWidget(4, 1, TurbCoeffComboBox)
 
-			fieldNameLabel = QtWidgets.QLabel("Field Values")
-			self.properties.setCellWidget(0, 0, fieldNameLabel)
-			fieldNameInput = QtWidgets.QLineEdit("Alpha.Water")
-			self.properties.setCellWidget(0, 1, fieldNameInput)
-
-			defaultValueLabel = QtWidgets.QLabel("Default Value")
-			self.properties.setCellWidget(1, 0, defaultValueLabel)
-			defaultValueInput = QtWidgets.QLineEdit("1")
-			self.properties.setCellWidget(1, 1, defaultValueInput)
-
-			fieldRegionLabel = QtWidgets.QLabel("Field Region")
-			self.properties.setCellWidget(2, 0, fieldRegionLabel)
-			fieldRegionCombox = QtWidgets.QComboBox()
-			fieldRegionOp = ["boxToCell", "cylinderToCell", "sphereToCell", "cylinderAnnulusToCell", "rotatedBoxToCell", "zoneToCell"]
-			fieldRegionCombox.addItems(fieldRegionOp)
-			self.properties.setCellWidget(2, 1, fieldRegionCombox)
-			
-			boxPoint1Label = QtWidgets.QLabel("box point1")
-			self.properties.setCellWidget(3, 0, boxPoint1Label)
-			boxPoint1Input = QtWidgets.QLineEdit("0, 0, 0")
-			self.properties.setCellWidget(3, 1, boxPoint1Input)
-
-			boxPoint2Label = QtWidgets.QLabel("box point2")
-			self.properties.setCellWidget(4, 0, boxPoint2Label)
-			boxPoint2Input = QtWidgets.QLineEdit("10, 10, 10")
-			self.properties.setCellWidget(4, 1, boxPoint2Input)
-
-			fieldValueLabel = QtWidgets.QLabel("Field Value")
-			self.properties.setCellWidget(5, 0, fieldValueLabel)
-			fieldValueInput = QtWidgets.QLineEdit("0")
-			self.properties.setCellWidget(5, 1, fieldValueInput)
-			
-		def RadiationProperties(self):
-
-			self.properties.setRowCount(12)
+		elif simuType == "laminar":
 			self.properties.setColumnCount(2)
-			self.properties.verticalHeader().hide()
-			self.properties.horizontalHeader().hide()
+			self.properties.setRowCount(1)  
 
-			radiatSwitchLabel = QtWidgets.QLabel("Ratiation")
-			self.properties.setCellWidget(0, 0, radiatSwitchLabel)
-			self.radiationSwitchCombox = QtWidgets.QComboBox()
-			self.radiationSwitchCombox.addItems(["on", "off"])
-			self.properties.setCellWidget(0, 1, self.radiationSwitchCombox)
+	def MRFProperties(self):
+		row, col = 8, 2
+		#TODO MRF also need a region input indicate which region the cellZone belongs to. Also, configed MRF need to appare in the tree. 
+		self.properties.setColumnCount(col)
+		self.properties.setRowCount(row)
+		self.properties.show()
 
-			radiatModelLabel = QtWidgets.QLabel("Ratiation Model")
-			self.properties.setCellWidget(1, 0, radiatModelLabel)
-			self.radiatModelCombox = QtWidgets.QComboBox()
-			radiatModelOp = ["fvDOM", "P1", "S2S"]
-			self.radiatModelCombox = QtWidgets.QComboBox()
-			self.radiatModelCombox.addItems(radiatModelOp)
-			self.properties.setCellWidget(1, 1, self.radiatModelCombox)
+		self.properties.horizontalHeader().hide()
+		self.properties.verticalHeader().hide()
 
-			nPhiLabel = QtWidgets.QLabel("nPhi")
-			self.properties.setCellWidget(2, 0, nPhiLabel)
-			self.nPhiInput = QtWidgets.QSpinBox()   
-			self.nPhiInput.setValue(2)
-			self.properties.setCellWidget(2, 1, self.nPhiInput)
+		MRFNameLabel = QtWidgets.QLabel("MRF Name")        
+		self.properties.setCellWidget(0, 0, MRFNameLabel)
+		MRFNameInput = QtWidgets.QLineEdit()
+		MRFNameInput.setText("MRF_" + str(self.MRFCount)) 
+		self.MRFCount += 1
+		self.properties.setCellWidget(0, 1, MRFNameInput)
 
-			nThetaLabel = QtWidgets.QLabel("nTheta")
-			self.properties.setCellWidget(3, 0, nThetaLabel)
-			self.nThetaInput = QtWidgets.QSpinBox()
-			self.nThetaInput.setValue(4)
-			self.properties.setCellWidget(3, 1, self.nThetaInput)
+		MRFCellZone = QtWidgets.QLabel("cellZone")        
+		self.properties.setCellWidget(1, 0, MRFCellZone)
+		cellZoneOp = ["cellZone1", "cellZone2"]
+		cellZoneOpComboBox = QtWidgets.QComboBox()
+		cellZoneOpComboBox.addItems(cellZoneOp)
+		self.properties.setCellWidget(1, 1, cellZoneOpComboBox)
+		
+		MRFactiveLabel = QtWidgets.QLabel("MRF")        
+		self.properties.setCellWidget(2, 0, MRFactiveLabel)
+		MRFactiveOp = ["on", "off"]
+		MRFactiveComboBox = QtWidgets.QComboBox()
+		MRFactiveComboBox.addItems(MRFactiveOp)
+		self.properties.setCellWidget(2, 1, MRFactiveComboBox)
 
-			radmaxIterLabel = QtWidgets.QLabel("maxIter")
-			self.properties.setCellWidget(4, 0, radmaxIterLabel)
-			self.radmaxIterInput = QtWidgets.QSpinBox()
-			self.radmaxIterInput.setValue(5)
-			self.properties.setCellWidget(4, 1, self.radmaxIterInput)
+		MRFnonRotatLabel = QtWidgets.QLabel("nonRotatingPatches")
+		self.properties.setCellWidget(3, 0, MRFnonRotatLabel)
+		MRFnonRotatPatchOp = self.patches
+		MRFnonRotatPatchCombox = QtWidgets.QComboBox()
+		MRFnonRotatPatchCombox.addItems(MRFnonRotatPatchOp)
+		self.properties.setCellWidget(3, 1, MRFnonRotatPatchCombox)
 
-			radTolLabel = QtWidgets.QLabel("tolerance")
-			self.properties.setCellWidget(5, 0, radTolLabel)
-			self.radTolInput = QtWidgets.QLineEdit("1E-3")
-			self.properties.setCellWidget(5, 1, self.radTolInput)
+		MRForiginLabel = QtWidgets.QLabel("origin")
+		self.properties.setCellWidget(4, 0, MRForiginLabel)
+		MRForiginInput = QtWidgets.QLineEdit("0, 0, 0")
+		self.properties.setCellWidget(4, 1, MRForiginInput)
 
-			radSolvFreqLabel = QtWidgets.QLabel("solve freq")
-			self.properties.setCellWidget(6, 0, radSolvFreqLabel)
-			self.radSolvFreqInput = QtWidgets.QSpinBox()
-			self.properties.setCellWidget(6, 1, self.radSolvFreqInput)
+		MRFaxisLabel = QtWidgets.QLabel("axis")
+		self.properties.setCellWidget(5, 0, MRFaxisLabel)
+		axisOp = ["x", "y", "z"]
+		MRFaxisCombobox = QtWidgets.QComboBox()
+		MRFaxisCombobox.addItems(axisOp)
+		self.properties.setCellWidget(5, 1, MRFaxisCombobox)
 
-			radAbsorpLabel = QtWidgets.QLabel("absorptivity")
-			self.properties.setCellWidget(7, 0, radAbsorpLabel)
-			self.radAbsorpInput = QtWidgets.QLineEdit("0.01")
-			self.properties.setCellWidget(7, 1, self.radAbsorpInput)
+		MRFomegaLabel = QtWidgets.QLabel("omega")
+		self.properties.setCellWidget(6, 0, MRFomegaLabel)
+		MRFomegaInput = QtWidgets.QLineEdit()
+		MRFomegaInput.setPlaceholderText("rpm")
+		self.properties.setCellWidget(6, 1, MRFomegaInput)
 
-			radEmissLabel = QtWidgets.QLabel("emissivity")
-			self.properties.setCellWidget(8, 0, radEmissLabel)
-			self.radEmissInput = QtWidgets.QLineEdit("0.01")
-			self.properties.setCellWidget(8, 1, self.radEmissInput)
+		addMRFButt = QtWidgets.QPushButton('Add/Update')
+		self.properties.setCellWidget(7, 0, addMRFButt)
+		DeleMRFButt = QtWidgets.QPushButton("Delete")
+		self.properties.setCellWidget(7, 1, DeleMRFButt)
 
-			radELabel = QtWidgets.QLabel("E")
-			self.properties.setCellWidget(9, 0, radELabel)
-			self.radEInput = QtWidgets.QLineEdit("0")
-			self.properties.setCellWidget(9, 1, self.radEInput)
+	def DynaMeshProperties(self):        
+		self.properties.setRowCount(8)
+		self.properties.setColumnCount(2)
+		self.properties.horizontalHeader().hide()
+		self.properties.verticalHeader().hide()
 
-			radScattLabel = QtWidgets.QLabel("scatter model")
-			self.properties.setCellWidget(10, 0, radScattLabel)
-			self.radScattInput = QtWidgets.QComboBox()
-			self.radScattInput.addItems(["none"])
-			self.properties.setCellWidget(10, 1, self.radScattInput)
+		DynaMeshFvLabel = QtWidgets.QLabel("dynamicFvMesh")
+		self.properties.setCellWidget(0, 0, DynaMeshFvLabel)
+		DynaMeshFvCombox = QtWidgets.QComboBox()
+		DynaMeshFvOp = ["solidBodyMotionFvMesh", "dynamicMotionSolverFvMesh", "dynamicRefineFvMesh", "staticFvMesh"]
+		DynaMeshFvCombox.addItems(DynaMeshFvOp)
+		self.properties.setCellWidget(0, 1, DynaMeshFvCombox)
 
-			radSootLabel = QtWidgets.QLabel("soot model")
-			self.properties.setCellWidget(11, 0, radSootLabel)
-			self.radSootInput = QtWidgets.QComboBox()
-			self.radSootInput.addItems(["none"])
-			self.properties.setCellWidget(11, 1, self.radSootInput)
+		DynaMeshSolver = QtWidgets.QLabel("Motion Solver")
+		self.properties.setCellWidget(1, 0, DynaMeshSolver)
+		DynaMeshSolverCombox = QtWidgets.QComboBox()
+		DynaMeshSolverOp = ["solidBody", "sixDoFRigidBodyMotion", ]
+		DynaMeshSolverCombox.addItems(DynaMeshSolverOp)
+		self.properties.setCellWidget(1, 1, DynaMeshSolverCombox)
 
-		def HeatTransProperties(self):
-			"""
-			type            heRhoThermo;
-			mixture         pureMixture;
-			transport       polynomial;
-			thermo          hPolynomial;
-			equationOfState icoPolynomial;
-			specie          specie;
-			energy          sensibleEnthalpy;
-			"""
-			self.properties.setRowCount(10)
-			self.properties.setColumnCount(2)
-			self.properties.verticalHeader().hide()
-			self.properties.horizontalHeader().hide()
+		DynaMeshFuncLabel = QtWidgets.QLabel("Motion function")
+		self.properties.setCellWidget(2, 0, DynaMeshFuncLabel)
+		motionFuncOp = ["rotatingMotion"]
+		motionFuncCombox = QtWidgets.QComboBox()
+		motionFuncCombox.addItems(motionFuncOp)
+		self.properties.setCellWidget(2, 1, motionFuncCombox)
 
-			regionLabel = QtWidgets.QLabel("Region")
-			self.properties.setCellWidget(0, 0, regionLabel)
-			self.HeatTransRegionInput = QtWidgets.QComboBox()
-			self.HeatTransRegionInput.addItems(list(self.regions.keys()))
-			self.properties.setCellWidget(0, 1, self.HeatTransRegionInput)
+		DynaMeshCellZone = QtWidgets.QLabel("cellZone")        
+		self.properties.setCellWidget(3, 0, DynaMeshCellZone)
+		cellZoneOp = ["cellZone1", "cellZone2"]
+		cellZoneOpComboBox = QtWidgets.QComboBox()
+		cellZoneOpComboBox.addItems(cellZoneOp)
+		self.properties.setCellWidget(3, 1, cellZoneOpComboBox)
 
-			ThermoType = QtWidgets.QLabel("Thermo Type")
-			self.properties.setCellWidget(1, 0, ThermoType)
-			self.ThermoTypeInput = QtWidgets.QComboBox()
-			ThermoTypeOp = ["hePsiThermo", "heRhoThermo", "heheuPsiThermo"]
-			self.ThermoTypeInput.addItems(ThermoTypeOp)
-			self.properties.setCellWidget(1, 1, self.ThermoTypeInput)
+		DynaMeshoriginLabel = QtWidgets.QLabel("origin")
+		self.properties.setCellWidget(4, 0, DynaMeshoriginLabel)
+		DynaMeshoriginInput = QtWidgets.QLineEdit("0, 0, 0")
+		self.properties.setCellWidget(4, 1, DynaMeshoriginInput)
 
-			ThermoMixLabel = QtWidgets.QLabel("Mixture")
-			self.properties.setCellWidget(2, 0, ThermoMixLabel)
-			self.ThermoMixInput = QtWidgets.QComboBox()
-			ThermoMixOp = ["pureMixture", "reactingMixture", "homogeneousMixture", "inhomogeneousMixture", "veryInhomogeneousMixture"]
-			self.ThermoMixInput.addItems(ThermoMixOp)
-			self.properties.setCellWidget(2, 1, self.ThermoMixInput)
-			
-			ThermoTransportLabel = QtWidgets.QLabel("transport")
-			self.properties.setCellWidget(3, 0, ThermoTransportLabel)
-			self.ThermoTranspInput = QtWidgets.QComboBox()
-			ThermoTranspOp = ["const", "sutherland", "polynomial", "logPolynomial"]
-			self.ThermoTranspInput.addItems(ThermoTranspOp)
-			self.properties.setCellWidget(3, 1, self.ThermoTranspInput)
+		DynaMeshaxisLabel = QtWidgets.QLabel("axis")
+		self.properties.setCellWidget(5, 0, DynaMeshaxisLabel)
+		axisOp = ["x", "y", "z"]
+		DynaMeshaxisCombobox = QtWidgets.QComboBox()
+		DynaMeshaxisCombobox.addItems(axisOp)
+		self.properties.setCellWidget(5, 1, DynaMeshaxisCombobox)
 
-			ThermoThermoLabel = QtWidgets.QLabel("thermo")
-			self.properties.setCellWidget(4, 0, ThermoThermoLabel)   
-			self.ThermoThermoInput = QtWidgets.QComboBox()
-			ThermoThermoOp = ["hConst", "eConst", "janaf", "hPolynomial"]
-			self.ThermoThermoInput.addItems(ThermoThermoOp)
-			self.properties.setCellWidget(4, 1, self.ThermoThermoInput)
+		DynaMeshomegaLabel = QtWidgets.QLabel("omega")
+		self.properties.setCellWidget(6, 0, DynaMeshomegaLabel)
+		DynaMeshomegaInput = QtWidgets.QLineEdit()
+		DynaMeshomegaInput.setPlaceholderText("rpm")
+		self.properties.setCellWidget(6, 1, DynaMeshomegaInput)
 
-			ThermoEoSLabel = QtWidgets.QLabel("equationOfState")
-			self.properties.setCellWidget(5, 0, ThermoEoSLabel)
-			self.ThermoEOSInput = QtWidgets.QComboBox()
-			ThermoEOSOp = ["rhoConst", "perfectGas", "incompressiblePerfectGas", "perfectFluid", "linear", "adiabaticPerfectFluid", "Boussinesq","PengRobinsonGas", "icoPolynomial"]
-			self.ThermoEOSInput.addItems(ThermoEOSOp)
-			self.properties.setCellWidget(5, 1, self.ThermoEOSInput)
+		addDynaMeshButt = QtWidgets.QPushButton('Add/Update')
+		self.properties.setCellWidget(7, 0, addDynaMeshButt)
+		DeleDynaMeshButt = QtWidgets.QPushButton("Delete")
+		self.properties.setCellWidget(7, 1, DeleDynaMeshButt)
 
-			ThermoSpecieLabel = QtWidgets.QLabel("specie")
-			self.properties.setCellWidget(6, 0, ThermoSpecieLabel)
-			self.ThermoSpecieInput = QtWidgets.QComboBox()
-			ThermoSpecieOp = ["specie", "thermodynamics", "transport"]
-			self.ThermoSpecieInput.addItems(ThermoSpecieOp)
-			self.properties.setCellWidget(6, 1, self.ThermoSpecieInput)
+	def MultiphaseProperties(self):
+		self.properties.setRowCount(6)
+		self.properties.setColumnCount(2)
+		self.properties.show()
+		
+		self.properties.horizontalHeader().hide()
+		self.properties.verticalHeader().hide()
 
-			ThermoEnergyLabel = QtWidgets.QLabel("energy")
-			self.properties.setCellWidget(7, 0, ThermoEnergyLabel)
-			self.ThermoEnergyInput = QtWidgets.QComboBox()
-			ThermoEnergyOp = ["sensibleEnthalpy", "sensibleInternalEnergy", "absoluteEnthalpy"]
-			self.ThermoEnergyInput.addItems(ThermoEnergyOp)
-			self.properties.setCellWidget(7, 1, self.ThermoEnergyInput)
+		fieldNameLabel = QtWidgets.QLabel("Field Values")
+		self.properties.setCellWidget(0, 0, fieldNameLabel)
+		fieldNameInput = QtWidgets.QLineEdit("Alpha.Water")
+		self.properties.setCellWidget(0, 1, fieldNameInput)
 
-		def ddtProperties(self):
-			self.properties.setColumnCount(2)
-			self.properties.setRowCount(2)
-			self.properties.verticalHeader().hide()
-			self.properties.horizontalHeader().hide()
+		defaultValueLabel = QtWidgets.QLabel("Default Value")
+		self.properties.setCellWidget(1, 0, defaultValueLabel)
+		defaultValueInput = QtWidgets.QLineEdit("1")
+		self.properties.setCellWidget(1, 1, defaultValueInput)
 
-			ddtLabel = QtWidgets.QLabel("ddtSchemes")
-			self.properties.setCellWidget(0, 0, ddtLabel)
-			self.ddtInput = QtWidgets.QComboBox()
-			ddtOp = ["steadyState", "Euler", "localEuler", "CrankNicholson \u03C8", "backward"]
-			self.ddtInput.addItems(ddtOp)
-			self.properties.setCellWidget(0, 1, self.ddtInput)
+		fieldRegionLabel = QtWidgets.QLabel("Field Region")
+		self.properties.setCellWidget(2, 0, fieldRegionLabel)
+		fieldRegionCombox = QtWidgets.QComboBox()
+		fieldRegionOp = ["boxToCell", "cylinderToCell", "sphereToCell", "cylinderAnnulusToCell", "rotatedBoxToCell", "zoneToCell"]
+		fieldRegionCombox.addItems(fieldRegionOp)
+		self.properties.setCellWidget(2, 1, fieldRegionCombox)
+		
+		boxPoint1Label = QtWidgets.QLabel("box point1")
+		self.properties.setCellWidget(3, 0, boxPoint1Label)
+		boxPoint1Input = QtWidgets.QLineEdit("0, 0, 0")
+		self.properties.setCellWidget(3, 1, boxPoint1Input)
 
-			gradLabel = QtWidgets.QLabel("grad")
-			self.properties.setCellWidget(1, 0, gradLabel)
-			self.gradInput = QtWidgets.QComboBox()
-			gradOp = [""]
+		boxPoint2Label = QtWidgets.QLabel("box point2")
+		self.properties.setCellWidget(4, 0, boxPoint2Label)
+		boxPoint2Input = QtWidgets.QLineEdit("10, 10, 10")
+		self.properties.setCellWidget(4, 1, boxPoint2Input)
+
+		fieldValueLabel = QtWidgets.QLabel("Field Value")
+		self.properties.setCellWidget(5, 0, fieldValueLabel)
+		fieldValueInput = QtWidgets.QLineEdit("0")
+		self.properties.setCellWidget(5, 1, fieldValueInput)
+		
+	def RadiationProperties(self):
+
+		self.properties.setRowCount(12)
+		self.properties.setColumnCount(2)
+		self.properties.verticalHeader().hide()
+		self.properties.horizontalHeader().hide()
+
+		radiatSwitchLabel = QtWidgets.QLabel("Ratiation")
+		self.properties.setCellWidget(0, 0, radiatSwitchLabel)
+		self.radiationSwitchCombox = QtWidgets.QComboBox()
+		self.radiationSwitchCombox.addItems(["on", "off"])
+		self.properties.setCellWidget(0, 1, self.radiationSwitchCombox)
+
+		radiatModelLabel = QtWidgets.QLabel("Ratiation Model")
+		self.properties.setCellWidget(1, 0, radiatModelLabel)
+		self.radiatModelCombox = QtWidgets.QComboBox()
+		radiatModelOp = ["fvDOM", "P1", "S2S"]
+		self.radiatModelCombox = QtWidgets.QComboBox()
+		self.radiatModelCombox.addItems(radiatModelOp)
+		self.properties.setCellWidget(1, 1, self.radiatModelCombox)
+
+		nPhiLabel = QtWidgets.QLabel("nPhi")
+		self.properties.setCellWidget(2, 0, nPhiLabel)
+		self.nPhiInput = QtWidgets.QSpinBox()   
+		self.nPhiInput.setValue(2)
+		self.properties.setCellWidget(2, 1, self.nPhiInput)
+
+		nThetaLabel = QtWidgets.QLabel("nTheta")
+		self.properties.setCellWidget(3, 0, nThetaLabel)
+		self.nThetaInput = QtWidgets.QSpinBox()
+		self.nThetaInput.setValue(4)
+		self.properties.setCellWidget(3, 1, self.nThetaInput)
+
+		radmaxIterLabel = QtWidgets.QLabel("maxIter")
+		self.properties.setCellWidget(4, 0, radmaxIterLabel)
+		self.radmaxIterInput = QtWidgets.QSpinBox()
+		self.radmaxIterInput.setValue(5)
+		self.properties.setCellWidget(4, 1, self.radmaxIterInput)
+
+		radTolLabel = QtWidgets.QLabel("tolerance")
+		self.properties.setCellWidget(5, 0, radTolLabel)
+		self.radTolInput = QtWidgets.QLineEdit("1E-3")
+		self.properties.setCellWidget(5, 1, self.radTolInput)
+
+		radSolvFreqLabel = QtWidgets.QLabel("solve freq")
+		self.properties.setCellWidget(6, 0, radSolvFreqLabel)
+		self.radSolvFreqInput = QtWidgets.QSpinBox()
+		self.properties.setCellWidget(6, 1, self.radSolvFreqInput)
+
+		radAbsorpLabel = QtWidgets.QLabel("absorptivity")
+		self.properties.setCellWidget(7, 0, radAbsorpLabel)
+		self.radAbsorpInput = QtWidgets.QLineEdit("0.01")
+		self.properties.setCellWidget(7, 1, self.radAbsorpInput)
+
+		radEmissLabel = QtWidgets.QLabel("emissivity")
+		self.properties.setCellWidget(8, 0, radEmissLabel)
+		self.radEmissInput = QtWidgets.QLineEdit("0.01")
+		self.properties.setCellWidget(8, 1, self.radEmissInput)
+
+		radELabel = QtWidgets.QLabel("E")
+		self.properties.setCellWidget(9, 0, radELabel)
+		self.radEInput = QtWidgets.QLineEdit("0")
+		self.properties.setCellWidget(9, 1, self.radEInput)
+
+		radScattLabel = QtWidgets.QLabel("scatter model")
+		self.properties.setCellWidget(10, 0, radScattLabel)
+		self.radScattInput = QtWidgets.QComboBox()
+		self.radScattInput.addItems(["none"])
+		self.properties.setCellWidget(10, 1, self.radScattInput)
+
+		radSootLabel = QtWidgets.QLabel("soot model")
+		self.properties.setCellWidget(11, 0, radSootLabel)
+		self.radSootInput = QtWidgets.QComboBox()
+		self.radSootInput.addItems(["none"])
+		self.properties.setCellWidget(11, 1, self.radSootInput)
+
+	def HeatTransProperties(self):
+		"""
+		type            heRhoThermo;
+		mixture         pureMixture;
+		transport       polynomial;
+		thermo          hPolynomial;
+		equationOfState icoPolynomial;
+		specie          specie;
+		energy          sensibleEnthalpy;
+		"""
+		self.properties.setRowCount(10)
+		self.properties.setColumnCount(2)
+		self.properties.verticalHeader().hide()
+		self.properties.horizontalHeader().hide()
+
+		regionLabel = QtWidgets.QLabel("Region")
+		self.properties.setCellWidget(0, 0, regionLabel)
+		self.HeatTransRegionInput = QtWidgets.QComboBox()
+		self.HeatTransRegionInput.addItems(list(self.regions.keys()))
+		self.properties.setCellWidget(0, 1, self.HeatTransRegionInput)
+
+		ThermoType = QtWidgets.QLabel("Thermo Type")
+		self.properties.setCellWidget(1, 0, ThermoType)
+		self.ThermoTypeInput = QtWidgets.QComboBox()
+		ThermoTypeOp = ["hePsiThermo", "heRhoThermo", "heheuPsiThermo"]
+		self.ThermoTypeInput.addItems(ThermoTypeOp)
+		self.properties.setCellWidget(1, 1, self.ThermoTypeInput)
+
+		ThermoMixLabel = QtWidgets.QLabel("Mixture")
+		self.properties.setCellWidget(2, 0, ThermoMixLabel)
+		self.ThermoMixInput = QtWidgets.QComboBox()
+		ThermoMixOp = ["pureMixture", "reactingMixture", "homogeneousMixture", "inhomogeneousMixture", "veryInhomogeneousMixture"]
+		self.ThermoMixInput.addItems(ThermoMixOp)
+		self.properties.setCellWidget(2, 1, self.ThermoMixInput)
+		
+		ThermoTransportLabel = QtWidgets.QLabel("transport")
+		self.properties.setCellWidget(3, 0, ThermoTransportLabel)
+		self.ThermoTranspInput = QtWidgets.QComboBox()
+		ThermoTranspOp = ["const", "sutherland", "polynomial", "logPolynomial"]
+		self.ThermoTranspInput.addItems(ThermoTranspOp)
+		self.properties.setCellWidget(3, 1, self.ThermoTranspInput)
+
+		ThermoThermoLabel = QtWidgets.QLabel("thermo")
+		self.properties.setCellWidget(4, 0, ThermoThermoLabel)   
+		self.ThermoThermoInput = QtWidgets.QComboBox()
+		ThermoThermoOp = ["hConst", "eConst", "janaf", "hPolynomial"]
+		self.ThermoThermoInput.addItems(ThermoThermoOp)
+		self.properties.setCellWidget(4, 1, self.ThermoThermoInput)
+
+		ThermoEoSLabel = QtWidgets.QLabel("equationOfState")
+		self.properties.setCellWidget(5, 0, ThermoEoSLabel)
+		self.ThermoEOSInput = QtWidgets.QComboBox()
+		ThermoEOSOp = ["rhoConst", "perfectGas", "incompressiblePerfectGas", "perfectFluid", "linear", "adiabaticPerfectFluid", "Boussinesq","PengRobinsonGas", "icoPolynomial"]
+		self.ThermoEOSInput.addItems(ThermoEOSOp)
+		self.properties.setCellWidget(5, 1, self.ThermoEOSInput)
+
+		ThermoSpecieLabel = QtWidgets.QLabel("specie")
+		self.properties.setCellWidget(6, 0, ThermoSpecieLabel)
+		self.ThermoSpecieInput = QtWidgets.QComboBox()
+		ThermoSpecieOp = ["specie", "thermodynamics", "transport"]
+		self.ThermoSpecieInput.addItems(ThermoSpecieOp)
+		self.properties.setCellWidget(6, 1, self.ThermoSpecieInput)
+
+		ThermoEnergyLabel = QtWidgets.QLabel("energy")
+		self.properties.setCellWidget(7, 0, ThermoEnergyLabel)
+		self.ThermoEnergyInput = QtWidgets.QComboBox()
+		ThermoEnergyOp = ["sensibleEnthalpy", "sensibleInternalEnergy", "absoluteEnthalpy"]
+		self.ThermoEnergyInput.addItems(ThermoEnergyOp)
+		self.properties.setCellWidget(7, 1, self.ThermoEnergyInput)
+
+	def ddtProperties(self):
+		self.properties.setColumnCount(2)
+		self.properties.setRowCount(2)
+		self.properties.verticalHeader().hide()
+		self.properties.horizontalHeader().hide()
+
+		ddtLabel = QtWidgets.QLabel("ddtSchemes")
+		self.properties.setCellWidget(0, 0, ddtLabel)
+		self.ddtInput = QtWidgets.QComboBox()
+		ddtOp = ["steadyState", "Euler", "localEuler", "CrankNicholson \u03C8", "backward"]
+		self.ddtInput.addItems(ddtOp)
+		self.properties.setCellWidget(0, 1, self.ddtInput)
+
+		gradLabel = QtWidgets.QLabel("grad")
+		self.properties.setCellWidget(1, 0, gradLabel)
+		self.gradInput = QtWidgets.QComboBox()
+		gradOp = [""]

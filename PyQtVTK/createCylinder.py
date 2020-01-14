@@ -4,7 +4,7 @@ from Ui_createCylinder import Ui_createCylinder
 doubleValidator = QtGui.QDoubleValidator()
 integelValidator = QtGui.QIntValidator(1, 1000)
 
-class GeoCylinder(QDialog, Ui_createCylinder):
+class createCylinder(QDialog, Ui_createCylinder):
     def __init__(self, parent=None):
 	
         super(createCylinder, self).__init__(parent)
