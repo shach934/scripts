@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'fvSchemes_grad.ui'
+# Form implementation generated from reading ui file 'C:/Shaohui/OpenFoam/scripts/PyQtVTK/Ui_fvSchemes_grad.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #

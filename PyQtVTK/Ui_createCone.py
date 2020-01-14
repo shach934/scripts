@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'createCone.ui'
+# Form implementation generated from reading ui file 'C:/Shaohui/OpenFoam/scripts/PyQtVTK/Ui_createCone.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -106,9 +106,6 @@ class Ui_createCone(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.previewConeBtn = QtWidgets.QPushButton(createCone)
-        self.previewConeBtn.setObjectName("previewConeBtn")
-        self.horizontalLayout_3.addWidget(self.previewConeBtn)
         self.createConeBtn = QtWidgets.QPushButton(createCone)
         self.createConeBtn.setObjectName("createConeBtn")
         self.horizontalLayout_3.addWidget(self.createConeBtn)
@@ -153,7 +150,6 @@ class Ui_createCone(object):
         self.coneCenterZInput.setText(_translate("createCone", "0"))
         self.coneCenterXInput.setText(_translate("createCone", "0"))
         self.coneCenterYInput.setText(_translate("createCone", "0"))
-        self.previewConeBtn.setText(_translate("createCone", "Preview"))
         self.createConeBtn.setText(_translate("createCone", "Create"))
 
 

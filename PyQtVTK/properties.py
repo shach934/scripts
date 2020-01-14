@@ -1,4 +1,9 @@
+import Lib
 
+__methods__ = [] # self is a DataStore
+register_method = Lib.register_method(__methods__)
+
+@register_method
 def clearLayout(self, cur_lay):
 	if cur_lay is not None:
 		while cur_lay.count():
@@ -10,26 +15,19 @@ def clearLayout(self, cur_lay):
 				self.clearLayout(item.layout())
 		sip.delete(cur_lay)
 
-
+@register_method
 def propertyView(self, current, old):
-
+		
 	if current.text(0) == "Box":
-		self.newBox = createBox()
+		self.newBoxPanel = createBox()
 		h_la = QtWidgets.QHBoxLayout()
-		h_la.addWidget(self.newBox)
+		h_la.addWidget(self.newBoxPanel)
 		self.clearLayout(self.propertyBox.layout())
 		self.propertyBox.setLayout(h_la)
 		self.drawBox()
 		for inputLine in (self.boxLengthXInput, self.boxLengthYInput, self.boxLengthZInput, self.boxCenterXInput, self.boxCenterYInput, self.boxCenterZInput):
 			inputLine.textChanged['QString'].connect(self.drawBox)
-
-        selectedColor = self.BoxColorComboBox.currentText()
-        if selectedColor == "PICK":
-            color = QColorDialog.getColor()
-            if color.isValid():
-                self.box[-1].GetProperty.SetColor(color)
-        else:
-            self.box[-1].GetProperty.SetColor(selectedColor)
+		self.BoxColorComboBox.currentTextChanged.connect(self.drawBox)
 
 		self.createBoxBtn.clicked.connect(self.addBox)
 
@@ -61,4 +59,3 @@ def propertyView(self, current, old):
 		self.propertyBox.setLayout(h_la)
 		self.previewConeBtn.clicked.connect(self.drawCone)
 		self.createConeBtn.clicked.connect(self.addCone)
-

@@ -22,29 +22,26 @@ Last edited: December 2019
 #####################################################################################################
 
 import sys, vtk
-from PyQt5 import QtCore, QtGui, sip
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk import vtkCylinderSource, vtkConeSource, vtkCubeSource, vtkSphereSource
 
 from OpenFOAMCase import *
-from createBox import Ui_createBox
+
 from createSphere import Ui_createSphere
 from createCylinder import Ui_createCylinder
 from createCone import Ui_createCone
 from mainWindow import Ui_OpenFOAM
 from settingBox import Ui_Setting
+import properties
 
+import Lib
+import properties
 
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
     pass
-
-class createBox(QDialog, Ui_createBox):
-    def __init__(self, parent=None):
-        super(createBox, self).__init__(parent)
-        self.setupUi(self) 
 
 class createCylinder(QDialog, Ui_createCylinder):
     def __init__(self, parent=None):
@@ -73,8 +70,7 @@ class SettingDialog(QMainWindow, Ui_Setting):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
 
-
-# noinspection PyAttributeOutsideInit
+@Lib.add_methods_from(properties)
 class MyWindow(QMainWindow, Ui_OpenFOAM):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
@@ -125,6 +121,8 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.actionOpen.triggered.connect(self.openFile)
         self.actionTools.triggered.connect(self.setting)
         self.actionQuit.triggered.connect(self.shutDownWarning)
+
+    from createGeo import drawBox
 
     def addTransparencyBar(self):
         self.transparencySlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
@@ -279,7 +277,6 @@ class MyWindow(QMainWindow, Ui_OpenFOAM):
         self.pipLine.currentItemChanged.connect(self.propertyView)
         self.pipLine.show()
         self.pipLine.expandAll()
-
 
     def TurbProperties(self):
         self.properties.setColumnCount(2)

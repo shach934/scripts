@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'fvSolution_SIMPLE.ui'
+# Form implementation generated from reading ui file 'C:/Shaohui/OpenFoam/scripts/PyQtVTK/Ui_fvSolution_SIMPLE.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
