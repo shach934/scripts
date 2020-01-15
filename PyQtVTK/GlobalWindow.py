@@ -31,7 +31,7 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
         self.modelTree = ModelTree(self.leftDomain)
         self.property = Property(self.leftDomain)
-        self.VTKwindow = VTKWindow(self.rightDomain)
+        self.VTKwindow = Panel_VTK(self.rightDomain)
         self.infoMonitor = Info(self.rightDomain)
 
         self.verticalLayout.addWidget(self.leftRightSplitter)

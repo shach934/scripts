@@ -1,146 +1,74 @@
-import sys
+import sys, math
 import vtk
+from PyQt5 import QtCore, QtGui
+from PyQt5 import Qt
+from PyQt5.QtWidgets import QLabel, QPushButton
+from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
-case = "multiRegionHeater"
-filename = "{}/system/controlDict".format(case)
-
-enabled_block = [
-    "rightSolid/internalMesh",
-    "leftSolid/internalMesh",
-    "heater/internalMesh",
-]
-
-field = "T"
-data_type = "point"
 
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
     pass
 
-# reader
-reader = vtk.vtkOpenFOAMReader()
-reader.SetFileName(filename)
-reader.Update()
+class main(object):
 
-latest_time = reader.GetTimeValues().GetRange()[1]
-print("Latest time:", latest_time)
+    def __init__(self, parent = None):
+        # Qt.QMainWindow.__init__(self, parent)
 
-reader.UpdateTimeStep(latest_time)
-reader.Update()
+        self.frame = Qt.QFrame()
+        self.vl = Qt.QVBoxLayout()
+        self.vtkWidget = QVTKRenderWindowInteractor(self.frame)
+        self.vl.addWidget(self.vtkWidget)
 
+        Label = QLabel("Test Label")
+        self.vl.addWidget(Label)
 
-n = reader.GetNumberOfPatchArrays()
-for i in range(n):
-    name = reader.GetPatchArrayName(i)
-    print(name)
+        self.btn = QPushButton("Click mig")
+        self.vl.addWidget(self.btn)
+        self.btn.clicked.connect(self.resetView)
 
-reader.DisableAllPatchArrays()
-for b in enabled_block:
-    reader.SetPatchArrayStatus(b, 1)
-reader.Update()
+        self.ren = vtk.vtkRenderer()
+        self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
 
+        self.vtkWidget.SetInteractorStyle(MouseInteractorStyle())
 
-block = reader.GetOutput()
+        self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
 
-array_name = field
-array_min = sys.float_info.max
-array_max = sys.float_info.min
+        # Create source
+        sphere = vtk.vtkCubeSource()
+        sphere.SetCenter(0, 0, 0)
+        sphere.SetXLength(5.0)
+        sphere.SetYLength(15.0)
+        sphere.SetZLength(5.0)
 
-itr = block.NewIterator()
-itr.InitTraversal()
-while not itr.IsDoneWithTraversal():
-    grid = itr.GetCurrentDataObject()
+        # Create a mapper
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(sphere.GetOutputPort())
 
-    if data_type == "cell":
-        T = grid.GetCellData().GetArray(field)
-    elif data_type == "point":
-        T = grid.GetPointData().GetArray(field)
-    else:
-        assert(0)
+        # Create an actor
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
 
-    T_min, T_max = T.GetRange()
+        self.ren.AddActor(actor)
+        self.ren.GradientBackgroundOn()
+        self.ren.SetBackground2(0.2, 0.4, 0.6)
+        self.ren.SetBackground(1, 1, 1)
 
-    if T_min < array_min:
-        array_min = T_min
-    if T_max > array_max:
-        array_max = T_max
+        self.frame.setLayout(self.vl)
+        self.iren.Initialize()
+        self.iren.Start()
+        self.frame.show()
 
-    itr.GoToNextItem()
+    def resetView(self):
+        self.ren.ResetCamera()
+        fp = self.ren.GetActiveCamera().GetFocalPoint()
+        p = self.ren.GetActiveCamera().GetPosition()
+        dist = math.sqrt( (p[0]-fp[0])**2 + (p[1]-fp[1])**2 + (p[2]-fp[2])**2 )
+        self.ren.GetActiveCamera().SetPosition(fp[0], fp[1], fp[2]+dist)
+        self.ren.GetActiveCamera().SetViewUp(0.0, 1.0, 0.0)
+        self.iren.Initialize()
+        self.iren.Start()
 
-
-# filter
-geom_filter = vtk.vtkGeometryFilter()
-geom_filter.SetInputData(reader.GetOutput())
-
-# lookup table
-lut = vtk.vtkLookupTable()
-lut.SetHueRange(0.667, 0)
-lut.Build()
-
-# mapper
-mapper = vtk.vtkCompositePolyDataMapper()
-mapper.SetInputConnection(geom_filter.GetOutputPort())
-if data_type == "cell":
-    mapper.SetScalarModeToUseCellFieldData()
-elif data_type == "point":
-    mapper.SetScalarModeToUsePointFieldData()
-mapper.SelectColorArray(array_name)
-mapper.SetScalarRange(array_min, array_max)
-mapper.SetLookupTable(lut)
-
-# actor
-actor = vtk.vtkActor()
-actor.SetMapper(mapper)
-
-prop = actor.GetProperty()
-prop.SetAmbient(0.5)
-
-prop.EdgeVisibilityOn()
-prop.SetEdgeColor(0, 0, 0)
-prop.SetLineWidth(2)
-
-prop.SetRepresentationToSurface()
-
-# renderer
-ren = vtk.vtkRenderer()
-ren.AddActor(actor)
-ren.GradientBackgroundOn()
-ren.SetBackground(1, 1, 1)
-ren.SetBackground2(0.4, 0.55, .75)
-
-ren_win = vtk.vtkRenderWindow()
-ren_win.AddRenderer(ren)
-ren_win.SetSize(640, 480)
-
-# interactor
-inter = vtk.vtkRenderWindowInteractor()
-inter.SetRenderWindow(ren_win)
-inter.SetInteractorStyle(MouseInteractorStyle())
-
-# scalar bar
-scalar_bar = vtk.vtkScalarBarActor()
-scalar_bar.SetOrientationToVertical()
-scalar_bar.SetLookupTable(lut)
-prop = vtk.vtkTextProperty()
-prop.SetColor(0, 0, 0)
-prop.SetFontSize(20)
-prop.SetFontFamilyToArial()
-prop.ItalicOff()
-prop.BoldOff()
-scalar_bar.UnconstrainedFontSizeOn()
-scalar_bar.SetTitleTextProperty(prop)
-scalar_bar.SetLabelTextProperty(prop)
-scalar_bar.SetLabelFormat("%5.2f")
-scalar_bar.SetTitle(array_name)
-ren.AddActor(scalar_bar)
-
-# text
-text = vtk.vtkTextActor()
-text.SetInput(case)
-text.GetTextProperty().SetColor(0, 0, 0)
-text.GetTextProperty().SetFontSize(24)
-text.SetPosition(200, 30)
-ren.AddActor(text)
-
-ren_win.Render()
-inter.Initialize()
-inter.Start()
+if __name__ == "__main__":
+    app = Qt.QApplication(sys.argv)
+    window = main()
+    sys.exit(app.exec_())

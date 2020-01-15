@@ -39,7 +39,7 @@ class Property(object):
         if self.currentItem == "Box":
             self.tempBox = createBox()
             h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.newBoxPanel)
+            h_la.addWidget(self.tempBox.setupUi())
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(h_la)
 

@@ -7,81 +7,90 @@ import MouseInteractorStyle
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
     pass
 
-class VTKWindow(object):
+class Panel_VTK(object):
     def __init__(self, domain):
         super().__init__()
+        self.setUpUi(domain)
 
-        self.wireFrame = False
-        self.featureEdge = False
-        # self.actionFrame.triggered.connect(self.featureEdgeView)
+    def setUpUi(self, domain):
 
-        self.domainLayout = QtWidgets.QVBoxLayout(domain)
+        self.window = QtWidgets.QFrame(domain)
+        self.windowLayout= QtWidgets.QVBoxLayout()
+
         self.tabs = QtWidgets.QTabWidget()
+        self.windowLayout.addWidget(self.tabs)
+
         self.Geometry = QtWidgets.QWidget()
-        self.GeoLayout = QtWidgets.QVBoxLayout(self.Geometry)
-        self.GeoFrame = QtWidgets.QFrame(self.Geometry)
-        self.GeoFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.GeoFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.tabs.addTab(self.Geometry, "Geometry")
+        self.Monitor = QtWidgets.QWidget()
+        self.tabs.addTab(self.Monitor, "Monitor")
+        self.tabs.setCurrentIndex(0)
+
+        self.window.setLayout(self.windowLayout)
+
+        self.GeoFrame = QtWidgets.QFrame()
+        vl = QtWidgets.QVBoxLayout(self.Geometry)
+        vl.addWidget(self.GeoFrame)
+        self.MonitorFrame = QtWidgets.QFrame()
+        vl = QtWidgets.QVBoxLayout(self.Monitor)
+        vl.addWidget(self.MonitorFrame)
+        
+        self.GeoLayout = QtWidgets.QVBoxLayout(self.GeoFrame)
+        self.MonitorLayout = QtWidgets.QVBoxLayout(self.MonitorFrame)
 
         self.receiveBar = QtWidgets.QToolBar()
         self.GeoLayout.addWidget(self.receiveBar)
 
-        self.GeoLayout.addWidget(self.GeoFrame)
-        self.tabs.addTab(self.Geometry, "Geometry")
-        self.Monitor = QtWidgets.QWidget()
-        self.MoniLayout = QtWidgets.QVBoxLayout(self.Monitor)
-        self.MonitorFrame = QtWidgets.QFrame(self.Monitor)
-        self.MonitorFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.MonitorFrame.setFrameShadow(QtWidgets.QFrame.Raised)
-        self.MoniLayout.addWidget(self.MonitorFrame)
-        self.tabs.addTab(self.Monitor, "Monitor")
-        self.domainLayout.addWidget(self.tabs)
-        self.tabs.setCurrentIndex(0)
-
         self.vtkWindow = QVTKRenderWindowInteractor(self.GeoFrame)
         self.GeoLayout.addWidget(self.vtkWindow)
-        # self.foamVTKGeo = vtk.vtkOpenFOAMReader()
-
-        self.filter = vtk.vtkGeometryFilter()
-        self.mapper = vtk.vtkCompositePolyDataMapper2()
-        self.actor = vtk.vtkActor()
 
         self.render = vtk.vtkRenderer()
-
-        self.render.GradientBackgroundOn ()
-        self.render.SetBackground (1, 1, 1)
-        self.render.SetBackground2 (0.4, 0.55, .75)
-        self.render.ResetCamera()
-
         self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
+
         self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
+        self.interRender = self.vtkWindow.GetRenderWindow().GetInteractor()
 
-        self.vtkWindow.Initialize()
-        self.vtkWindow.Start()
-        self.vtkWindow.show()
+        sphere = vtk.vtkCubeSource()
+        sphere.SetCenter(0, 0, 0)
+        sphere.SetXLength(5.0)
+        sphere.SetYLength(15.0)
+        sphere.SetZLength(5.0)
 
+        self.filter = vtk.vtkGeometryFilter()
+        self.mapper = vtk.vtkPolyDataMapper()
+        self.mapper.SetInputConnection(sphere.GetOutputPort())
+        self.actor = vtk.vtkActor()
+        self.actor.SetMapper(self.mapper)
 
+        self.render.AddActor(self.actor)
+        self.render.GradientBackgroundOn()
+        self.render.SetBackground2(0.2, 0.4, 0.6)
+        self.render.SetBackground(1, 1, 1)
 
         self.fields = []
         self.timeSteps = []
+        Label = QtWidgets.QLabel("Field")
+        self.receiveBar.addWidget(Label)
+        Label = QtWidgets.QLabel("Time")
+        self.receiveBar.addWidget(Label)
+
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
 
-        for item in self.fields:
-            self.fieldSelectCombo.addItem(item)
-        for time in self.timeSteps:
-            self.timeSelectCombo.addItem(time)
-
         self.receiveBar.addWidget(self.fieldSelectCombo)
         self.receiveBar.addWidget(self.timeSelectCombo)
+
+        self.GeoFrame.setLayout(self.GeoLayout)
+        self.interRender.Initialize()
+        self.interRender.Start()
+        self.window.show()
 
         """
         # self.receiveBar.addAction(self.actionAuto_Scale)
         # self.receiveBar.addAction(self.actionSet_Scale)
         # self.addTransparencyBar()
         """
-
-    def OFRender(self, vtkObject):
+    def OFinterRender(self, vtkObject):
 
         tArray = vtk_to_numpy(self.foamVTKGeo.GetTimeValues())
         self.foamVTKGeo.UpdateTimeStep(tArray[-1])
@@ -104,9 +113,9 @@ class VTKWindow(object):
         actorProper.SetEdgeColor(0, 0, 0)
         actorProper.SetLineWidth(2)
 
-        self.render.AddActor(self.actor)
+        self.interRender.AddActor(self.actor)
 
-        self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
+        self.vtkWindow.GetinterRenderWindow().AddinterRenderer(self.interRender)
         self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
         self.vtkWindow.Initialize()
         self.setupVTKBackGround()
@@ -123,7 +132,7 @@ class VTKWindow(object):
         else:
             prop.SetRepresentationToSurface()
             self.wireFrame = False
-        self.vtkWindow.Render()
+        self.vtkWindow.interRender()
 
     def featureEdgeView(self):
         if not self.featureEdge:
@@ -135,11 +144,11 @@ class VTKWindow(object):
             prop.SetColor(0, 0, 0)
             prop.SetLineWidth(2)
             prop.SetRepresentationToSurface()
-            self.vtkWindow.Render()
+            self.vtkWindow.interRender()
         else:
             self.mapper.SetInputConnection(self.filter.GetOutputPort())
             self.mapper.SetScalarModeToUseCellFieldData()
-            self.vtkWindow.Render()
+            self.vtkWindow.interRender()
             self.featureEdge = False
 
     def meshOnOff(self):
@@ -148,7 +157,7 @@ class VTKWindow(object):
         prop.EdgeVisibilityOn()
         prop.SetEdgeColor(1, 1, 1)
         prop.SetLineWidth(0)
-        self.vtkWindow.Render()
+        self.vtkWindow.interRender()
     
     def AddAxes(self):
         axesActor = vtk.vtkAxesActor()
@@ -159,11 +168,10 @@ class VTKWindow(object):
         self.axesWidget.InteractiveOff()  # InteractiveOn to enable move the axis
         self.axesWidget.SetViewport(0., 0., 0.2, 0.2)
 
-
     def setupVTKBackGround(self):
-        self.render.GradientBackgroundOn()
-        self.render.SetBackground2(0.2, 0.4, 0.6)
-        self.render.SetBackground(1, 1, 1)
+        self.interRender.GradientBackgroundOn()
+        self.interRender.SetBackground2(0.2, 0.4, 0.6)
+        self.interRender.SetBackground(1, 1, 1)
 
     def setScaleBar(self):
         # lookup table
@@ -202,11 +210,12 @@ class VTKWindow(object):
         transparencyValue = self.transparencySlider.value()
         prop = self.actor.GetProperty()
         prop.SetOpacity(1 - transparencyValue / 100)
-        self.vtkWindow.Render()
+        self.vtkWindow.interRender()
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    ui = VTKWindow()
-    ui.setupUi(Form)
+    window = QtWidgets.QFrame()
+    ui = Panel_VTK(window)
+    window.show()
     sys.exit(app.exec_())
