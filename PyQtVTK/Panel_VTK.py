@@ -4,6 +4,9 @@ from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import vtk
 import MouseInteractorStyle
 
+class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
+    pass
+
 class VTKWindow(object):
     def __init__(self, domain):
         super().__init__()
@@ -11,34 +14,59 @@ class VTKWindow(object):
         self.wireFrame = False
         self.featureEdge = False
         # self.actionFrame.triggered.connect(self.featureEdgeView)
-        
-        self.mainViewTabs = QtWidgets.QTabWidget(domain)
-        
-        self.geoTab = QtWidgets.QWidget()
-        self.geoTab.setSizeIncrement(QtCore.QSize(0, 0))
 
-        self.geoTab.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.mainViewTabs.addTab(self.geoTab, "Geometry")
-        
-        self.geoTabLayout = QtWidgets.QVBoxLayout()
-        self.receiveBar = QToolBar()
-        self.geoTabLayout.addWidget(self.receiveBar)
+        self.domainLayout = QtWidgets.QVBoxLayout(domain)
+        self.tabs = QtWidgets.QTabWidget()
+        self.Geometry = QtWidgets.QWidget()
+        self.GeoLayout = QtWidgets.QVBoxLayout(self.Geometry)
+        self.GeoFrame = QtWidgets.QFrame(self.Geometry)
+        self.GeoFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.GeoFrame.setFrameShadow(QtWidgets.QFrame.Raised)
 
-        self.monitorTab = QtWidgets.QWidget()
-        self.mainViewTabs.addTab(self.monitorTab, "Monitor")
+        self.receiveBar = QtWidgets.QToolBar()
+        self.GeoLayout.addWidget(self.receiveBar)
 
-        self.vtkWindow = QVTKRenderWindowInteractor()
-        self.foamVTKGeo = vtk.vtkOpenFOAMReader()
+        self.GeoLayout.addWidget(self.GeoFrame)
+        self.tabs.addTab(self.Geometry, "Geometry")
+        self.Monitor = QtWidgets.QWidget()
+        self.MoniLayout = QtWidgets.QVBoxLayout(self.Monitor)
+        self.MonitorFrame = QtWidgets.QFrame(self.Monitor)
+        self.MonitorFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.MonitorFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.MoniLayout.addWidget(self.MonitorFrame)
+        self.tabs.addTab(self.Monitor, "Monitor")
+        self.domainLayout.addWidget(self.tabs)
+        self.tabs.setCurrentIndex(0)
+
+        self.vtkWindow = QVTKRenderWindowInteractor(self.GeoFrame)
+        self.GeoLayout.addWidget(self.vtkWindow)
+        # self.foamVTKGeo = vtk.vtkOpenFOAMReader()
+
         self.filter = vtk.vtkGeometryFilter()
         self.mapper = vtk.vtkCompositePolyDataMapper2()
         self.actor = vtk.vtkActor()
+
         self.render = vtk.vtkRenderer()
 
-        self.geoTabLayout.addWidget(self.vtkWindow)
-        self.fields = ["T", "Ux", "Uy", "Uz", "magU", "p", "k", "epsilon", "G", "rho"]
-        self.timeSteps = ["0"]
+        self.render.GradientBackgroundOn ()
+        self.render.SetBackground (1, 1, 1)
+        self.render.SetBackground2 (0.4, 0.55, .75)
+        self.render.ResetCamera()
+
+        self.vtkWindow.GetRenderWindow().AddRenderer(self.render)
+        self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
+
+        self.vtkWindow.Initialize()
+        self.vtkWindow.Start()
+        self.vtkWindow.show()
+
+
+
+        self.fields = []
+        self.timeSteps = []
         self.fieldSelectCombo = QtWidgets.QComboBox()
         self.timeSelectCombo = QtWidgets.QComboBox()
+
         for item in self.fields:
             self.fieldSelectCombo.addItem(item)
         for time in self.timeSteps:
@@ -46,21 +74,14 @@ class VTKWindow(object):
 
         self.receiveBar.addWidget(self.fieldSelectCombo)
         self.receiveBar.addWidget(self.timeSelectCombo)
-        
-        self.mainViewTabs.show()
+
         """
-        # VTK related initialization.
-
-
-        self.geoTab.setLayout(self.geoTabLayout)
-        # GUI related initialization. some of them from case files.
-
         # self.receiveBar.addAction(self.actionAuto_Scale)
         # self.receiveBar.addAction(self.actionSet_Scale)
         # self.addTransparencyBar()
-
         """
-    def render(self, vtkObject):
+
+    def OFRender(self, vtkObject):
 
         tArray = vtk_to_numpy(self.foamVTKGeo.GetTimeValues())
         self.foamVTKGeo.UpdateTimeStep(tArray[-1])
@@ -182,3 +203,10 @@ class VTKWindow(object):
         prop = self.actor.GetProperty()
         prop.SetOpacity(1 - transparencyValue / 100)
         self.vtkWindow.Render()
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    ui = VTKWindow()
+    ui.setupUi(Form)
+    sys.exit(app.exec_())

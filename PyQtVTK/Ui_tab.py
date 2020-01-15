@@ -11,37 +11,29 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Form(object):
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(400, 300)
-        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.tabs = QtWidgets.QTabWidget(Form)
-        self.tabs.setObjectName("tabs")
+    def setupUi(self):
+        self.verticalLayout = QtWidgets.QVBoxLayout(domain)
+        self.tabs = QtWidgets.QTabWidget()
         self.Geometry = QtWidgets.QWidget()
-        self.Geometry.setObjectName("Geometry")
-        self.tabs.addTab(self.Geometry, "")
+        self.GeoLayout = QtWidgets.QVBoxLayout(self.Geometry)
+        self.GeoFrame = QtWidgets.QFrame(self.Geometry)
+        self.GeoFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.GeoFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.GeoLayout.addWidget(self.GeoFrame)
+        self.tabs.addTab(self.Geometry, "Geometry")
         self.Monitor = QtWidgets.QWidget()
-        self.Monitor.setObjectName("Monitor")
-        self.tabs.addTab(self.Monitor, "")
+        self.MoniLayout = QtWidgets.QVBoxLayout(self.Monitor)
+        self.MonitorFrame = QtWidgets.QFrame(self.Monitor)
+        self.MonitorFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.MonitorFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.MoniLayout.addWidget(self.MonitorFrame)
+        self.tabs.addTab(self.Monitor, "Monitor")
         self.verticalLayout.addWidget(self.tabs)
-
-        self.retranslateUi(Form)
         self.tabs.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(Form)
-
-    def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.tabs.setTabText(self.tabs.indexOf(self.Geometry), _translate("Form", "Geometry"))
-        self.tabs.setTabText(self.tabs.indexOf(self.Monitor), _translate("Form", "Monitor"))
-
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Form = QtWidgets.QWidget()
     ui = Ui_Form()
-    ui.setupUi(Form)
-    Form.show()
+    ui.setupUi()
     sys.exit(app.exec_())

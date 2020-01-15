@@ -16,7 +16,6 @@ data_type = "point"
 class MouseInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
     pass
 
-
 # reader
 reader = vtk.vtkOpenFOAMReader()
 reader.SetFileName(filename)

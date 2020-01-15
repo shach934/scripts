@@ -60,7 +60,6 @@ class MainWindow(Qt.QMainWindow):
         self.iren.Initialize()
         self.iren.Start()
 
-        vtkSTLWriter.
 
 if __name__ == "__main__":
     app = Qt.QApplication(sys.argv)
