@@ -13,7 +13,6 @@ class Panel_VTK(object):
     def __init__(self, domain):
         super().__init__()
         self.setUpUiStructure(domain)
-
         self.setUpBar()
         self.setUpVTKWindow()
 
@@ -135,8 +134,8 @@ class Panel_VTK(object):
 
         self.vtkWindow.SetInteractorStyle(MouseInteractorStyle())
         self.interRender = self.vtkWindow.GetRenderWindow().GetInteractor()
-        self.vtkWindow.cursor()
 
+        """
         sphere = vtk.vtkCubeSource()
         sphere.SetCenter(0, 0, 0)
         sphere.SetXLength(5.0)
@@ -150,6 +149,12 @@ class Panel_VTK(object):
         self.actor.SetMapper(self.mapper)
 
         self.render.AddActor(self.actor)
+        """
+        self.mapper = vtk.vtkPolyDataMapper()
+        self.actor = vtk.vtkActor()
+        self.actor.SetMapper(self.mapper)
+        self.render.AddActor(self.actor)
+
         self.setupVTKBackGround()
         self.AddAxes()
         self.setScaleBar()
@@ -195,7 +200,7 @@ class Panel_VTK(object):
         self.vtkWindow.show()
 
     def resetView(self):
-        self.render.ResetCamera()
+        self.render.GetActiveCamera().ParallelProjectionOff()
         fp = self.render.GetActiveCamera().GetFocalPoint()
         p = self.render.GetActiveCamera().GetPosition()
         dist = math.sqrt( (p[0]-fp[0])**2 + (p[1]-fp[1])**2 + (p[2]-fp[2])**2 )
@@ -272,8 +277,6 @@ class Panel_VTK(object):
         prop.SetEdgeColor(1, 1, 1)
         prop.SetLineWidth(0)
         self.interRender.ReInitialize()
-    
-
 
     def setupVTKBackGround(self):
         self.render.GradientBackgroundOn()
@@ -315,8 +318,8 @@ class Panel_VTK(object):
 
     def adjustTransparent(self):
         transparencyValue = self.transparencySlider.value()
-        prop = self.actor.GetProperty()
-        prop.SetOpacity(1 - transparencyValue / 100)
+        for actor in self.render.GetActors():
+            actor.GetProperty().SetOpacity(1 - transparencyValue / 100)
         self.interRender.ReInitialize()
 
 if __name__ == "__main__":

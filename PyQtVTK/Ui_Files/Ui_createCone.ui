@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>232</width>
-    <height>233</height>
+    <height>231</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -204,7 +204,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="coneDirectZInpt">
+          <widget class="QLineEdit" name="coneDirectZInput">
            <property name="text">
             <string>1</string>
            </property>

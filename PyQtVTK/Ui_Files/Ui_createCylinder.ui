@@ -201,7 +201,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="cylinderCenterZInpt">
+          <widget class="QLineEdit" name="cylinderCenterZInput">
            <property name="text">
             <string>0</string>
            </property>

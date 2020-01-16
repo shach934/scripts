@@ -8,11 +8,17 @@ doubleValidator = QtGui.QDoubleValidator()
 
 class createBox(QDialog, Ui_createBox):
 
-    def __init__(self, parent=None):
-
+    def __init__(self, Panel_VTK, parent=None):
+        self.colorTable = vtk.vtkNamedColors()
         super(createBox, self).__init__(parent)
+        self.outPut = Panel_VTK
+        self.box = vtk.vtkCubeSource()
         self.setupUi(self) 
+        self.validInput()
+        self.monitor()
+        self.drawBox()
 
+    def validInput(self):
         self.boxCenterXInput.setValidator(doubleValidator)
         self.boxCenterYInput.setValidator(doubleValidator)
         self.boxCenterZInput.setValidator(doubleValidator)
@@ -21,29 +27,34 @@ class createBox(QDialog, Ui_createBox):
         self.boxLengthYInput.setValidator(doubleValidator)
         self.boxLengthZInput.setValidator(doubleValidator)
 
+    def monitor(self):
+        self.boxLengthXInput.textChanged['QString'].connect(self.drawBox)
+        self.boxLengthYInput.textChanged['QString'].connect(self.drawBox)
+        self.boxLengthZInput.textChanged['QString'].connect(self.drawBox)
+
+        self.boxCenterXInput.textChanged['QString'].connect(self.drawBox)
+        self.boxCenterYInput.textChanged['QString'].connect(self.drawBox)
+        self.boxCenterZInput.textChanged['QString'].connect(self.drawBox)
+
+        self.boxColorCombox.currentTextChanged.connect(self.drawBox)
+        self.createBoxBtn.clicked.connect(self.addBox)
 
     def drawBox(self):
-        # Create source
-        self.box = vtk.vtkCubeSource()
+
+
         self.box.SetCenter([float(self.boxCenterXInput.text()), float(self.boxCenterYInput.text()), float(self.boxCenterZInput.text())])
         self.box.SetXLength(float(self.boxLengthXInput.text()))
         self.box.SetYLength(float(self.boxLengthYInput.text()))
         self.box.SetZLength(float(self.boxLengthZInput.text()))
 
-        # Create a mapper
         self.box_mapper = vtk.vtkPolyDataMapper()
         self.box_mapper.SetInputConnection(self.box.GetOutputPort())
-        
-        # Create an actor
         self.box_actor = vtk.vtkActor()
         self.box_actor.SetMapper(self.box_mapper)
         #TODO: try to transfer the text color name to a rgb array
-        # self.box_actor.GetProperty().SetColor(self.BoxColorComboBox.currentText())
-        self.box_actor.GetProperty().SetColor([0.2, 0.4, 0.6])
-    
-    def push2Window(self, Panel_VTK):
-        self.drawBox()
-        Panel_VTK.add2Render(self.box_actor)
+        color = self.colorTable.GetColor3d(self.boxColorCombox.currentText())
+        self.box_actor.GetProperty().SetColor(color);
+        self.outPut.add2Render(self.box_actor)
 
     def addBox(self):
         pass

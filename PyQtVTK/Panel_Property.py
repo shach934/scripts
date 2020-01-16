@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtWidgets
 from Panel_Tree import ModelTree
+import sip
 from createBox import *
 from createCone import *
 from createCylinder import *
@@ -35,56 +36,30 @@ class Property(object):
             sip.delete(cur_lay)
             
     def propertyView(self):
+        tempHboxLayout = QtWidgets.QHBoxLayout()
         if self.currentItem == "Box":
-            self.tempBox = createBox()
-            self.tempBox.push2Window(self.vtkWindow)
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.tempBox)
+            self.tempBox = createBox(self.vtkWindow)
+            tempHboxLayout.addWidget(self.tempBox)
             self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-
-            for inputLine in (self.tempBox.boxLengthXInput, self.tempBox.boxLengthYInput, self.tempBox.boxLengthZInput, \
-                             self.tempBox.boxCenterXInput, self.tempBox.boxCenterYInput, self.tempBox.boxCenterZInput):
-                inputLine.textChanged['QString'].connect(self.tempBox.drawBox)
-
-            self.tempBox.BoxColorComboBox.currentTextChanged.connect(self.tempBox.drawBox)
-            self.tempBox.createBoxBtn.clicked.connect(self.tempBox.addBox)
+            self.propertyBox.setLayout(tempHboxLayout)
 
         elif self.currentItem == "Sphere":
-            self.tempSphere = createSphere()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.tempSphere)
+            self.tempSphere = createSphere(self.vtkWindow)
+            tempHboxLayout.addWidget(self.tempSphere)
             self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-            for inputBox in (self.tempSphere.sphereRadiusInput, self.tempSphere.sphereCenterXInput, self.tempSphere.sphereCenterYInput,self.tempSphere.sphereCenterZInput, self.tempSphere.sphereResoluAlphaInput, self.tempSphere.sphereResoluThetaInput, self.tempSphere.sphereResoluDeltaInput):
-                inputBox.textChanged['QString'].connect(self.tempSphere.drawSphere)
-
-            self.tempSphere.sphereColorComboBox.currentTextChanged.connect(self.tempSphere.drawSphere)
-            self.createSphereBtn.clicked.connect(self.tempSphere.addSphere)
+            self.propertyBox.setLayout(tempHboxLayout)
 
         elif self.currentItem == "Cylinder":
-            self.tempCylinder = createCylinder()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.tempCylinder)
+            self.tempCylinder = createCylinder(self.vtkWindow)
+            tempHboxLayout.addWidget(self.tempCylinder)
             self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-            for inputBox in (self.tempCylinder.cylinderRadiusInput, self.tempCylinder.cylinderHeightInput, self.tempCylinder.cylinderCenterXInput, self.tempCylinder.cylinderCenterYInput, self.tempCylinder.cylinderCenterZInput, self.tempCylinder.cylinderResoluInput):
-                inputBox.textChanged['QString'].connect(self.tempCylinder.drawCylinder2Window)
+            self.propertyBox.setLayout(tempHboxLayout)
 
-            self.tempCylinder.cylinderColorComboBox.currentTextChanged.connect(self.tempCylinder.drawCylinder2Window)
-            self.createCylinderBtn.clicked.connect(self.tempCylinder.addCylinder)
-            
         elif self.currentItem == "Cone":
-            self.tempCone = createCone()
-            h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.tempCone)
+            self.tempCone = createCone(self.vtkWindow)
+            tempHboxLayout.addWidget(self.tempCone)
             self.clearLayout(self.propertyBox.layout())
-            self.propertyBox.setLayout(h_la)
-            for inputBox in (self.tempCone.coneRadiusInput, self.tempCone.coneCenterXInput, self.tempCone.coneCenterYInput,self.tempCone.coneCenterZInput, self.tempCone.coneHeightInput, self.tempCone.coneResoluInput):
-                inputBox.textChanged['QString'].connect(self.tempCone.drawCone)
-
-            self.tempCone.coneColorComboBox.currentTextChanged.connect(self.tempCone.drawCone)
-            self.createConeBtn.clicked.connect(self.tempCone.addCone)
+            self.propertyBox.setLayout(tempHboxLayout)
 
         def TurbProperties(self):
             self.properties.setColumnCount(2)

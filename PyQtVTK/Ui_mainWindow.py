@@ -67,7 +67,7 @@ class Ui_OpenFOAM(object):
         OpenFOAM.setStatusBar(self.statusBar)
         self.actionOpen = QtWidgets.QAction(OpenFOAM)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("images/open.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap("../images/open.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionOpen.setIcon(icon1)
         self.actionOpen.setObjectName("actionOpen")
         self.actionWrite = QtWidgets.QAction(OpenFOAM)
@@ -218,7 +218,7 @@ class Ui_OpenFOAM(object):
         self.actionFit_Window.setObjectName("actionFit_Window")
         self.actionNew = QtWidgets.QAction(OpenFOAM)
         icon24 = QtGui.QIcon()
-        icon24.addPixmap(QtGui.QPixmap("images/New.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon24.addPixmap(QtGui.QPixmap("../images/New.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionNew.setIcon(icon24)
         self.actionNew.setObjectName("actionNew")
         self.menuFile.addAction(self.actionNew)
@@ -339,6 +339,7 @@ class Ui_OpenFOAM(object):
         self.actionHeat_Transfer_Coefficent.setText(_translate("OpenFOAM", "Heat Transfer Coefficent"))
         self.actionVolume.setText(_translate("OpenFOAM", "Volumetric flow rate"))
         self.actionMass_flow_rate.setText(_translate("OpenFOAM", "Mass flow rate"))
+        self.actionFit_Window.setText(_translate("OpenFOAM", "Fit Window"))
         self.actionNew.setText(_translate("OpenFOAM", "New"))
 
 

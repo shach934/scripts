@@ -31,14 +31,14 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="BoxName">
+      <widget class="QLineEdit" name="boxNameInput">
        <property name="text">
         <string>Box_1</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="BoxColorComboBox">
+      <widget class="QComboBox" name="boxColorCombox">
        <item>
         <property name="text">
          <string>blue</string>
@@ -148,21 +148,21 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLineEdit" name="boxCenterXInput">
+          <widget class="QLineEdit" name="boxLengthXInput">
            <property name="text">
             <string>1</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="boxCenterYInput">
+          <widget class="QLineEdit" name="boxLengthYInput">
            <property name="text">
             <string>1</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="boxCenterZInput">
+          <widget class="QLineEdit" name="boxLengthZInput">
            <property name="text">
             <string>1</string>
            </property>
@@ -173,21 +173,21 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLineEdit" name="boxLengthXInput">
+          <widget class="QLineEdit" name="boxCenterXInput">
            <property name="text">
             <string>0</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="boxLengthYInput">
+          <widget class="QLineEdit" name="boxCenterYInput">
            <property name="text">
             <string>0</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="boxLengthZInput">
+          <widget class="QLineEdit" name="boxCenterZInput">
            <property name="text">
             <string>0</string>
            </property>

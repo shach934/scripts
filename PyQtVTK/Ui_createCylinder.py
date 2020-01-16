@@ -86,9 +86,9 @@ class Ui_createCylinder(object):
         self.cylinderCenterYInput = QtWidgets.QLineEdit(createCylinder)
         self.cylinderCenterYInput.setObjectName("cylinderCenterYInput")
         self.horizontalLayout.addWidget(self.cylinderCenterYInput)
-        self.cylinderCenterZInpt = QtWidgets.QLineEdit(createCylinder)
-        self.cylinderCenterZInpt.setObjectName("cylinderCenterZInpt")
-        self.horizontalLayout.addWidget(self.cylinderCenterZInpt)
+        self.cylinderCenterZInput = QtWidgets.QLineEdit(createCylinder)
+        self.cylinderCenterZInput.setObjectName("cylinderCenterZInput")
+        self.horizontalLayout.addWidget(self.cylinderCenterZInput)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.horizontalLayout_4.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
@@ -133,7 +133,7 @@ class Ui_createCylinder(object):
         self.cylinderHeightInput.setText(_translate("createCylinder", "1"))
         self.cylinderCenterXInput.setText(_translate("createCylinder", "0"))
         self.cylinderCenterYInput.setText(_translate("createCylinder", "0"))
-        self.cylinderCenterZInpt.setText(_translate("createCylinder", "0"))
+        self.cylinderCenterZInput.setText(_translate("createCylinder", "0"))
         self.createCylinderBtn.setText(_translate("createCylinder", "Create"))
 
 
