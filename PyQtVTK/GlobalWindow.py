@@ -11,12 +11,10 @@ from Ui_mainWindow import Ui_OpenFOAM
 from Ui_settingDialog import Ui_settingDialog
 
 class GlobalWindow(QMainWindow, Ui_OpenFOAM):
+
     def __init__(self, parent=None):
         super(GlobalWindow, self).__init__(parent)
         self.setupUi(self)
-
-        self.scalar_bar = vtk.vtkScalarBarActor()
-        self.axesWidget = vtk.vtkOrientationMarkerWidget()
 
         self.verticalLayout = QtWidgets.QVBoxLayout(self.mainWindow)
 
@@ -37,8 +35,8 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.verticalLayout.addWidget(self.leftRightSplitter)
         self.setCentralWidget(self.mainWindow)
 
-        self.modelTree.relateTo(self.property)
-        self.property.relateTo(self.modelTree)
+        self.modelTree.relate2Property(self.property)
+        self.property.relate2VTKWindow(self.VTKwindow)
 
         self.setStatusTip("Ready")
         self.leftRightSplitter.setSizes([100, 500])

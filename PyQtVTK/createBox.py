@@ -21,13 +21,14 @@ class createBox(QDialog, Ui_createBox):
         self.boxLengthYInput.setValidator(doubleValidator)
         self.boxLengthZInput.setValidator(doubleValidator)
 
+
     def drawBox(self):
         # Create source
-        self.box = vtk.vtBoxSource()
-        self.box.SetCenter([float(self.boxCenterXInput), float(self.boxCenterYInput), float(self.boxCenterZInput)])
-        self.box.SetXLength(float(self.boxLengthXInput))
-        self.box.SetYLength(float(self.boxLengthYInput))
-        self.box.SetZLength(float(self.boxLengthZInput))
+        self.box = vtk.vtkCubeSource()
+        self.box.SetCenter([float(self.boxCenterXInput.text()), float(self.boxCenterYInput.text()), float(self.boxCenterZInput.text())])
+        self.box.SetXLength(float(self.boxLengthXInput.text()))
+        self.box.SetYLength(float(self.boxLengthYInput.text()))
+        self.box.SetZLength(float(self.boxLengthZInput.text()))
 
         # Create a mapper
         self.box_mapper = vtk.vtkPolyDataMapper()
@@ -36,8 +37,13 @@ class createBox(QDialog, Ui_createBox):
         # Create an actor
         self.box_actor = vtk.vtkActor()
         self.box_actor.SetMapper(self.box_mapper)
-        self.box_actor.GetProperty().SetColor(self.BoxColorComboBox)
-        self.push2Window(self.box_actor)
+        #TODO: try to transfer the text color name to a rgb array
+        # self.box_actor.GetProperty().SetColor(self.BoxColorComboBox.currentText())
+        self.box_actor.GetProperty().SetColor([0.2, 0.4, 0.6])
     
     def push2Window(self, Panel_VTK):
-        Panel_VTK.render.AddActor(self.box_actor)
+        self.drawBox()
+        Panel_VTK.add2Render(self.box_actor)
+
+    def addBox(self):
+        pass

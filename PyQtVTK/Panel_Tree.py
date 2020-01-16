@@ -61,7 +61,7 @@ class ModelTree(object):
         self.pipLine.show()
         self.pipLine.expandAll()  
 
-    def relateTo(self, Panel_Property):
+    def relate2Property(self, Panel_Property):
         self.propertyView = Panel_Property
 
     def propertyView(self, currentItem, oldItem):

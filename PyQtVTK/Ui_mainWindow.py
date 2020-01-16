@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Ui_Files/Ui_mainWindow.ui'
+# Form implementation generated from reading ui file 'C:/Shaohui/OpenFoam/scripts/PyQtVTK/Ui_Files/Ui_mainWindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_OpenFOAM(object):
     def setupUi(self, OpenFOAM):
         OpenFOAM.setObjectName("OpenFOAM")
-        OpenFOAM.resize(1030, 719)
+        OpenFOAM.resize(1034, 728)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(6)
         sizePolicy.setVerticalStretch(0)
@@ -26,7 +26,7 @@ class Ui_OpenFOAM(object):
         self.mainWindow.setObjectName("mainWindow")
         OpenFOAM.setCentralWidget(self.mainWindow)
         self.menuBar = QtWidgets.QMenuBar(OpenFOAM)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1030, 22))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 1034, 22))
         self.menuBar.setObjectName("menuBar")
         self.menuFile = QtWidgets.QMenu(self.menuBar)
         self.menuFile.setObjectName("menuFile")
@@ -60,9 +60,6 @@ class Ui_OpenFOAM(object):
         self.viewBar.setSizePolicy(sizePolicy)
         self.viewBar.setObjectName("viewBar")
         OpenFOAM.addToolBar(QtCore.Qt.TopToolBarArea, self.viewBar)
-        self.receiveBar = QtWidgets.QToolBar(OpenFOAM)
-        self.receiveBar.setObjectName("receiveBar")
-        OpenFOAM.addToolBar(QtCore.Qt.TopToolBarArea, self.receiveBar)
         self.statusBar = QtWidgets.QStatusBar(OpenFOAM)
         self.statusBar.setBaseSize(QtCore.QSize(0, 50))
         self.statusBar.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
@@ -282,14 +279,6 @@ class Ui_OpenFOAM(object):
         self.mainToolBar.addAction(self.actionTools)
         self.mainToolBar.addAction(self.actionQuit)
         self.mainToolBar.addAction(self.actionPostProcess)
-        self.viewBar.addAction(self.actionAlign_X)
-        self.viewBar.addAction(self.actionAlign_Y)
-        self.viewBar.addAction(self.actionAligh_Z)
-        self.viewBar.addAction(self.actionFit_Window)
-        self.viewBar.addAction(self.actionMesh)
-        self.viewBar.addAction(self.actionFrame)
-        self.viewBar.addAction(self.actionTransperancy)
-        self.receiveBar.addSeparator()
 
         self.retranslateUi(OpenFOAM)
         QtCore.QMetaObject.connectSlotsByName(OpenFOAM)
@@ -309,7 +298,6 @@ class Ui_OpenFOAM(object):
         self.menuPostprocessing.setTitle(_translate("OpenFOAM", "Postprocessing"))
         self.mainToolBar.setWindowTitle(_translate("OpenFOAM", "mainBar"))
         self.viewBar.setWindowTitle(_translate("OpenFOAM", "viewBar"))
-        self.receiveBar.setWindowTitle(_translate("OpenFOAM", "toolBar"))
         self.statusBar.setToolTip(_translate("OpenFOAM", "To see if it exists"))
         self.actionOpen.setText(_translate("OpenFOAM", "Open"))
         self.actionWrite.setText(_translate("OpenFOAM", "Write"))
@@ -351,7 +339,6 @@ class Ui_OpenFOAM(object):
         self.actionHeat_Transfer_Coefficent.setText(_translate("OpenFOAM", "Heat Transfer Coefficent"))
         self.actionVolume.setText(_translate("OpenFOAM", "Volumetric flow rate"))
         self.actionMass_flow_rate.setText(_translate("OpenFOAM", "Mass flow rate"))
-        self.actionFit_Window.setText(_translate("OpenFOAM", "Fit Window"))
         self.actionNew.setText(_translate("OpenFOAM", "New"))
 
 

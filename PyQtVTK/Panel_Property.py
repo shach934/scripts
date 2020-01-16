@@ -20,8 +20,8 @@ class Property(object):
         self.currentItem = clickedItem
         self.propertyView()
 
-    def relateTo(self, ModelTree):
-        self.ModelTree = ModelTree
+    def relate2VTKWindow(self, Panel_VTK):
+        self.vtkWindow = Panel_VTK
 
     def clearLayout(self, cur_lay):
         if cur_lay is not None:
@@ -33,13 +33,13 @@ class Property(object):
                 else:
                     self.clearLayout(item.layout())
             sip.delete(cur_lay)
-
-    def propertyView(self):
             
+    def propertyView(self):
         if self.currentItem == "Box":
             self.tempBox = createBox()
+            self.tempBox.push2Window(self.vtkWindow)
             h_la = QtWidgets.QHBoxLayout()
-            h_la.addWidget(self.tempBox.setupUi())
+            h_la.addWidget(self.tempBox)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(h_la)
 
