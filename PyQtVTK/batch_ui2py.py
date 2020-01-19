@@ -117,7 +117,7 @@ class ui2py(QtWidgets.QMainWindow, Ui_ui2py):
             if filepath[count].name[len(filepath[count].name)-1]!='i' and filepath[count].name[len(filepath[count].name)-2]!='u' :
                 msg = QtWidgets.QMessageBox()
                 msg.setIcon(QtWidgets.QMessageBox.Warning)
-                msg.setText("Oops, Wrong file!")
+                msg.setText("Oops, Wrong file!") 
                 msg.setInformativeText("Please select a QtDesigner *.ui file.")
                 msg.setWindowTitle("Error")
                 msg.setStandardButtons(QtWidgets.QMessageBox.Ok)

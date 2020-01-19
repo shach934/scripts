@@ -1,60 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>settingDialog</class>
- <widget class="QDialog" name="settingDialog">
+ <class>openCase</class>
+ <widget class="QDialog" name="openCase">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>97</height>
+    <width>400</width>
+    <height>92</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLabel" name="defaultDict">
+        <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Default Path  </string>
+          <string>Path</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="defaultDict_2">
-         <property name="text">
-          <string>Paraview Path </string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QLineEdit" name="defaultPathInput"/>
+        <widget class="QLineEdit" name="openCasePathInput"/>
        </item>
        <item>
-        <widget class="QLineEdit" name="paraPathInput"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QToolButton" name="defaultPathBrowser">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="paraPathBrowser">
+        <widget class="QToolButton" name="openCaseBrowser">
          <property name="text">
           <string>...</string>
          </property>
@@ -81,7 +56,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>settingDialog</receiver>
+   <receiver>openCase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -97,7 +72,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>settingDialog</receiver>
+   <receiver>openCase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

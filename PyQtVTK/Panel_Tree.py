@@ -4,7 +4,7 @@ from Panel_Property import *
 class ModelTree(object):
     def __init__(self, domain):
         super().__init__()
-        
+
         self.pipLine = QtWidgets.QTreeWidget(domain)
         self.pipLine.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -48,13 +48,14 @@ class ModelTree(object):
 
         self.meshGeoItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Parts"])
         self.blockMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["BlockMesh"])
-        self.meshPointItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Point"])
-        self.meshMeshItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Mesh"])
+        self.snappyItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["SnappyMesh"])
+        self.layersItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Layers"])
+        self.meshCriteriaItem = QtWidgets.QTreeWidgetItem(self.meshItem, ["Criteria"])
 
         self.phyItem = QtWidgets.QTreeWidgetItem(self.pipLine.topLevelItem(0), ["Setup"])
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("images/setup.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.phyItem.setIcon(0, icon)
+        self.phyItem.setIcon(1, icon)
 
         self.pipLine.currentItemChanged.connect(self.propertyView)
 
@@ -66,7 +67,7 @@ class ModelTree(object):
 
     def propertyView(self, currentItem, oldItem):
         self.activeItem = currentItem.text(0)
-        self.propertyView.setViewItem(self.activeItem)     
+        self.propertyView.setViewItem(self.activeItem, oldItem)
 
     def initTree(self):
         # self.item_0 is the head item of the tree. it text is the name of the model.

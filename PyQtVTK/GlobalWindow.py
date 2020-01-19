@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys, vtk
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog
@@ -7,15 +10,17 @@ from Panel_Property import *
 from Panel_Tree import *
 from Panel_VTK import * 
 from Panel_Info import *
+
 from Ui_mainWindow import Ui_OpenFOAM
+from Ui_newCase import Ui_newCase
+from Ui_openCase import Ui_openCase
 from Ui_settingDialog import Ui_settingDialog
 
 class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent  =None):
         super(GlobalWindow, self).__init__(parent)
         self.setupUi(self)
-
         self.verticalLayout = QtWidgets.QVBoxLayout(self.mainWindow)
 
         self.leftRightSplitter = QtWidgets.QSplitter(self.mainWindow)
@@ -23,7 +28,7 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
         self.leftDomain = QtWidgets.QSplitter(self.leftRightSplitter)
         self.leftDomain.setOrientation(QtCore.Qt.Vertical)
-        
+
         self.rightDomain = QtWidgets.QSplitter(self.leftRightSplitter)
         self.rightDomain.setOrientation(QtCore.Qt.Vertical)
 
@@ -46,12 +51,12 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.show()
  
         # actions!!!
-        self.actionOpen.triggered.connect(self.openFile)
-        self.actionTools.triggered.connect(self.setting)
+        self.actionNew.triggered.connect(self.newCase)
+        self.actionOpen.triggered.connect(self.openCase)
+        self.actionTools.triggered.connect(self.settingDialog)
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
-    def openFile(self):
-
+    def openCase(self):
         # TODO add warning box to save the current config, open a new file will overwrite the current model. just
         #  like ANSA. However, the implimentation below has problem, it always open a new XinFoam instance
         """
@@ -66,13 +71,35 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
             self.__messaga__ += "No new case opened."
             return
         """
-        self.caseFolder = QFileDialog.getOpenFileName(self, 'Open file', self.defaultFolder,
-                                                      "OpenFOAM File (*.foam *.txt)")
-
-        if self.caseFolder[0] != "":
-            self.loadCaseGeo()
+        self.Dialog = QtWidgets.QDialog()
+        self.openCaseDialog = Ui_openCase()
+        self.openCaseDialog.setupUi(self.Dialog)
+        self.openCaseDialog.openCaseBrowser.clicked.connect(self.getOpenCasePath)
+        self.Dialog.show()
+        response = self.Dialog.exec_()
+        if response == QtWidgets.QDialog.Accepted:
+            self.casePath = self.openCaseDialog.openCasePathInput.text()
+            self.caseName = self.casePath.split("/")[-1]
             self.foamConfig.SetFolderAndName(self.caseFolder)
             self.foamConfig.loadCase()
+
+    def newCase(self):
+        self.Dialog = QtWidgets.QDialog()
+        self.newCaseDialog = Ui_newCase()
+        self.newCaseDialog.setupUi(self.Dialog)
+        self.newCaseDialog.newCaseBrowser.clicked.connect(self.getNewCasePath)
+        self.Dialog.show()
+        response = self.Dialog.exec_()
+        if response == QtWidgets.QDialog.Accepted:
+            self.caseName = self.newCaseDialog.newCaseNameInput.text()
+            self.casePath = self.newCaseDialog.newCasePathInput.text()
+
+    def getNewCasePath(self):
+        casePath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.newCaseDialog.newCasePathInput.setText(casePath)
+    def getOpenCasePath(self):
+        casePath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.openCaseDialog.openCasePathInput.setText(casePath)
 
     def loadCaseGeo(self):
         self.caseName = self.caseFolder[0].split("/")[-2]
@@ -117,9 +144,13 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.assignGeoTree()
         self.pipLine.expandAll()
 
-    def  setting(self):
-        self.Ui_settingDialog.show()
-
+    def  settingDialog(self):
+        settingDialog = QtWidgets.QDialog()
+        ui = Ui_settingDialog()
+        ui.setupUi(settingDialog)
+        settingDialog.show()
+        response = settingDialog.exec_()
+        
     def shutDownWarning(self):
         closeButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
                                                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,

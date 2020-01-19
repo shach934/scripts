@@ -5,6 +5,7 @@ from createBox import *
 from createCone import *
 from createCylinder import *
 from createSphere import *
+from Ui_blockMesh import Ui_blockMesh
 
 class Property(object):
     
@@ -14,10 +15,9 @@ class Property(object):
         self.propertyBox = QtWidgets.QFrame(domain)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         self.propertyBox.setSizePolicy(sizePolicy)
-
         self.propertyBox.show()
 
-    def setViewItem(self, clickedItem):
+    def setViewItem(self, clickedItem, previousClickedItem):
         self.currentItem = clickedItem
         self.propertyView()
 
@@ -34,29 +34,39 @@ class Property(object):
                 else:
                     self.clearLayout(item.layout())
             sip.delete(cur_lay)
-            
+# TODO: update the view window according to the last item. 
     def propertyView(self):
-        tempHboxLayout = QtWidgets.QHBoxLayout()
         if self.currentItem == "Box":
+            tempHboxLayout = QtWidgets.QVBoxLayout()
             self.tempBox = createBox(self.vtkWindow)
             tempHboxLayout.addWidget(self.tempBox)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif self.currentItem == "Sphere":
+            tempHboxLayout = QtWidgets.QVBoxLayout()
             self.tempSphere = createSphere(self.vtkWindow)
             tempHboxLayout.addWidget(self.tempSphere)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif self.currentItem == "Cylinder":
+            tempHboxLayout = QtWidgets.QVBoxLayout()
             self.tempCylinder = createCylinder(self.vtkWindow)
             tempHboxLayout.addWidget(self.tempCylinder)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif self.currentItem == "Cone":
+            tempHboxLayout = QtWidgets.QVBoxLayout()
             self.tempCone = createCone(self.vtkWindow)
+            tempHboxLayout.addWidget(self.tempCone)
+            self.clearLayout(self.propertyBox.layout())
+            self.propertyBox.setLayout(tempHboxLayout)
+
+        elif self.currentItem == "Parts":
+            tempHboxLayout = QtWidgets.QVBoxLayout()
+            self.tempCone = Part(self.vtkWindow)
             tempHboxLayout.addWidget(self.tempCone)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)

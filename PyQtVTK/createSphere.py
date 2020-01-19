@@ -60,4 +60,11 @@ class createSphere(QDialog, Ui_createSphere):
         self.outPut.add2Render(self.sphere_actor)
 
     def addSphere(self):
-        pass        
+        filename = self.sphereNameInput.text() + "stl" 
+        self.sphere.SetThetaResolution(int(self.sphereResoluThetaInput.text())) 
+        self.sphere.SetPhiResolution(int(self.sphereResoluPhiInput.text())) 
+        
+        writer = vtk.vtkSTLWriter() 
+        writer.SetFileName(filename) 
+        writer.SetInputConnection(self.sphere.GetOutputPort()) 
+        writer.Write() 

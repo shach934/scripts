@@ -1,64 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>settingDialog</class>
- <widget class="QDialog" name="settingDialog">
+ <class>newCase</class>
+ <widget class="QDialog" name="newCase">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>97</height>
+    <width>341</width>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QLabel" name="defaultDict">
-         <property name="text">
-          <string>Default Path  </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="defaultDict_2">
-         <property name="text">
-          <string>Paraview Path </string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLineEdit" name="defaultPathInput"/>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="paraPathInput"/>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Path</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QToolButton" name="defaultPathBrowser">
+        <widget class="QLineEdit" name="newCaseNameInput">
          <property name="text">
-          <string>...</string>
+          <string>case_1</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="paraPathBrowser">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="newCasePathInput"/>
+         </item>
+         <item>
+          <widget class="QToolButton" name="newCaseBrowser">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -81,7 +78,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>settingDialog</receiver>
+   <receiver>newCase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -97,7 +94,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>settingDialog</receiver>
+   <receiver>newCase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

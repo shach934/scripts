@@ -65,4 +65,10 @@ class createCone(QDialog, Ui_createCone):
         self.outPut.add2Render(self.cone_actor)
 
     def addCone(self):
-        pass        
+        filename = self.coneNameInput.text() + "stl" 
+        self.cone.SetResolution(int(self.coneResoluInput.text())) 
+        
+        writer = vtk.vtkSTLWriter() 
+        writer.SetFileName(filename) 
+        writer.SetInputConnection(self.cone.GetOutputPort()) 
+        writer.Write() 

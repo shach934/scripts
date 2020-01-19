@@ -115,10 +115,12 @@ class Panel_VTK(object):
         self.receiveBar.addAction(self.actionAuto_Scale)
         self.receiveBar.addAction(self.actionSet_Scale)
         
-        self.actionFit_Window.triggered.connect(self.resetView)
-        self.actionAlign_X.triggered.connect(self.align_X)  
-        self.actionAlign_Y.triggered.connect(self.align_Y)
-        self.actionAligh_Z.triggered.connect(self.align_Z)
+        self.actionFrame.triggered.connect(self.wireFrameView)
+        self.actionMesh.triggered.connect(self.meshOnOff)
+        # self.actionFit_Window.triggered.connect(self.resetView)
+        # self.actionAlign_X.triggered.connect(self.align_X)  
+        # self.actionAlign_Y.triggered.connect(self.align_Y)
+        # self.actionAligh_Z.triggered.connect(self.align_Z)
 
         self.GeoFrame.setLayout(self.GeoLayout)
 
@@ -158,13 +160,16 @@ class Panel_VTK(object):
         self.setupVTKBackGround()
         self.AddAxes()
         self.setScaleBar()
-        self.resetView()
         self.interRender.Initialize()
         self.interRender.Start()
         self.window.show()
 
     def add2Render(self, newActor):
         self.render.AddActor(newActor)
+        self.interRender.ReInitialize()
+
+    def removeFromRender(self, discardActor):
+        self.render.removeActor(discardActor)
         self.interRender.ReInitialize()
 
     def OFinterRender(self, vtkObject):
@@ -198,23 +203,6 @@ class Panel_VTK(object):
 
         self.vtkWindow.Start()
         self.vtkWindow.show()
-
-    def resetView(self):
-        self.render.GetActiveCamera().ParallelProjectionOff()
-        fp = self.render.GetActiveCamera().GetFocalPoint()
-        p = self.render.GetActiveCamera().GetPosition()
-        dist = math.sqrt( (p[0]-fp[0])**2 + (p[1]-fp[1])**2 + (p[2]-fp[2])**2 )
-        self.render.GetActiveCamera().SetPosition(fp[0], fp[1], fp[2]+dist)
-        self.render.GetActiveCamera().SetViewUp(0.0, 1.0, 0.0)
-        self.vtkWindow.Initialize()
-
-    def align_X(self):
-        self.render.GetActiveCamera().SetViewUp(1.0, 0.0, 0.0)
-        self.interRender.ReInitialize()
-
-    def align_Y(self):
-        self.render.GetActiveCamera().SetViewUp(0.0, 1.0, 0.0)
-        self.interRender.ReInitialize()
 
     def align_Z(self):
         self.resetView()
@@ -273,7 +261,6 @@ class Panel_VTK(object):
     def meshOnOff(self):
         prop = self.actor.GetProperty()
         prop.EdgeVisibilityOff()
-        prop.EdgeVisibilityOn()
         prop.SetEdgeColor(1, 1, 1)
         prop.SetLineWidth(0)
         self.interRender.ReInitialize()

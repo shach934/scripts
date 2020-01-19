@@ -40,8 +40,6 @@ class createBox(QDialog, Ui_createBox):
         self.createBoxBtn.clicked.connect(self.addBox)
 
     def drawBox(self):
-
-
         self.box.SetCenter([float(self.boxCenterXInput.text()), float(self.boxCenterYInput.text()), float(self.boxCenterZInput.text())])
         self.box.SetXLength(float(self.boxLengthXInput.text()))
         self.box.SetYLength(float(self.boxLengthYInput.text()))
@@ -57,4 +55,8 @@ class createBox(QDialog, Ui_createBox):
         self.outPut.add2Render(self.box_actor)
 
     def addBox(self):
-        pass
+        filename = self.boxNameInput.text() + ".stl" 
+        writer = vtk.vtkSTLWriter() 
+        writer.SetFileName(filename) 
+        writer.SetInputConnection(self.box.GetOutputPort()) 
+        writer.Write() 

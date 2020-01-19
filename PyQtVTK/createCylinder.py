@@ -57,4 +57,10 @@ class createCylinder(QDialog, Ui_createCylinder):
         self.outPut.add2Render(self.cylinder_actor)
 
     def addCylinder(self):
-        pass        
+        filename = self.cylinderNameInput.text() + "stl" 
+        self.cylinder.SetResolution(int(self.cylinderResoluInput.text())) 
+        
+        writer = vtk.vtkSTLWriter() 
+        writer.SetFileName(filename) 
+        writer.SetInputConnection(self.cylinder.GetOutputPort()) 
+        writer.Write() 
