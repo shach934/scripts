@@ -1,2 +1,3 @@
 import os
-os.system("bash -c -i 'blockMesh'")
+status = os.system("bash -ilc -i ls > log & ")
+print(status)

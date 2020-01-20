@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import sys, vtk
+import sys, vtk, os
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QMessageBox, QDialog
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 import MouseInteractorStyle
+
 from Panel_Property import * 
 from Panel_Tree import *
 from Panel_VTK import * 
@@ -57,25 +57,13 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.actionQuit.triggered.connect(self.shutDownWarning)
 
     def openCase(self):
-        # TODO add warning box to save the current config, open a new file will overwrite the current model. just
-        #  like ANSA. However, the implimentation below has problem, it always open a new XinFoam instance
-        """
-        buttonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before open new case?",
-                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
-        if buttonReply == QMessageBox.Yes:
-            OpenFOAMCase.write()
-            self.resetFile()
-        if buttonReply == QMessageBox.No:
-            self.resetFile()
-        if buttonReply == QMessageBox.Cancel:
-            self.__messaga__ += "No new case opened."
-            return
-        """
+        # TODO No, During the process, all the change should be wrote to the disc immediately. No save function needed.
         self.Dialog = QtWidgets.QDialog()
         self.openCaseDialog = Ui_openCase()
         self.openCaseDialog.setupUi(self.Dialog)
         self.openCaseDialog.openCaseBrowser.clicked.connect(self.getOpenCasePath)
         self.Dialog.show()
+
         response = self.Dialog.exec_()
         if response == QtWidgets.QDialog.Accepted:
             self.casePath = self.openCaseDialog.openCasePathInput.text()
@@ -93,10 +81,23 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         if response == QtWidgets.QDialog.Accepted:
             self.caseName = self.newCaseDialog.newCaseNameInput.text()
             self.casePath = self.newCaseDialog.newCasePathInput.text()
+            self.path = self.casePath + "/" + self.caseName
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+            print("Directory " , self.path ,  " Created ")
+        else:    
+            print("Directory " , self.path ,  " already exists")
+            buttonReply = QMessageBox.question(self, 'The folder is already exits\n', "Do you want to override it?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if buttonReply == QMessageBox.Yes:
+                os.rmdir(self.path)
+                os.mkdir(self.path)
+            else:
+                self.newCase()
 
     def getNewCasePath(self):
         casePath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.newCaseDialog.newCasePathInput.setText(casePath)
+
     def getOpenCasePath(self):
         casePath = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.openCaseDialog.openCasePathInput.setText(casePath)
@@ -118,10 +119,8 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
         n = self.foamVTKGeo.GetNumberOfPatchArrays()
         for i in range(n):
-            # the patches are stored in a array together, region_i/patch_n  region_i/internalMesh
             self.patches.append(self.foamVTKGeo.GetPatchArrayName(i))
 
-        # this function will disable all the patches, use this to disable patches not checked
         # self.foamReader.DisableAllPatchArrays()
 
         # TODO count the number of regions/blocks
@@ -150,7 +149,9 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         ui.setupUi(settingDialog)
         settingDialog.show()
         response = settingDialog.exec_()
-        
+        if response == QtWidgets.QDialog.Accepted:
+            self.defaut 
+
     def shutDownWarning(self):
         closeButtonReply = QMessageBox.warning(self, 'FOAM Warning', "Do you want to save before exit?",
                                                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,

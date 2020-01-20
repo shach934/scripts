@@ -12,9 +12,10 @@ integelValidator = QtGui.QIntValidator(1, 100000000)
 
 class blockMesh(QDialog, Ui_blockMesh):
 
-    def __init__(self, Panel_VTK, parent=None):
+    def __init__(self, Panel_VTK, parent=None, casePath):
         self.colorTable = vtk.vtkNamedColors()
         super(blockMesh, self).__init__(parent)
+        self.casePath = casePath
         self.outputWindow = Panel_VTK
         self.validInput()
         self.setupUi(self) 
@@ -68,12 +69,6 @@ class blockMesh(QDialog, Ui_blockMesh):
         self.createBlockMeshBtn.clicked.connect(self.createBlockMesh)
 
     def previewBlockMesh(self):
-        maxVertex = [float(self.maxXInput.text()), float(self.maxYInput.text()), float(self.maxZInput.text())]
-        minVertex = [float(self.minXInput.text()), float(self.minYInput.text()), float(self.minZInput.text())]
-        seedPoint = [float(self.pointXInput.text()), float(self.pointYInput.text()), float(self.pointZInput.text())]
-        grading   = [float(self.gradXInput.text()), float(self.gradYInput.text()), float(self.gradZInput.text())]
-        cellNUm   = [int(self.cellNumXInput.text()), int(self.cellNumYinput.text()), int(self.cellNumZInput.text())]
-
         self.blockMesh = vtk.vtkCubeSource()
         self.blockMesh_mapper = vtk.vtkPolyDataMapper()
         self.blockMesh_mapper.SetInputConnection(self.blockMesh.GetOutputPort())
@@ -86,7 +81,13 @@ class blockMesh(QDialog, Ui_blockMesh):
         self.box_actor.GetProperty().SetColor(self.colorTable.GetColor3d("gray");
         self.outputWindow.add2Render(self.box_actor)
 
-    def createBlockMesh(self):
+    def weiteBlockMeshDict(self):
+        self.maxX, self.maxY, self.maxZ = float(self.maxXInput.text()), float(self.maxYInput.text()), float(self.maxZInput.text())
+        self.minX, self.minY, self.minZ = float(self.minXInput.text()), float(self.minYInput.text()), float(self.minZInput.text())
+        self.pX, self.pY, self.pZ = float(self.pointXInput.text()), float(self.pointYInput.text()), float(self.pointZInput.text())
+        self.gradX, self.gradY, self.gradZ = float(self.gradXInput.text()), float(self.gradYInput.text()), float(self.gradZInput.text())
+        self.cellNX, self.cellNY, self.cellNZ  = int(self.cellNumXInput.text()), int(self.cellNumYinput.text()), int(self.cellNumZInput.text())
+
         aa = glob.glob(self.caseDir + '/system')
         if aa == []:
             os.system('mkdir ' + self.caseDir + '/system')
@@ -95,13 +96,13 @@ class blockMesh(QDialog, Ui_blockMesh):
         f.write('/*--------------------------------*- C++ -*----------------------------------*\ \n')
         f.write('| =========                 |                                                 | \n')
         f.write('| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           | \n')
-        f.write('|  \\    /   O peration     | Version:  2.2.0                                 | \n')
-        f.write('|   \\  /    A nd           | Web:      www.OpenFOAM.org                      | \n')
+        f.write('|  \\    /   O peration     | Version:  v1906                                 | \n')
+        f.write('|   \\  /    A nd           | Web:      www.OpenFOAM.com                      | \n')
         f.write('|    \\/     M anipulation  |                                                 | \n')
         f.write('\*---------------------------------------------------------------------------*/ \n')
         f.write('FoamFile \n')
         f.write('{ \n')
-        f.write('    version     2.0; \n')
+        f.write('    version     v1906; \n')
         f.write('    format      ascii; \n')
         f.write('    class       dictionary; \n')
         f.write('    object      blockMeshDict; \n')
@@ -111,18 +112,18 @@ class blockMesh(QDialog, Ui_blockMesh):
         f.write('convertToMeters 1; \n')
         f.write('vertices \n')
         f.write('( \n')
-        f.write('   ( ' + dic['minx'] + ' ' + dic['miny'] + ' ' + dic['minz'] + ' ) \n') 
-        f.write('   ( ' + dic['maxx'] + ' ' + dic['miny'] + ' ' + dic['minz'] + ' ) \n')         
-        f.write('   ( ' + dic['maxx'] + ' ' + dic['maxy'] + ' ' + dic['minz'] + ' ) \n')         
-        f.write('   ( ' + dic['minx'] + ' ' + dic['maxy'] + ' ' + dic['minz'] + ' ) \n')         
-        f.write('   ( ' + dic['minx'] + ' ' + dic['miny'] + ' ' + dic['maxz'] + ' ) \n')         
-        f.write('   ( ' + dic['maxx'] + ' ' + dic['miny'] + ' ' + dic['maxz'] + ' ) \n') 
-        f.write('   ( ' + dic['maxx'] + ' ' + dic['maxy'] + ' ' + dic['maxz'] + ' ) \n') 
-        f.write('   ( ' + dic['minx'] + ' ' + dic['maxy'] + ' ' + dic['maxz'] + ' ) \n') 
+        f.write('   ( ' + str(self.minX) + ' ' + str(self.minY) + ' ' + str(self.minZ) + ' ) \n') 
+        f.write('   ( ' + str(self.maxX) + ' ' + str(self.minY) + ' ' + str(self.minZ) + ' ) \n')         
+        f.write('   ( ' + str(self.maxX) + ' ' + str(self.maxY) + ' ' + str(self.minZ) + ' ) \n')         
+        f.write('   ( ' + str(self.minX) + ' ' + str(self.maxY) + ' ' + str(self.minZ) + ' ) \n')         
+        f.write('   ( ' + str(self.minX) + ' ' + str(self.minY) + ' ' + str(self.maxZ) + ' ) \n')         
+        f.write('   ( ' + str(self.maxX) + ' ' + str(self.minY) + ' ' + str(self.maxZ) + ' ) \n') 
+        f.write('   ( ' + str(self.maxX) + ' ' + str(self.maxY) + ' ' + str(self.maxZ) + ' ) \n') 
+        f.write('   ( ' + str(self.minX) + ' ' + str(self.maxY) + ' ' + str(self.maxZ) + ' ) \n') 
         f.write(');\n')
         f.write('blocks\n')
         f.write('(\n')
-        f.write('    hex (0 1 2 3 4 5 6 7) (' + dic['nodex'] + ' ' + dic['nodey'] + ' ' + dic['nodez'] + ') simpleGrading (1 1 1)\n')
+        f.write('    hex (0 1 2 3 4 5 6 7) (' + str(self.cellNX) + ' ' + str(self.cellNY) + ' ' + str(self.cellNZ) + ') simpleGrading (' + str(self.gradX) + ' ' + str(self.gradY) + ' ' + str(self.gradZ) +')\n')
         f.write(');\n')
         f.write('edges\n')
         f.write('(\n')
@@ -188,3 +189,6 @@ class blockMesh(QDialog, Ui_blockMesh):
            
         f.close() 
     #-------------------------------------------------------------------------------------------------
+
+    def createBlockMesh(self):
+        os.system("batch -i -c blockMesh > log")
