@@ -25,8 +25,10 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
         self.setUpMessagePanel()
 
         self.connectWires()
+
         self.showMaximized()
         self.show()
+
     #------------------------------------------------------------------------------
     def setUpGlobalPanels(self):
 
@@ -236,8 +238,15 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
     #------------------------------------------------------------------------------
     def clearLayout(self, layout):
-        for i in reversed(range(layout.count())): 
-            layout.itemAt(i).widget().setParent(None)
+        if cur_lay is not None:
+            while cur_lay.count():
+                item = cur_lay.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.clearLayout(item.layout())
+            sip.delete(cur_lay)
 
     #------------------------------------------------------------------------------
     def setUpMessagePanel(self):
@@ -265,35 +274,35 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
         if curr == "Box":
             tempHboxLayout = QtWidgets.QVBoxLayout()
-            self.tempBox = createBox(self.vtkWindow)
+            self.tempBox = createBox(self.render)
             tempHboxLayout.addWidget(self.tempBox)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif curr == "Sphere":
             tempHboxLayout = QtWidgets.QVBoxLayout()
-            self.tempSphere = createSphere(self.vtkWindow)
+            self.tempSphere = createSphere(self.render)
             tempHboxLayout.addWidget(self.tempSphere)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif curr == "Cylinder":
             tempHboxLayout = QtWidgets.QVBoxLayout()
-            self.tempCylinder = createCylinder(self.vtkWindow)
+            self.tempCylinder = createCylinder(self.render)
             tempHboxLayout.addWidget(self.tempCylinder)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif curr == "Cone":
             tempHboxLayout = QtWidgets.QVBoxLayout()
-            self.tempCone = createCone(self.vtkWindow)
+            self.tempCone = createCone(self.render)
             tempHboxLayout.addWidget(self.tempCone)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
 
         elif curr == "blockMesh":
             tempHboxLayout = QtWidgets.QVBoxLayout()
-            self.blockMesh = blockMesh(self.vtkWindow)
+            self.blockMesh = blockMesh(self.render)
             tempHboxLayout.addWidget(self.blockMesh)
             self.clearLayout(self.propertyBox.layout())
             self.propertyBox.setLayout(tempHboxLayout)
@@ -315,7 +324,7 @@ class GlobalWindow(QMainWindow, Ui_OpenFOAM):
 
         self.actor.SetMapper(self.mapper)
         # set the presentation style
-        actorProper = self.actor.GetProperty()  # property of the VTK view
+        actorProper = self.actor.GetProperty()
 
         # show the mesh edge, it is using the surface and integralMesh together
         actorProper.EdgeVisibilityOn()

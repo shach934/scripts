@@ -11,18 +11,19 @@ from Ui_createCylinder import Ui_createCylinder
 doubleValidator = QtGui.QDoubleValidator()
 integelValidator = QtGui.QIntValidator(1, 1000)
 
+#------------------------------------------------------------------------------
 class createBox(QDialog, Ui_createBox):
 
-    def __init__(self, Panel_VTK, parent=None):
+    def __init__(self, render, parent=None):
         self.colorTable = vtk.vtkNamedColors()
         super(createBox, self).__init__(parent)
-        self.outPut = Panel_VTK
+        self.render = render
         self.box = vtk.vtkCubeSource()
         self.setupUi(self) 
         self.validInput()
         self.monitor()
         self.drawBox()
-
+        self.show()
     def validInput(self):
         self.boxCenterXInput.setValidator(doubleValidator)
         self.boxCenterYInput.setValidator(doubleValidator)
@@ -42,7 +43,7 @@ class createBox(QDialog, Ui_createBox):
         self.boxCenterZInput.textChanged['QString'].connect(self.drawBox)
 
         self.boxColorCombox.currentTextChanged.connect(self.drawBox)
-        self.createBoxBtn.clicked.connect(self.addBox)
+        self.createBoxBtn.clicked.connect(self.saveBox)
 
     def drawBox(self):
         self.box.SetCenter([float(self.boxCenterXInput.text()), float(self.boxCenterYInput.text()), float(self.boxCenterZInput.text())])
@@ -54,26 +55,24 @@ class createBox(QDialog, Ui_createBox):
         self.box_mapper.SetInputConnection(self.box.GetOutputPort())
         self.box_actor = vtk.vtkActor()
         self.box_actor.SetMapper(self.box_mapper)
-        #TODO: try to transfer the text color name to a rgb array
         color = self.colorTable.GetColor3d(self.boxColorCombox.currentText())
         self.box_actor.GetProperty().SetColor(color);
-        self.outPut.add2Render(self.box_actor)
+        self.render.AddActor(self.box_actor)
 
-    def addBox(self):
-        filename = self.boxNameInput.text() + ".stl" 
+    def saveBox(self, path):
+        filename = path + "/" + self.boxNameInput.text() + ".stl" 
         writer = vtk.vtkSTLWriter() 
         writer.SetFileName(filename) 
         writer.SetInputConnection(self.box.GetOutputPort()) 
         writer.Write() 
-		
-doubleValidator = QtGui.QDoubleValidator()
 
+#------------------------------------------------------------------------------
 class createSphere(QDialog, Ui_createSphere):
 
-    def __init__(self, Panel_VTK, parent=None):
+    def __init__(self, render, parent=None):
         self.colorTable = vtk.vtkNamedColors()
         super(createSphere, self).__init__(parent)
-        self.outPut = Panel_VTK
+        self.render = render
         self.sphere = vtk.vtkSphereSource()
         self.setupUi(self) 
         self.validInput()
@@ -100,7 +99,7 @@ class createSphere(QDialog, Ui_createSphere):
         self.sphereRadiusInput.textChanged["QString"].connect(self.drawSphere)
 
         self.sphereColorCombox.currentTextChanged.connect(self.drawSphere)
-        self.createSphereBtn.clicked.connect(self.addSphere)
+        self.createSphereBtn.clicked.connect(self.saveSphere)
 
     def drawSphere(self):
         self.sphere.SetCenter([float(self.sphereCenterXInput.text()), float(self.sphereCenterYInput.text()), float(self.sphereCenterZInput.text())])
@@ -118,10 +117,10 @@ class createSphere(QDialog, Ui_createSphere):
 
         color = self.colorTable.GetColor3d(self.sphereColorCombox.currentText())
         self.sphere_actor.GetProperty().SetColor(color);
-        self.outPut.add2Render(self.sphere_actor)
+        self.render.AddActor(self.sphere_actor)
 
-    def addSphere(self):
-        filename = self.sphereNameInput.text() + "stl" 
+    def saveSphere(self, path):
+        filename = path + "/" + self.sphereNameInput.text() + "stl" 
         self.sphere.SetThetaResolution(int(self.sphereResoluThetaInput.text())) 
         self.sphere.SetPhiResolution(int(self.sphereResoluPhiInput.text())) 
         
@@ -130,12 +129,13 @@ class createSphere(QDialog, Ui_createSphere):
         writer.SetInputConnection(self.sphere.GetOutputPort()) 
         writer.Write() 
 
+#------------------------------------------------------------------------------
 class createCylinder(QDialog, Ui_createCylinder):
 
-    def __init__(self, Panel_VTK, parent=None):
+    def __init__(self, render, parent=None):
         self.colorTable = vtk.vtkNamedColors()
         super(createCylinder, self).__init__(parent)
-        self.outPut = Panel_VTK
+        self.render = render
         self.cylinder = vtk.vtkCylinderSource()
         self.setupUi(self) 
         self.validInput()
@@ -161,7 +161,7 @@ class createCylinder(QDialog, Ui_createCylinder):
         self.cylinderCenterZInput.textChanged['QString'].connect(self.drawCylinder)
 
         self.cylinderColorCombox.currentTextChanged.connect(self.drawCylinder)
-        self.createCylinderBtn.clicked.connect(self.addCylinder)
+        self.createCylinderBtn.clicked.connect(self.saveCylinder)
 
     def drawCylinder(self):
         self.cylinder.SetCenter([float(self.cylinderCenterXInput.text()), float(self.cylinderCenterYInput.text()), float(self.cylinderCenterZInput.text())])
@@ -176,22 +176,23 @@ class createCylinder(QDialog, Ui_createCylinder):
 
         color = self.colorTable.GetColor3d(self.cylinderColorCombox.currentText())
         self.cylinder_actor.GetProperty().SetColor(color);
-        self.outPut.add2Render(self.cylinder_actor)
+        self.render.AddActor(self.cylinder_actor)
 
-    def addCylinder(self):
-        filename = self.cylinderNameInput.text() + "stl" 
+    def saveCylinder(self, path):
+        filename = path + "/" + self.cylinderNameInput.text() + "stl" 
         self.cylinder.SetResolution(int(self.cylinderResoluInput.text())) 
         
         writer = vtk.vtkSTLWriter() 
         writer.SetFileName(filename) 
         writer.SetInputConnection(self.cylinder.GetOutputPort()) 
         writer.Write() 
-		
+
+#------------------------------------------------------------------------------
 class createCone(QDialog, Ui_createCone):
-    def __init__(self, Panel_VTK, parent=None):
+    def __init__(self, render, parent=None):
         self.colorTable = vtk.vtkNamedColors()
         super(createCone, self).__init__(parent)
-        self.outPut = Panel_VTK
+        self.render = render
         self.cone = vtk.vtkConeSource()
         self.setupUi(self) 
         self.validInput()
@@ -225,9 +226,9 @@ class createCone(QDialog, Ui_createCone):
         self.coneCenterZInput.textChanged['QString'].connect(self.drawCone)
 
         self.coneColorCombox.currentTextChanged.connect(self.drawCone)
-        self.createConeBtn.clicked.connect(self.addCone)
+        self.createConeBtn.clicked.connect(self.saveCone)
 
-    def drawCone(self):
+    def drawCone(self, window):
         self.cone.SetCenter([float(self.coneCenterXInput.text()), float(self.coneCenterYInput.text()), float(self.coneCenterZInput.text())])
         self.cone.SetHeight(float(self.coneHeightInput.text()))
         self.cone.SetRadius(float(self.coneRadiusInput.text()))
@@ -241,10 +242,10 @@ class createCone(QDialog, Ui_createCone):
 
         color = self.colorTable.GetColor3d(self.coneColorCombox.currentText())
         self.cone_actor.GetProperty().SetColor(color);
-        self.outPut.add2Render(self.cone_actor)
+        self.render.AddActor(self.cone_actor)
 
-    def addCone(self):
-        filename = self.coneNameInput.text() + "stl" 
+    def saveCone(self, path):
+        filename = path + "/" + self.coneNameInput.text() + "stl" 
         self.cone.SetResolution(int(self.coneResoluInput.text())) 
         
         writer = vtk.vtkSTLWriter() 
